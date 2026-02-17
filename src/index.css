@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================
+   GLOBAL BASE (CLEAN)
+========================= */
+
+:root{
+  --accent: #ea580c;
+  --text: #111111;
+
+  /* cursor light defaults */
+  --mx: 50vw;
+  --my: 20vh;
+}
+
+html, body, #root{
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+html{
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+body{
+  background: transparent;
+  color: var(--text);
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+}
+
+#root{
+  background: transparent;
+}
+
+a{ color: inherit; text-decoration: none; }
+button{ font: inherit; }
+
+/* =========================
+   CURSOR REACTIVE LIGHT
+========================= */
+
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(
+      circle at var(--mx) var(--my),
+      rgba(0,0,0,0.06),
+      transparent 55%
+    );
+  mix-blend-mode: multiply;
+}
+
+/* =========================
+   MOOD -> ACCENT
+========================= */
+
+body[data-mood="sod"]{ --accent:#ea580c; }
+body[data-mood="chat"]{ --accent:#0ea5e9; }
+
+/*
+  אם תרצה hover גלובלי בעתיד, תוסיף פה property אמיתי
+  (למשל: outline / filter / underline וכו').
+  לא להשאיר ruleset ריק.
+*/
