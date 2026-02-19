@@ -1,7 +1,8 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
-  base: "/RomiSinizkey-CV-Website-Personal-Portfolio/",
-});
+  // רק בפרודקשן (deploy) נוסיף base של הריפו
+  base: mode === "production" ? "/RomiSinizkey-CV-Website-Personal-Portfolio/" : "/",
+}));

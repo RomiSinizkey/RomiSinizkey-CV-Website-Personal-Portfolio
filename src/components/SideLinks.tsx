@@ -44,6 +44,7 @@ export default function SideLinks() {
 
   return (
     <div
+      id="side-links"
       style={{
         position: "fixed",
         left: 24,

@@ -72,3 +72,21 @@ body[data-mood="chat"]{ --accent:#0ea5e9; }
   (למשל: outline / filter / underline וכו').
   לא להשאיר ruleset ריק.
 */
+
+
+/* AI highlight ring */
+.ai-highlight{
+  position: relative;
+  border-radius: 18px;
+  outline: 3px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  box-shadow:
+    0 0 0 10px color-mix(in srgb, var(--accent) 18%, transparent),
+    0 22px 70px rgba(0,0,0,0.18);
+  animation: aiPulse 1.8s ease-in-out;
+}
+
+@keyframes aiPulse{
+  0%   { transform: translateZ(0) scale(1); }
+  30%  { transform: translateZ(0) scale(1.01); }
+  100% { transform: translateZ(0) scale(1); }
+}
