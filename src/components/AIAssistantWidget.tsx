@@ -569,8 +569,11 @@ export default function AIAssistantWidget() {
               width: 30,
               height: 30,
               borderRadius: 9999,
-              background: open ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0)",
-              filter: open ? "blur(10px)" : "blur(0px)",
+               // ✅ no filter blur (fixes warning)
+              background: "transparent",
+              boxShadow: open
+                ? "0 0 0 10px rgba(255,255,255,0.10), 0 0 24px 10px rgba(255,255,255,0.18)"
+                : "0 0 0 0 rgba(0,0,0,0)",
               opacity: open ? 0.35 : 0.0,
               pointerEvents: "none",
             }}
