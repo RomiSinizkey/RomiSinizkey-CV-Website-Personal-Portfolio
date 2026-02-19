@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -98,18 +98,8 @@ function AgentAvatar({ open }: { open: boolean }) {
 function SparkleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 2l1.2 5.2L18 8.4l-4.8 1.2L12 14l-1.2-4.4L6 8.4l4.8-1.2L12 2z"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M19 13l.6 2.6L22 16l-2.4.4L19 19l-.6-2.6L16 16l2.4-.4L19 13z"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
+      <path d="M12 2l1.2 5.2L18 8.4l-4.8 1.2L12 14l-1.2-4.4L6 8.4l4.8-1.2L12 2z" stroke="white" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M19 13l.6 2.6L22 16l-2.4.4L19 19l-.6-2.6L16 16l2.4-.4L19 13z" stroke="white" strokeWidth="2" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -125,7 +115,9 @@ function SendIcon() {
 export default function AIAssistantWidget() {
   const navigate = useNavigate();
   const location = useLocation();
-
+  // 📌 position of NEED HELP button (fixed anchor)
+  const BTN_LEFT = 0;
+  const BTN_TOP = 117;
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"full" | "mini">("full");
   const [typing, setTyping] = useState(false);
@@ -138,51 +130,13 @@ export default function AIAssistantWidget() {
 
   const endRef = useRef<HTMLDivElement | null>(null);
 
-  const btnRef = useRef<HTMLButtonElement | null>(null);
-  const panelRef = useRef<HTMLDivElement | null>(null);
-
-  // your positions
-  const BTN_LEFT = 0;
-  const BTN_TOP = 117;
-
-  const HOST_PAD = 14;
-  const VIEW_MARGIN = 14;
-
-  const [panelPos, setPanelPos] = useState<{ left: number; top: number } | null>(null);
-  const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
-
-  const computePanelPos = () => {
-    const btn = btnRef.current;
-    const panel = panelRef.current;
-    if (!btn || !panel) return;
-
-    const br = btn.getBoundingClientRect();
-    const pr = panel.getBoundingClientRect();
-
-    const gap = 12;
-    const totalW = pr.width + HOST_PAD * 2;
-    const totalH = pr.height + HOST_PAD * 2;
-
-    // Prefer RIGHT of button
-    let left = br.right + gap;
-    let top = br.top;
-
-    const fitsRight = left + totalW <= window.innerWidth - VIEW_MARGIN;
-
-    if (!fitsRight) {
-      left = br.left;
-      top = br.bottom + gap;
-    }
-
-    if (top + totalH > window.innerHeight - VIEW_MARGIN) {
-      top = br.top - totalH - gap;
-    }
-
-    left = clamp(left, VIEW_MARGIN, window.innerWidth - totalW - VIEW_MARGIN);
-    top = clamp(top, VIEW_MARGIN, window.innerHeight - totalH - VIEW_MARGIN);
-
-    setPanelPos({ left, top });
-  };
+  // ✅ stable mobile detection (no addListener)
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia("(max-width: 640px)").matches);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.matchMedia("(max-width: 640px)").matches);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   useEffect(() => setMounted(true), []);
 
@@ -190,31 +144,6 @@ export default function AIAssistantWidget() {
     if (!open) return;
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [msgs, typing, open, mode]);
-
-  useLayoutEffect(() => {
-    if (!open) return;
-    requestAnimationFrame(() => computePanelPos());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, mode]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onResize = () => computePanelPos();
-    const onScroll = () => computePanelPos();
-    window.addEventListener("resize", onResize);
-    window.addEventListener("scroll", onScroll, true);
-    return () => {
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("scroll", onScroll, true);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, mode]);
-
-  const lastSnippet = useMemo(() => {
-    const last = [...msgs].reverse().find((m) => m.from === "ai" || m.from === "user");
-    if (!last) return "";
-    return last.text.length > 92 ? last.text.slice(0, 92) + "…" : last.text;
-  }, [msgs]);
 
   const goTo = async (route: string, anchorId?: string, options?: { openShowcase?: boolean }) => {
     const same = location.pathname === route;
@@ -278,17 +207,18 @@ export default function AIAssistantWidget() {
     await answer(q);
   };
 
-  // ---------------- UI: SQUARE + CLEAN ----------------
+  // ✅ panel sizes: narrower on mobile
+  const panelWFull = isMobile ? "min(320px, calc(100vw - 24px))" : "390px";
+  const panelWMini = isMobile ? "min(300px, calc(100vw - 24px))" : "320px";
+
+  // ✅ stable fixed placement: always left side, never moves
+  const PANEL_LEFT = isMobile ? 12 : 18;
+  const PANEL_TOP = isMobile ? 120 : 110; // mobile lower to avoid top-left ROMI
+  
+
   const PanelFull = (
-    <div ref={panelRef} className="w-[390px] max-w-[92vw]">
-      <div
-        style={{
-          background: "#ffffff",
-          boxShadow: "0 30px 120px rgba(0,0,0,0.18)",
-          overflow: "hidden",
-        }}
-      >
-        {/* header */}
+    <div style={{ width: panelWFull, maxWidth: "calc(100vw - 24px)" }}>
+      <div style={{ background: "#ffffff", boxShadow: "0 30px 120px rgba(0,0,0,0.18)", overflow: "hidden" }}>
         <div style={{ padding: "14px 14px 10px", display: "flex", alignItems: "center", gap: 12 }}>
           <AgentAvatar open />
           <div style={{ minWidth: 0 }}>
@@ -299,26 +229,14 @@ export default function AIAssistantWidget() {
           <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
             <button
               onClick={() => setMode("mini")}
-              style={{
-                padding: "6px 10px",
-                fontSize: 12,
-                fontWeight: 600,
-                color: "rgba(0,0,0,0.65)",
-                background: "transparent",
-              }}
+              style={{ padding: "6px 10px", fontSize: 12, fontWeight: 600, color: "rgba(0,0,0,0.65)", background: "transparent" }}
               title="Minimize"
             >
               Minimize
             </button>
             <button
               onClick={() => setOpen(false)}
-              style={{
-                padding: "6px 10px",
-                fontSize: 12,
-                fontWeight: 600,
-                color: "rgba(0,0,0,0.65)",
-                background: "transparent",
-              }}
+              style={{ padding: "6px 10px", fontSize: 12, fontWeight: 600, color: "rgba(0,0,0,0.65)", background: "transparent" }}
               title="Close"
             >
               Close
@@ -326,21 +244,13 @@ export default function AIAssistantWidget() {
           </div>
         </div>
 
-        {/* suggestions */}
         <div style={{ padding: "0 14px 10px" }}>
           <div style={{ display: "flex", gap: 8, overflowX: "auto" }}>
             {SUGGESTIONS.map((s) => (
               <button
                 key={s}
                 onClick={() => quickAsk(s)}
-                style={{
-                  padding: "8px 10px",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  background: "rgba(0,0,0,0.05)",
-                  color: "rgba(0,0,0,0.65)",
-                  whiteSpace: "nowrap",
-                }}
+                style={{ padding: "8px 10px", fontSize: 12, fontWeight: 600, background: "rgba(0,0,0,0.05)", color: "rgba(0,0,0,0.65)", whiteSpace: "nowrap" }}
               >
                 {s}
               </button>
@@ -348,16 +258,8 @@ export default function AIAssistantWidget() {
           </div>
         </div>
 
-        {/* messages */}
         <div style={{ padding: "0 14px 12px" }}>
-          <div
-            style={{
-              background: "#f3f4f6",
-              padding: 12,
-              maxHeight: "min(46vh, 340px)",
-              overflow: "auto",
-            }}
-          >
+          <div style={{ background: "#f3f4f6", padding: 12, maxHeight: "min(46vh, 340px)", overflow: "auto" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {msgs.map((m) => (
                 <div key={m.id} style={{ display: "flex", justifyContent: m.from === "user" ? "flex-end" : "flex-start" }}>
@@ -390,7 +292,6 @@ export default function AIAssistantWidget() {
           </div>
         </div>
 
-        {/* input */}
         <div style={{ padding: "12px 14px 14px", background: "#ffffff" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, background: "#f3f4f6", padding: "10px 12px" }}>
@@ -431,34 +332,24 @@ export default function AIAssistantWidget() {
   );
 
   const PanelMini = (
-    <div ref={panelRef} className="w-[320px] max-w-[86vw]">
-      <div
-        style={{
-          background: "#ffffff",
-          boxShadow: "0 22px 80px rgba(0,0,0,0.18)",
-          overflow: "hidden",
-        }}
-      >
+    <div style={{ width: panelWMini, maxWidth: "calc(100vw - 24px)" }}>
+      <div style={{ background: "#ffffff", boxShadow: "0 22px 80px rgba(0,0,0,0.18)", overflow: "hidden" }}>
         <div style={{ padding: 12, display: "flex", alignItems: "center", gap: 12 }}>
           <AgentAvatar open />
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(0,0,0,0.82)" }}>AI Assistant</div>
             <div style={{ fontSize: 12, color: "rgba(0,0,0,0.60)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {lastSnippet}
+              {(() => {
+                const last = [...msgs].reverse().find((m) => m.from === "ai" || m.from === "user");
+                if (!last) return "";
+                return last.text.length > 92 ? last.text.slice(0, 92) + "…" : last.text;
+              })()}
             </div>
           </div>
 
           <button
             onClick={() => setMode("full")}
-            style={{
-              background: "var(--accent)",
-              color: "white",
-              padding: "10px 14px",
-              fontSize: 12,
-              fontWeight: 700,
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-            }}
+            style={{ background: "var(--accent)", color: "white", padding: "10px 14px", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}
           >
             Expand
           </button>
@@ -471,7 +362,6 @@ export default function AIAssistantWidget() {
 
   return createPortal(
     <>
-      {/* backdrop */}
       <AnimatePresence>
         {open ? (
           <motion.div
@@ -486,22 +376,21 @@ export default function AIAssistantWidget() {
         ) : null}
       </AnimatePresence>
 
-      {/* panel host */}
       <AnimatePresence>
         {open ? (
           <motion.div
             key="panelHost"
             style={{
               position: "fixed",
-              left: panelPos?.left ?? BTN_LEFT,
-              top: panelPos?.top ?? BTN_TOP + 56,
+              left: PANEL_LEFT,
+              top: PANEL_TOP,
               zIndex: 2147483646,
               pointerEvents: "auto",
-              padding: HOST_PAD,
+              padding: 0,
             }}
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            exit={{ opacity: 0, y: -8 }}
             transition={{ type: "spring", stiffness: 320, damping: 26 }}
           >
             {mode === "full" ? PanelFull : PanelMini}
@@ -509,128 +398,68 @@ export default function AIAssistantWidget() {
         ) : null}
       </AnimatePresence>
 
-      {/* button (still rounded per your current code – tell me if you want it square too) */}
+      {/* ✅ button shows ONLY when closed */}
+      {!open && (
         <motion.button
-          ref={btnRef}
           onClick={() => {
-            setOpen((v) => {
-              const next = !v;
-              if (next) setMode("full");
-              return next;
-            });
-            setTimeout(() => computePanelPos(), 0);
+            setOpen(true);
+            setMode("full");
           }}
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.96 }}
-          animate={{
-            scale: open ? 1 : [1, 1.01, 1],
-          }}
-          transition={{
-            duration: open ? 0.2 : 2.4,
-            repeat: open ? 0 : Infinity,
-            ease: "easeInOut",
-          }}
+          animate={{ scale: [1, 1.01, 1] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
           style={{
             position: "fixed",
             left: BTN_LEFT,
             top: BTN_TOP,
             zIndex: 2147483647,
             pointerEvents: "auto",
-
             height: 42,
             padding: "0 14px 0 10px",
             display: "inline-flex",
             alignItems: "center",
             gap: 10,
-
-            // ✅ pro look: dark when closed, accent when open
-            background: open ? "var(--accent)" : "rgba(17,17,17,0.92)",
+            background: "rgba(17,17,17,0.92)",
             color: "#fff",
-
             borderRadius: 9999,
-            border: open ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(255,255,255,0.10)",
-
-            // ✅ glass + shadow
+            border: "1px solid rgba(255,255,255,0.10)",
             backdropFilter: "blur(10px)",
-            boxShadow: open
-              ? "0 18px 52px rgba(0,0,0,0.28)"
-              : "0 14px 44px rgba(0,0,0,0.20)",
+            boxShadow: "0 14px 44px rgba(0,0,0,0.20)",
           }}
           aria-label="Open assistant help"
         >
-          {/* glow layer (behind icon) */}
           <span
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              left: 10,
-              top: "50%",
-              transform: "translateY(-50%)",
-              width: 30,
-              height: 30,
-              borderRadius: 9999,
-               // ✅ no filter blur (fixes warning)
-              background: "transparent",
-              boxShadow: open
-                ? "0 0 0 10px rgba(255,255,255,0.10), 0 0 24px 10px rgba(255,255,255,0.18)"
-                : "0 0 0 0 rgba(0,0,0,0)",
-              opacity: open ? 0.35 : 0.0,
-              pointerEvents: "none",
-            }}
-          />
-
-          {/* icon bubble */}
-          <motion.span
-            animate={{
-              rotate: open ? 0 : [0, 2, 0, -2, 0],
-            }}
-            transition={{
-              duration: 3.2,
-              repeat: open ? 0 : Infinity,
-              ease: "easeInOut",
-            }}
             style={{
               width: 28,
               height: 28,
               display: "grid",
               placeItems: "center",
               borderRadius: 9999,
-              background: open ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.12)",
+              background: "rgba(255,255,255,0.12)",
               border: "1px solid rgba(255,255,255,0.10)",
-              boxShadow: open ? "0 10px 22px rgba(0,0,0,0.16)" : "none",
               flex: "0 0 auto",
             }}
           >
             <SparkleIcon />
-          </motion.span>
+          </span>
 
-          {/* label */}
-          <span
-            style={{
-              fontSize: 13,
-              fontWeight: 800,
-              letterSpacing: "0.06em",
-              whiteSpace: "nowrap",
-              lineHeight: 1,
-            }}
-          >
+          <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: "0.06em", whiteSpace: "nowrap", lineHeight: 1 }}>
             Need help?
           </span>
 
-          {/* tiny status indicator */}
           <span
             aria-hidden="true"
             style={{
               width: 8,
               height: 8,
               borderRadius: 9999,
-              background: open ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)",
-              boxShadow: open ? "0 0 0 4px rgba(255,255,255,0.18)" : "none",
+              background: "rgba(255,255,255,0.35)",
               marginLeft: 2,
             }}
           />
         </motion.button>
-
+      )}
     </>,
     document.body
   );

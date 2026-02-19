@@ -97,16 +97,15 @@ export default function HomeProjectsShowcase() {
     };
   }, []);
 
-  const enter =
-    dir === "down"
-      ? { opacity: 0, x: 120, filter: "blur(10px)" }
-      : { opacity: 0, x: 60, filter: "blur(8px)" };
+    const enter =
+      dir === "down"
+        ? { opacity: 0, x: 120, scale: 0.985 }
+        : { opacity: 0, x: 60, scale: 0.992 };
 
-  const exit =
-    dir === "up"
-      ? { opacity: 0, x: 120, filter: "blur(10px)" }
-      : { opacity: 0, x: 60, filter: "blur(8px)" };
-
+    const exit =
+      dir === "up"
+        ? { opacity: 0, x: 120, scale: 0.985 }
+        : { opacity: 0, x: 60, scale: 0.992 };
   return (
     <>
       <ProjectFxOverlay fx={activeFx} />
@@ -117,7 +116,7 @@ export default function HomeProjectsShowcase() {
             className="fixed right-8 bottom-8 z-[9998]"
             style={{ right: 32, bottom: 70 }}
             initial={enter}
-            animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={exit}
             transition={{ type: "spring", stiffness: 260, damping: 24 }}
           >
