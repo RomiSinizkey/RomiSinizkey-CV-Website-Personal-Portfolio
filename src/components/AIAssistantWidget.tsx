@@ -399,67 +399,82 @@ export default function AIAssistantWidget() {
       </AnimatePresence>
 
       {/* ✅ button shows ONLY when closed */}
-      {!open && (
-        <motion.button
-          onClick={() => {
-            setOpen(true);
-            setMode("full");
-          }}
-          whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.96 }}
-          animate={{ scale: [1, 1.01, 1] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-          style={{
-            position: "fixed",
-            left: BTN_LEFT,
-            top: BTN_TOP,
-            zIndex: 2147483647,
-            pointerEvents: "auto",
-            height: 42,
-            padding: "0 14px 0 10px",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 10,
-            background: "rgba(17,17,17,0.92)",
-            color: "#fff",
-            borderRadius: 9999,
-            border: "1px solid rgba(255,255,255,0.10)",
-            backdropFilter: "blur(10px)",
-            boxShadow: "0 14px 44px rgba(0,0,0,0.20)",
-          }}
-          aria-label="Open assistant help"
-        >
-          <span
+        {!open && (
+          <motion.button
+            onClick={() => {
+              setOpen(true);
+              setMode("full");
+            }}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.96 }}
+            animate={isMobile ? undefined : { scale: [1, 1.01, 1] }}
+            transition={isMobile ? undefined : { duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+            title="Need help?"
+            aria-label="Need help?"
             style={{
-              width: 28,
-              height: 28,
-              display: "grid",
-              placeItems: "center",
-              borderRadius: 9999,
-              background: "rgba(255,255,255,0.12)",
+              position: "fixed",
+              left: BTN_LEFT,
+              top: BTN_TOP,
+              zIndex: 2147483647,
+              pointerEvents: "auto",
+
+              // ✅ mobile = icon-only circle, desktop = pill with text
+              height: isMobile ? 46 : 42,
+              width: isMobile ? 46 : "auto",
+              padding: isMobile ? 0 : "0 14px 0 10px",
+
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: isMobile ? 0 : 10,
+
+              background: "rgba(17,17,17,0.92)",
+              color: "#fff",
+
+              borderRadius: isMobile ? 9999 : 9999,
               border: "1px solid rgba(255,255,255,0.10)",
-              flex: "0 0 auto",
+              backdropFilter: "blur(10px)",
+              boxShadow: "0 14px 44px rgba(0,0,0,0.20)",
             }}
           >
-            <SparkleIcon />
-          </span>
+            {/* icon bubble */}
+            <span
+              style={{
+                width: isMobile ? 30 : 28,
+                height: isMobile ? 30 : 28,
+                display: "grid",
+                placeItems: "center",
+                borderRadius: 9999,
+                background: "rgba(255,255,255,0.12)",
+                border: "1px solid rgba(255,255,255,0.10)",
+                flex: "0 0 auto",
+              }}
+            >
+              <SparkleIcon />
+            </span>
 
-          <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: "0.06em", whiteSpace: "nowrap", lineHeight: 1 }}>
-            Need help?
-          </span>
+            {/* ✅ desktop-only label */}
+            {!isMobile && (
+              <>
+                <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: "0.06em", whiteSpace: "nowrap", lineHeight: 1 }}>
+                  Need help?
+                </span>
 
-          <span
-            aria-hidden="true"
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: 9999,
-              background: "rgba(255,255,255,0.35)",
-              marginLeft: 2,
-            }}
-          />
-        </motion.button>
-      )}
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 9999,
+                    background: "rgba(255,255,255,0.35)",
+                    marginLeft: 2,
+                  }}
+                />
+              </>
+            )}
+          </motion.button>
+        )}
+
     </>,
     document.body
   );
