@@ -3,12 +3,11 @@
 ========================= */
 
 .topNav{
-  position: absolute;           /* ✅ לא יזוז עם הגלילה */
-  top: 14px;
-  right: 22px;
+  position: fixed; /* ✅ במקום absolute: קשור למסך ולא לגובה הדף */
+  top: calc(14px + env(safe-area-inset-top));
+  right: calc(22px + env(safe-area-inset-right));
   z-index: 99999;
 
-  /* ביטול תזוזות/טריקים חיצוניים */
   left: auto;
   bottom: auto;
   transform: none;
@@ -51,14 +50,14 @@
   border: 0;
   cursor: pointer;
 
-  font-family: inherit;      /* ✅ */
+  font-family: inherit;
 }
 
 .topNavLabel{
-  font-family: inherit;      /* ✅ */
+  font-family: inherit;
   font-size: 10.5px;
   font-weight: 650;
-  letter-spacing: 0.12em;    /* טיפה פחות “כבד” */
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(0,0,0,0.72);
   transition: color 160ms ease;
@@ -81,7 +80,7 @@
 @media (max-width: 900px){
   .topNav{
     top: 50%;
-    right: 14px;
+    right: calc(14px + env(safe-area-inset-right));
     transform: translateY(-50%);
   }
 
