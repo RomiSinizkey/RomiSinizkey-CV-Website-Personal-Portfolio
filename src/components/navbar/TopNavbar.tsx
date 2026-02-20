@@ -1,5 +1,6 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import type React from "react";
+import { useState } from "react";
+import type { MouseEvent } from "react";
 
 const links = [
   { label: "Home", to: "/" },
@@ -19,7 +20,6 @@ function fireShowcaseOpen() {
 function scrollToProjectsPreview() {
   const el = document.getElementById("projects-preview");
   if (!el) return;
-
   const y = el.getBoundingClientRect().top + window.scrollY - 24;
   window.scrollTo({ top: y, behavior: "smooth" });
 }
@@ -27,33 +27,36 @@ function scrollToProjectsPreview() {
 export default function TopNavbar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
 
-  const onProjectsClick = (e: React.MouseEvent) => {
+  const onProjectsClick = (e: MouseEvent) => {
     e.preventDefault();
 
     if (location.pathname === "/") {
-      // ✅ כבר ב-Home: הדלקה + גלילה
       fireShowcaseOpen();
       scrollToProjectsPreview();
       return;
     }
 
-    // ✅ לא ב-Home: נווט ל-Home, והוא ידליק אחרי mount
     navigate("/", { state: { scrollTo: "projects-preview", openShowcase: true } });
   };
 
   return (
-    <header className="topNav">
+    <header className={`topNav ${collapsed ? "isCollapsed" : ""}`}>
+      <button
+        className="topNavToggle"
+        type="button"
+        onClick={() => setCollapsed((v) => !v)}
+        aria-label="Toggle navigation"
+      >
+        <span className="topNavChevron">{collapsed ? "›" : "‹"}</span>
+      </button>
+
       <nav className="topNavInner" aria-label="Primary">
         {links.map((l) => {
           if (l.label === "Projects") {
             return (
-              <a
-                key={l.label}
-                href="/projects"
-                className="topNavItem"
-                onClick={onProjectsClick}
-              >
+              <a key={l.label} href="/projects" className="topNavItem" onClick={onProjectsClick}>
                 <span className="topNavLabel">Projects</span>
               </a>
             );

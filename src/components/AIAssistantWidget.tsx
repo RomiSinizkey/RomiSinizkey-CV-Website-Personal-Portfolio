@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -115,11 +115,12 @@ function SendIcon() {
 export default function AIAssistantWidget() {
   const navigate = useNavigate();
   const location = useLocation();
-  // 📌 position of NEED HELP button (fixed anchor)
+
+  // Button anchor (when closed)
   const BTN_LEFT = 0;
   const BTN_TOP = 117;
+
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<"full" | "mini">("full");
   const [typing, setTyping] = useState(false);
   const [input, setInput] = useState("");
   const [mounted, setMounted] = useState(false);
@@ -128,9 +129,8 @@ export default function AIAssistantWidget() {
     { id: uid(), from: "ai", text: "Hey 👋 I’m your assistant. Ask where something is, or tap a quick action." },
   ]);
 
-  const endRef = useRef<HTMLDivElement | null>(null);
+  const scrollBoxRef = useRef<HTMLDivElement | null>(null);
 
-  // ✅ stable mobile detection (no addListener)
   const [isMobile, setIsMobile] = useState(() => window.matchMedia("(max-width: 640px)").matches);
   useEffect(() => {
     const onResize = () => setIsMobile(window.matchMedia("(max-width: 640px)").matches);
@@ -140,10 +140,15 @@ export default function AIAssistantWidget() {
 
   useEffect(() => setMounted(true), []);
 
+  // keep chat pinned to bottom
   useEffect(() => {
     if (!open) return;
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [msgs, typing, open, mode]);
+    const el = scrollBoxRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
+  }, [msgs, typing, open]);
 
   const goTo = async (route: string, anchorId?: string, options?: { openShowcase?: boolean }) => {
     const same = location.pathname === route;
@@ -202,41 +207,45 @@ export default function AIAssistantWidget() {
 
   const quickAsk = async (q: string) => {
     if (!open) setOpen(true);
-    if (mode !== "full") setMode("full");
     setMsgs((m) => [...m, { id: uid(), from: "user", text: q }]);
     await answer(q);
   };
 
-  // ✅ panel sizes: narrower on mobile
-  const panelWFull = isMobile ? "min(320px, calc(100vw - 24px))" : "390px";
-  const panelWMini = isMobile ? "min(300px, calc(100vw - 24px))" : "320px";
+  const panelW = isMobile ? "min(260px, calc(100vw - 24px))" : "260px";
+  const PANEL_LEFT = isMobile ? 10 : 16;
+  const V_PAD = isMobile ? 18 : 20;
+  const FULL_H = 300;
 
-  // ✅ stable fixed placement: always left side, never moves
-  const PANEL_LEFT = isMobile ? 12 : 18;
-  const PANEL_TOP = isMobile ? 120 : 110; // mobile lower to avoid top-left ROMI
-  
+  const PanelShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <div
+      style={{
+        background: "#ffffff",
+        boxShadow: "0 30px 120px rgba(0,0,0,0.18)",
+        overflow: "hidden",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {children}
+    </div>
+  );
 
   const PanelFull = (
-    <div style={{ width: panelWFull, maxWidth: "calc(100vw - 24px)" }}>
-      <div style={{ background: "#ffffff", boxShadow: "0 30px 120px rgba(0,0,0,0.18)", overflow: "hidden" }}>
-        <div style={{ padding: "14px 14px 10px", display: "flex", alignItems: "center", gap: 12 }}>
+    <div style={{ width: panelW, maxWidth: "calc(100vw - 24px)", height: "100%" }}>
+      <PanelShell>
+        {/* header */}
+        <div style={{ padding: "12px 12px 8px", display: "flex", alignItems: "center", gap: 10, flex: "0 0 auto" }}>
           <AgentAvatar open />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(0,0,0,0.85)" }}>AI Assistant</div>
-            <div style={{ fontSize: 12, color: "rgba(0,0,0,0.55)" }}>Ask me to navigate.</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(0,0,0,0.85)" }}>AI Assistant</div>
+            <div style={{ fontSize: 11.5, color: "rgba(0,0,0,0.55)" }}>Ask me to navigate.</div>
           </div>
 
-          <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-            <button
-              onClick={() => setMode("mini")}
-              style={{ padding: "6px 10px", fontSize: 12, fontWeight: 600, color: "rgba(0,0,0,0.65)", background: "transparent" }}
-              title="Minimize"
-            >
-              Minimize
-            </button>
+          <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
             <button
               onClick={() => setOpen(false)}
-              style={{ padding: "6px 10px", fontSize: 12, fontWeight: 600, color: "rgba(0,0,0,0.65)", background: "transparent" }}
+              style={{ padding: "6px 8px", fontSize: 11.5, fontWeight: 600, color: "rgba(0,0,0,0.65)", background: "transparent" }}
               title="Close"
             >
               Close
@@ -244,13 +253,21 @@ export default function AIAssistantWidget() {
           </div>
         </div>
 
-        <div style={{ padding: "0 14px 10px" }}>
+        {/* suggestions */}
+        <div style={{ padding: "0 12px 8px", flex: "0 0 auto" }}>
           <div style={{ display: "flex", gap: 8, overflowX: "auto" }}>
             {SUGGESTIONS.map((s) => (
               <button
                 key={s}
                 onClick={() => quickAsk(s)}
-                style={{ padding: "8px 10px", fontSize: 12, fontWeight: 600, background: "rgba(0,0,0,0.05)", color: "rgba(0,0,0,0.65)", whiteSpace: "nowrap" }}
+                style={{
+                  padding: "7px 9px",
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  background: "rgba(0,0,0,0.05)",
+                  color: "rgba(0,0,0,0.65)",
+                  whiteSpace: "nowrap",
+                }}
               >
                 {s}
               </button>
@@ -258,17 +275,27 @@ export default function AIAssistantWidget() {
           </div>
         </div>
 
-        <div style={{ padding: "0 14px 12px" }}>
-          <div style={{ background: "#f3f4f6", padding: 12, maxHeight: "min(46vh, 340px)", overflow: "auto" }}>
+        {/* messages */}
+        <div style={{ padding: "0 12px 10px", flex: "1 1 auto", minHeight: 0 }}>
+          <div
+            ref={scrollBoxRef}
+            style={{
+              background: "#f3f4f6",
+              padding: 9,
+              height: "100%",
+              overflowY: "auto",
+              overflowX: "hidden",
+            }}
+          >
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {msgs.map((m) => (
                 <div key={m.id} style={{ display: "flex", justifyContent: m.from === "user" ? "flex-end" : "flex-start" }}>
                   <div
                     style={{
                       maxWidth: "85%",
-                      padding: "10px 12px",
-                      fontSize: 13,
-                      lineHeight: 1.4,
+                      padding: "9px 10px",
+                      fontSize: 12.5,
+                      lineHeight: 1.35,
                       color: m.from === "user" ? "white" : "rgba(0,0,0,0.82)",
                       background: m.from === "user" ? "var(--accent)" : "#ffffff",
                       boxShadow: m.from === "user" ? "0 10px 25px rgba(0,0,0,0.10)" : "0 6px 16px rgba(0,0,0,0.08)",
@@ -281,27 +308,26 @@ export default function AIAssistantWidget() {
 
               {typing && (
                 <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                  <div style={{ background: "#fff", padding: "10px 12px", boxShadow: "0 6px 16px rgba(0,0,0,0.08)" }}>
+                  <div style={{ background: "#fff", padding: "9px 10px", boxShadow: "0 6px 16px rgba(0,0,0,0.08)" }}>
                     <TypingDots />
                   </div>
                 </div>
               )}
-
-              <div ref={endRef} />
             </div>
           </div>
         </div>
 
-        <div style={{ padding: "12px 14px 14px", background: "#ffffff" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ flex: 1, background: "#f3f4f6", padding: "10px 12px" }}>
+        {/* input */}
+        <div style={{ padding: "10px 12px 12px", background: "#ffffff", flex: "0 0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ flex: 1, background: "#f3f4f6", padding: "9px 10px" }}>
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") onSend();
                 }}
-                style={{ width: "100%", background: "transparent", outline: "none", fontSize: 14, color: "rgba(0,0,0,0.85)" }}
+                style={{ width: "100%", background: "transparent", outline: "none", fontSize: 13, color: "rgba(0,0,0,0.85)" }}
                 placeholder='Example: "Where are the projects?"'
               />
             </div>
@@ -311,10 +337,10 @@ export default function AIAssistantWidget() {
               style={{
                 background: "var(--accent)",
                 color: "white",
-                padding: "10px 16px",
-                fontSize: 12,
+                padding: "9px 12px",
+                fontSize: 11.5,
                 fontWeight: 700,
-                letterSpacing: "0.18em",
+                letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 boxShadow: "0 12px 30px rgba(0,0,0,0.16)",
                 display: "flex",
@@ -327,38 +353,22 @@ export default function AIAssistantWidget() {
             </button>
           </div>
         </div>
-      </div>
-    </div>
-  );
-
-  const PanelMini = (
-    <div style={{ width: panelWMini, maxWidth: "calc(100vw - 24px)" }}>
-      <div style={{ background: "#ffffff", boxShadow: "0 22px 80px rgba(0,0,0,0.18)", overflow: "hidden" }}>
-        <div style={{ padding: 12, display: "flex", alignItems: "center", gap: 12 }}>
-          <AgentAvatar open />
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(0,0,0,0.82)" }}>AI Assistant</div>
-            <div style={{ fontSize: 12, color: "rgba(0,0,0,0.60)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {(() => {
-                const last = [...msgs].reverse().find((m) => m.from === "ai" || m.from === "user");
-                if (!last) return "";
-                return last.text.length > 92 ? last.text.slice(0, 92) + "…" : last.text;
-              })()}
-            </div>
-          </div>
-
-          <button
-            onClick={() => setMode("full")}
-            style={{ background: "var(--accent)", color: "white", padding: "10px 14px", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}
-          >
-            Expand
-          </button>
-        </div>
-      </div>
+      </PanelShell>
     </div>
   );
 
   if (!mounted) return null;
+
+  const hostStyle: React.CSSProperties = {
+    position: "fixed",
+    left: PANEL_LEFT,
+    top: `calc(${V_PAD}px + env(safe-area-inset-top))`,
+    height: `${FULL_H}px`,
+    width: panelW,
+    maxWidth: "calc(100vw - 24px)",
+    zIndex: 2147483646,
+    pointerEvents: "auto",
+  };
 
   return createPortal(
     <>
@@ -380,101 +390,72 @@ export default function AIAssistantWidget() {
         {open ? (
           <motion.div
             key="panelHost"
-            style={{
-              position: "fixed",
-              left: PANEL_LEFT,
-              top: PANEL_TOP,
-              zIndex: 2147483646,
-              pointerEvents: "auto",
-              padding: 0,
-            }}
+            style={hostStyle}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ type: "spring", stiffness: 320, damping: 26 }}
           >
-            {mode === "full" ? PanelFull : PanelMini}
+            <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>{PanelFull}</div>
           </motion.div>
         ) : null}
       </AnimatePresence>
 
-      {/* ✅ button shows ONLY when closed */}
-        {!open && (
-          <motion.button
-            onClick={() => {
-              setOpen(true);
-              setMode("full");
-            }}
-            whileHover={{ y: -2 }}
-            whileTap={{ scale: 0.96 }}
-            animate={isMobile ? undefined : { scale: [1, 1.01, 1] }}
-            transition={isMobile ? undefined : { duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-            title="Need help?"
-            aria-label="Need help?"
+      {!open && (
+        <motion.button
+          onClick={() => setOpen(true)}
+          whileHover={{ y: -2 }}
+          whileTap={{ scale: 0.96 }}
+          animate={isMobile ? undefined : { scale: [1, 1.01, 1] }}
+          transition={isMobile ? undefined : { duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          title="Need help?"
+          aria-label="Need help?"
+          style={{
+            position: "fixed",
+            left: BTN_LEFT,
+            top: BTN_TOP,
+            zIndex: 2147483647,
+            pointerEvents: "auto",
+            height: isMobile ? 46 : 42,
+            width: isMobile ? 46 : "auto",
+            padding: isMobile ? 0 : "0 14px 0 10px",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: isMobile ? 0 : 10,
+            background: "rgba(17,17,17,0.92)",
+            color: "#fff",
+            borderRadius: 9999,
+            border: "1px solid rgba(255,255,255,0.10)",
+            backdropFilter: "blur(10px)",
+            boxShadow: "0 14px 44px rgba(0,0,0,0.20)",
+          }}
+        >
+          <span
             style={{
-              position: "fixed",
-              left: BTN_LEFT,
-              top: BTN_TOP,
-              zIndex: 2147483647,
-              pointerEvents: "auto",
-
-              // ✅ mobile = icon-only circle, desktop = pill with text
-              height: isMobile ? 46 : 42,
-              width: isMobile ? 46 : "auto",
-              padding: isMobile ? 0 : "0 14px 0 10px",
-
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: isMobile ? 0 : 10,
-
-              background: "rgba(17,17,17,0.92)",
-              color: "#fff",
-
-              borderRadius: isMobile ? 9999 : 9999,
+              width: isMobile ? 30 : 28,
+              height: isMobile ? 30 : 28,
+              display: "grid",
+              placeItems: "center",
+              borderRadius: 9999,
+              background: "rgba(255,255,255,0.12)",
               border: "1px solid rgba(255,255,255,0.10)",
-              backdropFilter: "blur(10px)",
-              boxShadow: "0 14px 44px rgba(0,0,0,0.20)",
+              flex: "0 0 auto",
             }}
           >
-            {/* icon bubble */}
-            <span
-              style={{
-                width: isMobile ? 30 : 28,
-                height: isMobile ? 30 : 28,
-                display: "grid",
-                placeItems: "center",
-                borderRadius: 9999,
-                background: "rgba(255,255,255,0.12)",
-                border: "1px solid rgba(255,255,255,0.10)",
-                flex: "0 0 auto",
-              }}
-            >
-              <SparkleIcon />
-            </span>
+            <SparkleIcon />
+          </span>
 
-            {/* ✅ desktop-only label */}
-            {!isMobile && (
-              <>
-                <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: "0.06em", whiteSpace: "nowrap", lineHeight: 1 }}>
-                  Need help?
-                </span>
-
-                <span
-                  aria-hidden="true"
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: 9999,
-                    background: "rgba(255,255,255,0.35)",
-                    marginLeft: 2,
-                  }}
-                />
-              </>
-            )}
-          </motion.button>
-        )}
-
+          {!isMobile && (
+            <>
+              <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: "0.06em", whiteSpace: "nowrap", lineHeight: 1 }}>
+                Need help?
+              </span>
+              <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: 9999, background: "rgba(255,255,255,0.35)", marginLeft: 2 }} />
+            </>
+          )}
+        </motion.button>
+      )}
     </>,
     document.body
   );

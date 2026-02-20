@@ -1,16 +1,19 @@
 /* =========================
-   ULTRA PREMIUM NAVBAR (RESPONSIVE)
+   ULTRA PREMIUM NAVBAR (RESPONSIVE) + TOGGLE (ALL DEVICES)
 ========================= */
 
+/* base */
 .topNav{
-  position: fixed; /* ✅ במקום absolute: קשור למסך ולא לגובה הדף */
+  position: fixed; /* ✅ קשור למסך ולא לגובה הדף */
   top: calc(14px + env(safe-area-inset-top));
   right: calc(22px + env(safe-area-inset-right));
   z-index: 99999;
 
   left: auto;
   bottom: auto;
-  transform: none;
+
+  transition: transform 260ms ease, opacity 200ms ease;
+  will-change: transform;
 }
 
 .topNavInner{
@@ -63,17 +66,49 @@
   transition: color 160ms ease;
 }
 
-.topNavItem:hover .topNavLabel{
-  color: var(--accent);
-}
+.topNavItem:hover .topNavLabel{ color: var(--accent); }
 
 .topNavItem.isActive{
   background: rgba(234,88,12,0.10);
   border: 1px solid rgba(234,88,12,0.18);
 }
+.topNavItem.isActive .topNavLabel{ color: var(--accent); }
 
-.topNavItem.isActive .topNavLabel{
-  color: var(--accent);
+/* ===== Toggle button (ALL DEVICES) ===== */
+.topNavToggle{
+  position: absolute;
+  left: -38px;              /* יושב משמאל לסרגל */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.75);
+  border: 1px solid rgba(0,0,0,0.10);
+
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+
+  box-shadow: 0 14px 40px rgba(0,0,0,0.12);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.topNavChevron{
+  font-size: 18px;
+  font-weight: 900;
+  color: rgba(0,0,0,0.65);
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+/* ===== collapsed (DESKTOP default position) ===== */
+.topNav.isCollapsed{
+  transform: translateX(calc(100% - 18px)); /* משאיר "טיפ" קטן */
+  opacity: 0.98;
 }
 
 /* ===== MOBILE: sidebar right ===== */
@@ -94,12 +129,20 @@
     overflow: visible;
   }
 
-  .topNavItem{
-    padding: 8px 10px;
-  }
-
+  .topNavItem{ padding: 8px 10px; }
   .topNavLabel{
     font-size: 10px;
     letter-spacing: 0.10em;
+  }
+
+  /* collapsed on mobile must keep translateY(-50%) */
+  .topNav.isCollapsed{
+    transform: translateY(-50%) translateX(calc(100% - 14px));
+  }
+
+  /* toggle button should sit near top of the vertical pill */
+  .topNavToggle{
+    top: 14px;
+    transform: none;
   }
 }
