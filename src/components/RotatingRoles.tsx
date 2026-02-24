@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { animationPresets } from "../design-system";
 
 const roles = [
   "FULL-STACK DEVELOPER",
@@ -37,7 +38,11 @@ export default function RotatingRoles() {
         <AnimatePresence mode="wait">
           <motion.div
             key={`${index}-${roles[index]}`}
-            initial={{ y: 14, opacity: 0, filter: "blur(8px)" }}
+            variants={animationPresets.fadeInUp}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            transition={{ duration: 0.32 }}
             animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
             exit={{ y: -14, opacity: 0, filter: "blur(8px)" }}
             transition={{ duration: 0.32 }}

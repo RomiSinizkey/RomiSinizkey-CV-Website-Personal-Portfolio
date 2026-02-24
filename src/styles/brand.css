@@ -67,3 +67,173 @@
   filter: brightness(1.07);
   background-position: 100% 0;
 }
+
+/* =========================
+   APPLE-STYLE GLASS WRAPPER
+   (Additive only — does NOT change .logoName)
+========================= */
+
+.logoFxApple{
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  padding: 10px 14px;
+
+  /* helps pseudo layers behave */
+  isolation: isolate;
+  transform: translateZ(0);
+
+  /* wrapper can show glow + ripple outside */
+  overflow: visible;
+}
+
+/* glass body */
+.logoFxApple::before{
+  content:"";
+  position:absolute;
+  inset:-10px;
+  border-radius:999px;
+
+  /* Apple-like glass */
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.66), rgba(255,255,255,0.38)),
+    radial-gradient(120% 180% at 30% 20%, rgba(255,255,255,0.55), transparent 60%);
+
+  border: 1px solid rgba(0,0,0,0.08);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+
+  box-shadow:
+    0 18px 55px rgba(0,0,0,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.55);
+
+  opacity: 0;
+  transform: scale(0.985);
+  transition: opacity 180ms ease, transform 260ms cubic-bezier(.2,.9,.2,1);
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* specular highlight sweep */
+.logoFxApple::after{
+  content:"";
+  position:absolute;
+  inset:-10px;
+  border-radius:999px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0) 35%,
+    rgba(255,255,255,0.55) 48%,
+    rgba(255,255,255,0) 62%
+  );
+
+  opacity: 0;
+  transform: translateX(-55%);
+  transition: opacity 180ms ease;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* subtle ring (accent-aware but not changing text) */
+.logoFxApple:hover{
+  box-shadow:
+    0 0 0 1px rgba(234,88,12,0.16),
+    0 0 0 6px rgba(234,88,12,0.06);
+}
+
+/* show glass + run highlight once */
+.logoFxApple:hover::before{
+  opacity: 1;
+  transform: scale(1);
+}
+.logoFxApple:hover::after{
+  opacity: 1;
+  animation: appleSweep 900ms cubic-bezier(.2,.9,.2,1) 1;
+}
+
+@keyframes appleSweep{
+  0%{ transform: translateX(-60%); }
+  100%{ transform: translateX(60%); }
+}
+
+/* micro-noise texture (very subtle) */
+.logoFxApple > .logoName{
+  position: relative;
+}
+.logoFxApple > .logoName::after{
+  content:"";
+  position:absolute;
+  inset:-18px;
+  border-radius:999px;
+  pointer-events:none;
+  opacity: 0;
+  transition: opacity 180ms ease;
+
+  /* noise illusion using repeating gradients */
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0,0,0,0.03) 0px,
+      rgba(0,0,0,0.03) 1px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,0) 6px
+    );
+  mix-blend-mode: soft-light;
+
+  /* safety: never block the text/ripple */
+  z-index: -1;
+}
+.logoFxApple:hover > .logoName::after{
+  opacity: 0.35;
+}
+
+/* =========================
+   APPLE CLICK RIPPLE (iOS-like)
+========================= */
+
+.logoRipple{
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  pointer-events: none;
+
+  /* centered at click point */
+  transform: translate(-50%, -50%) scale(1);
+
+  /* Apple-ish ripple: white highlight + slight warm edge */
+  background: radial-gradient(
+    circle,
+    rgba(255,255,255,0.75) 0%,
+    rgba(255,255,255,0.35) 35%,
+    rgba(251,146,60,0.22) 55%,
+    rgba(255,255,255,0.0) 72%
+  );
+
+  filter: blur(0.2px);
+  opacity: 0.85;
+
+  animation: logoRipplePop 650ms cubic-bezier(.2,.9,.2,1) forwards;
+  z-index: 5; /* above glass */
+}
+
+@keyframes logoRipplePop{
+  0%{
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.85;
+  }
+  100%{
+    transform: translate(-50%, -50%) scale(18);
+    opacity: 0;
+  }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .logoFxApple:hover::after{ animation: none; }
+  .logoRipple{ animation: none; opacity: 0; }
+}

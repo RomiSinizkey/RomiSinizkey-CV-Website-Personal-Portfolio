@@ -1,6 +1,8 @@
+import { Badge } from "../design-system";
+
 export default function StatsBar() {
   return (
-    <div className="inline-flex items-center gap-3 px-6 py-2">
+    <div className="inline-flex items-center gap-3 px-2">
       <span
         className="h-2 w-2 rounded-full"
         style={{
@@ -8,9 +10,9 @@ export default function StatsBar() {
           boxShadow: "0 0 18px var(--accent)",
         }}
       />
-      <span className="text-[12px] font-semibold tracking-[0.18em] uppercase text-black/70">
+      <Badge variant="primary" size="sm">
         React • TypeScript • JS • Node • DB • Python • C++
-      </span>
+      </Badge>
     </div>
   );
 }

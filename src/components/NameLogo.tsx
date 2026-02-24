@@ -1,32 +1,43 @@
-import { useRef } from "react";
+import React, { useRef } from "react";
 
 export default function NameLogo() {
-  const ref = useRef<HTMLSpanElement | null>(null);
+  const wrapRef = useRef<HTMLSpanElement | null>(null);
 
-  const onMove = (e: React.MouseEvent) => {
-    const el = ref.current;
+  const ripple = (clientX: number, clientY: number) => {
+    const el = wrapRef.current;
     if (!el) return;
 
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width;  // 0..1
-    const py = (e.clientY - r.top) / r.height;  // 0..1
+    const rect = el.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
 
-    const rx = (0.5 - py) * 18; // rotateX
-    const ry = (px - 0.5) * 18; // rotateY
+    // create ripple element
+    const r = document.createElement("span");
+    r.className = "logoRipple";
+    r.style.left = `${x}px`;
+    r.style.top = `${y}px`;
+    el.appendChild(r);
 
-    el.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(2px)`;
+    // cleanup after animation
+    const remove = () => r.remove();
+    r.addEventListener("animationend", remove, { once: true });
   };
 
-  const onLeave = () => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.transform = `perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0px)`;
+  const onPointerDown = (e: React.PointerEvent) => {
+    // only primary click for mouse
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    ripple(e.clientX, e.clientY);
   };
 
   return (
     <div className="fixed left-10 top-10 z-50 select-none">
-      <span ref={ref} className="logoName" onMouseMove={onMove} onMouseLeave={onLeave}>
-        romi
+      <span
+        ref={wrapRef}
+        className="logoFxApple"
+        onPointerDown={onPointerDown}
+        aria-label="Romi logo"
+      >
+        <span className="logoName">ROMI</span>
       </span>
     </div>
   );
