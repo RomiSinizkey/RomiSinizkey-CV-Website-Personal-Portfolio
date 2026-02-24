@@ -40,9 +40,7 @@ export default function RotatingRoles() {
             key={`${index}-${roles[index]}`}
             variants={animationPresets.fadeInUp}
             initial="hidden"
-            animate="visible"
-            exit="hidden"
-            transition={{ duration: 0.32 }}
+            
             animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
             exit={{ y: -14, opacity: 0, filter: "blur(8px)" }}
             transition={{ duration: 0.32 }}
