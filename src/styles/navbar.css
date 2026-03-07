@@ -309,3 +309,109 @@
 .topNavItem:active{
   filter: brightness(1.03);
 }
+/* Toggle FX layer */
+.topNavToggle { position: absolute; overflow: visible; }
+
+.topNavToggle .csfxLayer{
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.topNavToggle .csfxBurst{
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 1px;
+  height: 1px;
+}
+
+/* Ring only (reuse same ring animation) */
+.topNavToggle .csfxRing{
+  position: absolute;
+  left: -10px;
+  top: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: conic-gradient(
+    from 90deg,
+    rgba(236,72,153,0.9),
+    rgba(59,130,246,0.95),
+    rgba(34,197,94,0.85),
+    rgba(250,204,21,0.95),
+    rgba(236,72,153,0.9)
+  );
+  filter: blur(0.2px);
+  opacity: 0;
+  transform: scale(0.25);
+  animation: csfx-ring 950ms cubic-bezier(.2,.9,.2,1) forwards;
+}
+/* =========================
+   STACK BADGE NAV (NEW)
+   - does NOT conflict with .topNavInner/.topNavItem
+========================= */
+
+.stackNav{
+  position: relative;
+  width: 520px;
+  height: 220px;
+  max-width: calc(100vw - 180px);
+  overflow: visible;
+}
+
+/* the actual "pill badges" */
+.stackBadge{
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.28);
+
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+
+  box-shadow:
+    0 22px 55px rgba(0,0,0,0.18),
+    0 10px 22px rgba(0,0,0,0.10);
+  transition: transform 420ms cubic-bezier(.2,.9,.2,1), box-shadow 420ms ease, filter 420ms ease;
+}
+
+.stackBadge:hover{
+  box-shadow:
+    0 30px 70px rgba(0,0,0,0.22),
+    0 12px 26px rgba(0,0,0,0.12);
+  filter: saturate(1.22) contrast(1.06);
+}
+
+.stackLabel{
+  position: relative;
+  z-index: 2;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  color: rgba(255,255,255,0.96);
+  text-shadow: 0 2px 10px rgba(0,0,0,0.35);
+}
+
+.stackLabel.isActive{
+  color: #ffffff;
+}
+
+/* highlight like Canva badge */
+.stackHighlight{
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  opacity: 0.26;
+  background: linear-gradient(180deg, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.04) 48%, rgba(255,255,255,0) 70%);
+  z-index: 1;
+}
+
+/* sizes */
+.stackSizeSm{ padding: 10px 22px; font-size: 18px; }
+.stackSizeMd{ padding: 12px 28px; font-size: 22px; }
+.stackSizeLg{ padding: 14px 34px; font-size: 26px; }

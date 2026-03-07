@@ -30,14 +30,25 @@ export default function NameLogo() {
   };
 
   return (
-    <div className="fixed left-10 top-10 z-50 select-none">
+    <div className="fixed left-6 top-6 z-[2147483500] select-none">
       <span
         ref={wrapRef}
         className="logoFxApple"
         onPointerDown={onPointerDown}
         aria-label="Romi logo"
       >
-        <span className="logoName">ROMI</span>
+        <span
+          className="logoName"
+          style={{
+            background: "none",
+            color: "#f97316",          // כתום מודרני
+            WebkitTextFillColor: "#f97316",
+            textShadow: "0 1px 0 rgba(255,255,255,0.65)",
+            fontWeight: 900,
+          }}
+        >
+          ROMI
+        </span>
       </span>
     </div>
   );

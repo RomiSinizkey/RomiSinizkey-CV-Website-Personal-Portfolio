@@ -28,7 +28,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       className = "",
       isLoading = false,
       disabled,
-      ...props
     },
     ref
   ) => {
@@ -63,7 +62,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           ${disabled ? "opacity-50 cursor-not-allowed" : ""}
           ${className}
         `}
-        {...(props as any)}
       >
         {isLoading ? (
           <motion.span

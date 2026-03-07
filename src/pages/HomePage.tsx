@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import heroImg from "../assets/hero.jpg";
 
-import SideLinks from "../components/SideLinks";
-import NameLogo from "../components/NameLogo";
-import HomeProjectsShowcase from "../components/HomeProjectsShowcase";
 import HomeHeroTitle from "../components/HomeHeroTitle";
+import SideLinks from "../components/SideLinks";
+import { AboutPageContent } from "./AboutPage";
+import { profile } from "../data/profile";
 
 // Ripple effect component for click interactions
 interface Ripple {
@@ -27,8 +26,8 @@ function ClickRipples() {
       setTimeout(() => {
         const newRipple: Ripple = {
           id: Date.now() + i,
-          x: e.clientX,
-          y: e.clientY,
+          x: e.clientX + window.scrollX,
+          y: e.clientY + window.scrollY,
           color: colors[Math.floor(Math.random() * colors.length)],
         };
 
@@ -44,14 +43,14 @@ function ClickRipples() {
 
   return (
     <div
-      className="fixed inset-0 pointer-events-auto z-40"
+      className="absolute inset-0 pointer-events-auto z-40"
       onClick={handleClick}
       style={{ cursor: "crosshair" }}
     >
       {ripples.map((ripple) => (
         <motion.div
           key={ripple.id}
-          className="fixed rounded-full pointer-events-none"
+          className="absolute rounded-full pointer-events-none"
           style={{
             left: ripple.x,
             top: ripple.y,
@@ -158,10 +157,16 @@ function AnimatedAlgorithmFlow() {
 
 export default function HomePage() {
   const location = useLocation();
-  const [scrollProgress, setScrollProgress] = useState(0);
+
+  const scrollToSection = (sectionId: string) => {
+    const el = document.getElementById(sectionId);
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.scrollY - 24;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  };
 
   useEffect(() => {
-    const state = location.state as any | undefined;
+    const state = location.state as { scrollTo?: string; openShowcase?: boolean } | undefined;
     const s = state?.scrollTo as string | undefined;
     const openShowcase = Boolean(state?.openShowcase);
 
@@ -173,47 +178,19 @@ export default function HomePage() {
       }
 
       if (s) {
-        const el = document.getElementById(s);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        scrollToSection(s);
       }
     });
   }, [location.state]);
 
-  // Track scroll progress for progress bar
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = scrollHeight > 0 ? window.scrollY / scrollHeight : 0;
-      setScrollProgress(progress);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
-    <div
-      className="min-h-[200vh] w-full relative overflow-hidden"
-      style={{
-        backgroundImage: `url(${heroImg})`,
-        backgroundSize: "100%",
-        backgroundPosition: "center bottom",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
-      {/* Scroll Progress Bar */}
-      <motion.div
-        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-orange-500 via-sky-500 to-orange-500 z-50"
-        style={{ width: `${scrollProgress * 100}%` }}
-      />
-
+    <div className="relative w-full overflow-x-hidden">
       {/* Animated background glow - moves with scroll */}
       <motion.div
-        className="fixed top-0 left-0 w-full h-full pointer-events-none"
+        className="absolute inset-0 w-full h-full pointer-events-none"
         style={{
           background:
             "radial-gradient(circle at 20% 50%, rgba(234, 88, 12, 0.05) 0%, transparent 50%)",
-          y: window.scrollY ? window.scrollY * 0.5 : 0,
         }}
       />
 
@@ -250,40 +227,156 @@ export default function HomePage() {
         }}
       />
 
-      {/* Scroll hint - appears at start, fades with scroll */}
-      <motion.div
-        className="fixed bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none z-40"
-        animate={{ opacity: 1 - scrollProgress * 2, y: scrollProgress > 0.1 ? 20 : 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <span className="text-xs font-semibold text-gray-600 uppercase tracking-widest">
-          Scroll to explore
-        </span>
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="text-2xl text-orange-600"
-        >
-          ↓
-        </motion.div>
-      </motion.div>
+      {/* Home Section */}
+      <section id="home-section" className="relative min-h-screen overflow-hidden">
+        <HomeHeroTitle />
+      </section>
 
-      {/* Hero Section */}
-      <HomeHeroTitle />
+      {/* Projects Section */}
+      <section id="projects-section" className="relative z-20 min-h-screen px-6 py-24">
+        <div id="projects-preview" className="h-px w-px" aria-hidden="true" />
+        <div className="mx-auto w-full max-w-5xl">
+          <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">Projects</h2>
+          <p className="mt-3 text-slate-600">A single-page flow: scroll to move between sections.</p>
 
-      {/* Scroll target */}
-      <div
-        id="projects-preview"
-        className="absolute left-0 top-[120vh] h-px w-px"
-        aria-hidden="true"
-      />
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {profile.projects.map((project) => (
+              <a
+                key={project.name}
+                href={project.link}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-3xl border border-slate-200/80 bg-white/70 p-6 backdrop-blur-sm shadow-[0_18px_45px_rgba(15,23,42,0.08)] transition hover:-translate-y-1"
+              >
+                <h3 className="text-xl font-bold text-slate-900">{project.name}</h3>
+                <p className="mt-2 text-sm text-slate-600">{project.desc}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {project.tech.map((tech) => (
+                    <span
+                      key={`${project.name}-${tech}`}
+                      className="rounded-full bg-slate-900/90 px-3 py-1 text-xs font-semibold text-white"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {/* Projects Showcase */}
-      <HomeProjectsShowcase />
+      {/* About Section */}
+      <section id="about-section" className="relative z-20 min-h-screen px-4 py-14 md:px-6 md:py-20">
+        <div className="mx-auto w-full max-w-6xl">
+          <AboutPageContent embedded />
+        </div>
+      </section>
 
-      {/* Side Links & Logo */}
+      {/* Education Section */}
+      <section id="education-section" className="relative z-20 min-h-screen px-6 py-24">
+        <div className="mx-auto w-full max-w-5xl">
+          <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">Education</h2>
+          <div className="mt-8 space-y-5">
+            {profile.education.map((edu, idx) => (
+              <div
+                key={`${edu.institution}-${idx}`}
+                className="rounded-3xl border border-slate-200/80 bg-white/70 p-6 backdrop-blur-sm shadow-[0_18px_45px_rgba(15,23,42,0.08)]"
+              >
+                <h3 className="text-xl font-bold text-slate-900">{edu.degree}</h3>
+                <p className="mt-1 text-slate-700">{edu.institution}</p>
+                <p className="mt-1 text-sm text-slate-500">{edu.years}</p>
+                {edu.details?.length ? (
+                  <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                    {edu.details.map((detail) => (
+                      <li key={detail}>• {detail}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Experience Section */}
+      <section id="experience-section" className="relative z-20 min-h-screen px-6 py-24">
+        <div className="mx-auto w-full max-w-5xl">
+          <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">Experience</h2>
+          <div className="mt-8 space-y-5">
+            {profile.experience.map((exp, idx) => (
+              <div
+                key={`${exp.company}-${idx}`}
+                className="rounded-3xl border border-slate-200/80 bg-white/70 p-6 backdrop-blur-sm shadow-[0_18px_45px_rgba(15,23,42,0.08)]"
+              >
+                <h3 className="text-xl font-bold text-slate-900">{exp.title}</h3>
+                <p className="mt-1 text-slate-700">{exp.company}</p>
+                <p className="mt-1 text-sm text-slate-500">{exp.years}</p>
+                <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                  {exp.bullets.map((bullet) => (
+                    <li key={bullet}>• {bullet}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Skills Section */}
+      <section id="skills-section" className="relative z-20 min-h-screen px-6 py-24">
+        <div className="mx-auto w-full max-w-5xl">
+          <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">Skills</h2>
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {profile.skills.map((group) => (
+              <div
+                key={group.group}
+                className="rounded-3xl border border-slate-200/80 bg-white/70 p-6 backdrop-blur-sm shadow-[0_18px_45px_rgba(15,23,42,0.08)]"
+              >
+                <h3 className="text-lg font-bold text-slate-900">{group.group}</h3>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {group.items.map((item) => (
+                    <span
+                      key={`${group.group}-${item}`}
+                      className="rounded-full bg-slate-900/90 px-3 py-1 text-xs font-semibold text-white"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Languages Section */}
+      <section id="languages-section" className="relative z-20 min-h-screen px-6 py-24">
+        <div className="mx-auto w-full max-w-5xl rounded-3xl border border-slate-200/80 bg-white/70 p-8 backdrop-blur-sm shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
+          <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">Languages</h2>
+          <div className="mt-6 flex flex-wrap gap-3">
+            {[
+              "Hebrew",
+              "English",
+            ].map((language) => (
+              <span key={language} className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">
+                {language}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Military Section */}
+      <section id="military-section" className="relative z-20 min-h-screen px-6 py-24">
+        <div className="mx-auto w-full max-w-5xl rounded-3xl border border-slate-200/80 bg-white/70 p-8 backdrop-blur-sm shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
+          <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">Military</h2>
+          <p className="mt-4 text-slate-700">Military service details section.</p>
+        </div>
+      </section>
+
       <SideLinks />
-      <NameLogo />
+
     </div>
   );
 }

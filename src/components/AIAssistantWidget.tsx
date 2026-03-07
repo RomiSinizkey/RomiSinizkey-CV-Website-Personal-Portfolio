@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AI_INTENTS, SUGGESTIONS, type AiIntentKey } from "./ai/aiIntents";
+import AILoader from "./ui/ai-loader";
 
 type Msg = { id: string; from: "user" | "ai"; text: string };
 
@@ -86,8 +87,16 @@ function AgentAvatar({ open }: { open: boolean }) {
         transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
       />
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[42%] flex gap-2">
-        <motion.div className="h-2.5 w-2.5 bg-black/75" animate={{ scaleY: [1, 0.12, 1] }} transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }} />
-        <motion.div className="h-2.5 w-2.5 bg-black/75" animate={{ scaleY: [1, 0.12, 1] }} transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.1 }} />
+        <motion.div
+          className="h-2.5 w-2.5 bg-black/75"
+          animate={{ scaleY: [1, 0.12, 1] }}
+          transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="h-2.5 w-2.5 bg-black/75"
+          animate={{ scaleY: [1, 0.12, 1] }}
+          transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.1 }}
+        />
       </div>
       <motion.div
         className="absolute left-1/2 top-[62%] -translate-x-1/2 h-[3px] w-4 bg-black/55"
@@ -95,15 +104,6 @@ function AgentAvatar({ open }: { open: boolean }) {
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
       />
     </motion.div>
-  );
-}
-
-function SparkleIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M12 2l1.2 5.2L18 8.4l-4.8 1.2L12 14l-1.2-4.4L6 8.4l4.8-1.2L12 2z" stroke="white" strokeWidth="2" strokeLinejoin="round" />
-      <path d="M19 13l.6 2.6L22 16l-2.4.4L19 19l-.6-2.6L16 16l2.4-.4L19 13z" stroke="white" strokeWidth="2" strokeLinejoin="round" />
-    </svg>
   );
 }
 
@@ -135,11 +135,9 @@ export default function AIAssistantWidget() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // === Hooks ALWAYS at top (no conditionals) ===
   const [open, setOpen] = useState(false);
   const [typing, setTyping] = useState(false);
   const [input, setInput] = useState("");
-  const [mounted, setMounted] = useState(false);
 
   const [msgs, setMsgs] = useState<Msg[]>(() => [
     { id: uid(), from: "ai", text: "Hey 👋 I’m your assistant. Ask where something is, or tap a quick action." },
@@ -162,7 +160,10 @@ export default function AIAssistantWidget() {
       const raw = localStorage.getItem(POS_KEY);
       if (!raw) return { x: 16, y: 120 };
       const p = JSON.parse(raw) as BtnPos;
-      return { x: typeof p.x === "number" ? p.x : 16, y: typeof p.y === "number" ? p.y : 120 };
+      return {
+        x: typeof p.x === "number" ? p.x : 16,
+        y: typeof p.y === "number" ? p.y : 120,
+      };
     } catch {
       return { x: 16, y: 120 };
     }
@@ -180,7 +181,6 @@ export default function AIAssistantWidget() {
 
   const suppressOpenRef = useRef(false);
 
-  // nicer tooltip
   const [showHint, setShowHint] = useState(false);
   const hintTimerRef = useRef<number | null>(null);
 
@@ -195,11 +195,10 @@ export default function AIAssistantWidget() {
       if (hintTimerRef.current) window.clearTimeout(hintTimerRef.current);
     };
   }, []);
-  // === Effects ===
-  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.matchMedia("(max-width: 640px)").matches);
+    onResize();
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
@@ -217,7 +216,6 @@ export default function AIAssistantWidget() {
   }, [btnPos]);
 
   useEffect(() => {
-    // keep button in bounds on resize
     const onResize = () => {
       const el = btnWrapRef.current;
       const w = el?.getBoundingClientRect().width ?? 56;
@@ -235,19 +233,26 @@ export default function AIAssistantWidget() {
     if (!open) return;
     const el = scrollBoxRef.current;
     if (!el) return;
-    requestAnimationFrame(() => (el.scrollTop = el.scrollHeight));
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
   }, [msgs, typing, open]);
 
-  // === Logic ===
   const closePanel = () => setOpen(false);
 
-  const goTo = async (route: string, anchorId?: string, options?: { openShowcase?: boolean }) => {
+  const goTo = async (
+    route: string,
+    anchorId?: string,
+    options?: { openShowcase?: boolean }
+  ) => {
     const same = location.pathname === route;
     if (!same) {
       navigate(route, { replace: false });
       await sleep(120);
     }
-    if (options?.openShowcase) window.dispatchEvent(new CustomEvent("home:projects:open"));
+    if (options?.openShowcase) {
+      window.dispatchEvent(new CustomEvent("home:projects:open"));
+    }
     if (anchorId) return await scrollToId(anchorId);
     return true;
   };
@@ -257,7 +262,10 @@ export default function AIAssistantWidget() {
       setTyping(true);
       await sleep(240);
       setTyping(false);
-      setMsgs((m) => [...m, { id: uid(), from: "ai", text: 'English only 🙂 (e.g., "Where are the projects?")' }]);
+      setMsgs((m) => [
+        ...m,
+        { id: uid(), from: "ai", text: 'English only 🙂 (e.g., "Where are the projects?")' },
+      ]);
       return;
     }
 
@@ -268,7 +276,10 @@ export default function AIAssistantWidget() {
 
     if (!intentKey) {
       setTyping(false);
-      setMsgs((m) => [...m, { id: uid(), from: "ai", text: 'Try: "Where are the projects?", "Show my experience", "Contact".' }]);
+      setMsgs((m) => [
+        ...m,
+        { id: uid(), from: "ai", text: 'Try: "Where are the projects?", "Show my experience", "Contact".' },
+      ]);
       return;
     }
 
@@ -280,17 +291,28 @@ export default function AIAssistantWidget() {
     await sleep(120);
 
     if (intent.action.type === "route") {
-      const ok = await goTo(intent.action.route, intent.action.anchorId, { openShowcase: intent.action.openShowcase });
+      const ok = await goTo(intent.action.route, intent.action.anchorId, {
+        openShowcase: intent.action.openShowcase,
+      });
       if (ok) closePanel();
-      else setMsgs((m) => [...m, { id: uid(), from: "ai", text: "I couldn’t find that section on this page." }]);
+      else {
+        setMsgs((m) => [
+          ...m,
+          { id: uid(), from: "ai", text: "I couldn’t find that section on this page." },
+        ]);
+      }
       return;
     }
 
     if (intent.action.type === "external") {
       const w = window.open(intent.action.href, "_blank", "noreferrer");
       if (w) closePanel();
-      else setMsgs((m) => [...m, { id: uid(), from: "ai", text: "Popup blocked — please allow popups and try again." }]);
-      return;
+      else {
+        setMsgs((m) => [
+          ...m,
+          { id: uid(), from: "ai", text: "Popup blocked — please allow popups and try again." },
+        ]);
+      }
     }
   };
 
@@ -308,7 +330,6 @@ export default function AIAssistantWidget() {
     await answer(q);
   };
 
-  // === Panel rendering ===
   const panelW = isMobile ? "min(260px, calc(100vw - 24px))" : "260px";
   const FULL_H = 300;
 
@@ -323,9 +344,7 @@ export default function AIAssistantWidget() {
     pointerEvents: "auto",
   };
 
-  // === SAFE drag handlers (no extra hooks) ===
   const DRAG_THRESHOLD = 6;
-  const BTN_H = isMobile ? 46 : 42;
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
@@ -357,27 +376,24 @@ export default function AIAssistantWidget() {
     const nextX = st.startLeft + dx;
     const nextY = st.startTop + dy;
 
-    const x = clamp(nextX, 8, window.innerWidth - w - 8);
-    const y = clamp(nextY, 8, window.innerHeight - h - 8);
-
-    setBtnPos({ x, y });
+    setBtnPos({
+      x: clamp(nextX, 8, window.innerWidth - w - 8),
+      y: clamp(nextY, 8, window.innerHeight - h - 8),
+    });
   };
 
-    const onPointerUp = () => {
-      const st = dragState.current;
-      dragState.current = null;
+  const onPointerUp = () => {
+    const st = dragState.current;
+    dragState.current = null;
 
-      // ✅ if arrow toggled or we explicitly suppressed opening
-      if (suppressOpenRef.current) {
-        suppressOpenRef.current = false;
-        return;
-      }
+    if (suppressOpenRef.current) {
+      suppressOpenRef.current = false;
+      return;
+    }
 
-      if (st?.didDrag) return; // prevents open after drag
-      setOpen(true);
-    };
-
-  if (!mounted) return null;
+    if (st?.didDrag) return;
+    setOpen(true);
+  };
 
   return createPortal(
     <>
@@ -405,8 +421,17 @@ export default function AIAssistantWidget() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ type: "spring", stiffness: 320, damping: 26 }}
           >
-            <div style={{ width: panelW, maxWidth: "calc(100vw - 24px)", height: "100%", background: "#fff", overflow: "hidden", display: "flex", flexDirection: "column" }}>
-              {/* header */}
+            <div
+              style={{
+                width: panelW,
+                maxWidth: "calc(100vw - 24px)",
+                height: "100%",
+                background: "#fff",
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               <div style={{ padding: "12px 12px 8px", display: "flex", alignItems: "center", gap: 10, flex: "0 0 auto" }}>
                 <AgentAvatar open />
                 <div style={{ minWidth: 0 }}>
@@ -417,7 +442,13 @@ export default function AIAssistantWidget() {
                 <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
                   <button
                     onClick={() => setOpen(false)}
-                    style={{ padding: "6px 8px", fontSize: 11.5, fontWeight: 600, color: "rgba(0,0,0,0.65)", background: "transparent" }}
+                    style={{
+                      padding: "6px 8px",
+                      fontSize: 11.5,
+                      fontWeight: 600,
+                      color: "rgba(0,0,0,0.65)",
+                      background: "transparent",
+                    }}
                     title="Close"
                   >
                     Close
@@ -425,7 +456,6 @@ export default function AIAssistantWidget() {
                 </div>
               </div>
 
-              {/* suggestions */}
               <div style={{ padding: "0 12px 8px", flex: "0 0 auto" }}>
                 <div style={{ display: "flex", gap: 8, overflowX: "auto" }}>
                   {SUGGESTIONS.map((s) => (
@@ -447,9 +477,17 @@ export default function AIAssistantWidget() {
                 </div>
               </div>
 
-              {/* messages */}
               <div style={{ padding: "0 12px 10px", flex: "1 1 auto", minHeight: 0 }}>
-                <div ref={scrollBoxRef} style={{ background: "#f3f4f6", padding: 9, height: "100%", overflowY: "auto", overflowX: "hidden" }}>
+                <div
+                  ref={scrollBoxRef}
+                  style={{
+                    background: "#f3f4f6",
+                    padding: 9,
+                    height: "100%",
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                  }}
+                >
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {msgs.map((m) => (
                       <div key={m.id} style={{ display: "flex", justifyContent: m.from === "user" ? "flex-end" : "flex-start" }}>
@@ -471,7 +509,13 @@ export default function AIAssistantWidget() {
 
                     {typing && (
                       <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                        <div style={{ background: "#fff", padding: "9px 10px", boxShadow: "0 6px 16px rgba(0,0,0,0.08)" }}>
+                        <div
+                          style={{
+                            background: "#fff",
+                            padding: "9px 10px",
+                            boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
+                          }}
+                        >
                           <TypingDots />
                         </div>
                       </div>
@@ -480,7 +524,6 @@ export default function AIAssistantWidget() {
                 </div>
               </div>
 
-              {/* input */}
               <div style={{ padding: "10px 12px 12px", background: "#ffffff", flex: "0 0 auto" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div style={{ flex: 1, background: "#f3f4f6", padding: "9px 10px" }}>
@@ -490,7 +533,13 @@ export default function AIAssistantWidget() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter") onSend();
                       }}
-                      style={{ width: "100%", background: "transparent", outline: "none", fontSize: 13, color: "rgba(0,0,0,0.85)" }}
+                      style={{
+                        width: "100%",
+                        background: "transparent",
+                        outline: "none",
+                        fontSize: 13,
+                        color: "rgba(0,0,0,0.85)",
+                      }}
                       placeholder='Example: "Where are the projects?"'
                     />
                   </div>
@@ -521,13 +570,11 @@ export default function AIAssistantWidget() {
         ) : null}
       </AnimatePresence>
 
-      {/* CLOSED draggable button */}
       {!open && (
         <div
           ref={btnWrapRef}
           onPointerDown={(e) => {
             onPointerDown(e);
-            // show a short hint on touch devices when starting interaction
             if (e.pointerType !== "mouse") showHintFor(1200);
           }}
           onPointerMove={onPointerMove}
@@ -546,22 +593,17 @@ export default function AIAssistantWidget() {
             zIndex: 2147483647,
             display: "inline-flex",
             alignItems: "center",
-            gap: 8,
-            height: BTN_H,
-            padding: isMobile ? 0 : "0 12px 0 10px",
-            background: "rgba(17,17,17,0.92)",
-            color: "#fff",
-            borderRadius: 9999,
-            border: "1px solid rgba(255,255,255,0.10)",
-            backdropFilter: "blur(10px)",
-            boxShadow: "0 14px 44px rgba(0,0,0,0.20)",
+            gap: 10,
             touchAction: "none",
             userSelect: "none",
             cursor: "grab",
+            background: "transparent",
+            border: "none",
+            boxShadow: "none",
+            padding: 0,
           }}
           aria-label="AI assistant button"
         >
-          {/* ✅ Pretty tooltip */}
           {showHint && (
             <div
               style={{
@@ -579,7 +621,6 @@ export default function AIAssistantWidget() {
                 fontSize: 12.5,
                 lineHeight: 1.25,
                 pointerEvents: "none",
-                transform: "translateY(0)",
                 zIndex: 2147483647,
               }}
             >
@@ -588,7 +629,6 @@ export default function AIAssistantWidget() {
                 Drag to move • Click to open
               </div>
 
-              {/* little arrow */}
               <div
                 style={{
                   position: "absolute",
@@ -605,74 +645,85 @@ export default function AIAssistantWidget() {
             </div>
           )}
 
-          {/* arrow toggle (desktop only) */}
-            {!isMobile && (
-              <div
-                role="button"
-                tabIndex={0}
-                data-no-open
-                onPointerDown={(e) => {
-                  e.stopPropagation();
-                  suppressOpenRef.current = true;
-                }}
-                onPointerUp={(e) => {
-                  e.stopPropagation();
-                  suppressOpenRef.current = true;
-                }}
-                onClick={(e) => {
+          {!isMobile && (
+            <div
+              role="button"
+              tabIndex={0}
+              data-no-open
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                suppressOpenRef.current = true;
+              }}
+              onPointerUp={(e) => {
+                e.stopPropagation();
+                suppressOpenRef.current = true;
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                suppressOpenRef.current = true;
+                setMini((v) => !v);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
                   e.stopPropagation();
                   suppressOpenRef.current = true;
                   setMini((v) => !v);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    suppressOpenRef.current = true;
-                    setMini((v) => !v);
-                  }
-                }}
-                style={{
-                  height: 26,
-                  width: 26,
-                  borderRadius: 9999,
-                  display: "grid",
-                  placeItems: "center",
-                  background: "rgba(255,255,255,0.10)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  cursor: "pointer",
-                  flex: "0 0 auto",
-                }}
-                aria-label={mini ? "Expand" : "Collapse"}
-                title={mini ? "Expand" : "Collapse"}
-              >
-                <ChevronIcon collapsed={mini} />
-              </div>
-            )}
+                }
+              }}
+              style={{
+                height: 28,
+                width: 28,
+                borderRadius: 9999,
+                display: "grid",
+                placeItems: "center",
+                background: "rgba(17,17,17,0.88)",
+                border: "1px solid rgba(255,255,255,0.14)",
+                color: "white",
+                cursor: "pointer",
+                flex: "0 0 auto",
+                boxShadow: "0 10px 24px rgba(0,0,0,0.20)",
+              }}
+              aria-label={mini ? "Expand" : "Collapse"}
+              title={mini ? "Expand" : "Collapse"}
+            >
+              <ChevronIcon collapsed={mini} />
+            </div>
+          )}
 
-          <span
+          <div
             style={{
-              width: isMobile ? 30 : 28,
-              height: isMobile ? 30 : 28,
-              display: "grid",
-              placeItems: "center",
-              borderRadius: 9999,
-              background: "rgba(255,255,255,0.12)",
-              border: "1px solid rgba(255,255,255,0.10)",
-              flex: "0 0 auto",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 10,
+              padding: mini || isMobile ? 0 : "0 10px 0 0",
             }}
           >
-            <SparkleIcon />
-          </span>
+            <AILoader variant="button" size={isMobile ? "sm" : "md"} />
 
-          {!mini && !isMobile && (
-            <>
-              <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: "0.06em", whiteSpace: "nowrap", lineHeight: 1 }}>
-                Need help?
-              </span>
-              <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: 9999, background: "rgba(255,255,255,0.35)", marginLeft: 2 }} />
-            </>
-          )}
+            {!mini && !isMobile && (
+              <div
+                style={{
+                  padding: "0 14px 0 2px",
+                  height: 42,
+                  display: "flex",
+                  alignItems: "center",
+                  borderRadius: 9999,
+                  background: "rgba(17,17,17,0.88)",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  color: "white",
+                  boxShadow: "0 14px 44px rgba(0,0,0,0.20)",
+                  backdropFilter: "blur(10px)",
+                  fontSize: 13,
+                  fontWeight: 800,
+                  letterSpacing: "0.06em",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Ask AI
+              </div>
+            )}
+          </div>
         </div>
       )}
     </>,

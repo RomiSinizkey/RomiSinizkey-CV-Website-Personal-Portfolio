@@ -1,280 +1,391 @@
-import { useMemo, useState, useRef } from "react";
-import { Github, Linkedin, Mail, Phone, FileText } from "lucide-react";
+'use client';
+
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { profile } from "../data/profile";
 
 type RevealKey = "email" | "phone" | null;
 
-interface IconParticle {
-  id: number;
-  angle: number;
-  distance: number;
-  icon: string;
-  color: string;
-  startX: number;
-  startY: number;
+type FloatingButtonProps = {
+  children: ReactNode;
+  trigger: (args: { isOpen: boolean; toggle: () => void }) => ReactNode;
+};
+
+const list = {
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, staggerDirection: -1 },
+  },
+  hidden: {
+    opacity: 0,
+    transition: { when: "afterChildren", staggerChildren: 0.08 },
+  },
+};
+
+const item = {
+  visible: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 8 },
+};
+
+function FloatingButton({ children, trigger }: FloatingButtonProps) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [isOpen, setIsOpen] = useState(true);
+  const toggle = () => setIsOpen((v) => !v);
+
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (!ref.current || !target) return;
+      if (!ref.current.contains(target)) setIsOpen(false);
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <motion.ul
+        initial="hidden"
+        animate={isOpen ? "visible" : "hidden"}
+        variants={list}
+        style={{
+          listStyle: "none",
+          margin: 0,
+          padding: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 12,
+          position: "absolute",
+          bottom: "100%",
+          marginBottom: 12,
+          pointerEvents: isOpen ? "auto" : "none",
+        }}
+      >
+        {children}
+      </motion.ul>
+
+      {trigger({ isOpen, toggle })}
+    </div>
+  );
 }
 
 const bubble = {
-  hidden: { opacity: 0, x: -8, scale: 0.98, filter: "blur(6px)" },
-  show: { opacity: 1, x: 0, scale: 1, filter: "blur(0px)" },
-  exit: { opacity: 0, x: -8, scale: 0.98, filter: "blur(6px)" },
+  hidden: { opacity: 0, x: -8, scale: 0.95 },
+  show: { opacity: 1, x: 0, scale: 1 },
+  exit: { opacity: 0, x: -8, scale: 0.95 },
 };
+
+function IconImg({
+  src,
+  alt,
+  size,
+}: {
+  src: string;
+  alt: string;
+  size: number;
+}) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      width={size}
+      height={size}
+      draggable={false}
+      style={{
+        width: size,
+        height: size,
+        objectFit: "contain",
+        display: "block",
+        pointerEvents: "none",
+        userSelect: "none",
+      }}
+    />
+  );
+}
 
 export default function SideLinks() {
   const github = useMemo(
     () => profile.socials.find((s) => s.label.toLowerCase().includes("github"))?.href,
     []
   );
+
   const linkedin = useMemo(
     () => profile.socials.find((s) => s.label.toLowerCase().includes("linkedin"))?.href,
     []
   );
 
   const [reveal, setReveal] = useState<RevealKey>(null);
-  const [particles, setParticles] = useState<IconParticle[]>([]);
-  const particleCounterRef = useRef(0);
+  const toggleReveal = (key: RevealKey) =>
+    setReveal((cur) => (cur === key ? null : key));
 
-  const toggle = (key: RevealKey) => setReveal((cur) => (cur === key ? null : key));
-
-  // Create icon burst effect
-  const createBurst = (
-    iconName: string,
-    color: string,
-    startX: number,
-    startY: number,
-    count: number = 12
-  ) => {
-    const newParticles: IconParticle[] = [];
-    for (let i = 0; i < count; i++) {
-      newParticles.push({
-        id: particleCounterRef.current++,
-        angle: (360 / count) * i,
-        distance: 80 + Math.random() * 40,
-        icon: iconName,
-        color: color,
-        startX: startX,
-        startY: startY,
-      });
-    }
-    setParticles((prev) => [...prev, ...newParticles]);
-
-    // Remove particles after animation
-    setTimeout(() => {
-      setParticles((prev) =>
-        prev.filter((p) => !newParticles.some((np) => np.id === p.id))
-      );
-    }, 1000);
-  };
-
-  // Render icon particle
-  const renderIconParticle = (particle: IconParticle, size: number = 20) => {
-    const rad = (particle.angle * Math.PI) / 180;
-    const x = Math.cos(rad) * particle.distance;
-    const y = Math.sin(rad) * particle.distance;
-
-    const iconMap: Record<string, typeof Github> = {
-      github: Github,
-      linkedin: Linkedin,
-      mail: Mail,
-      phone: Phone,
-      cv: FileText,
-    };
-
-    const Icon = iconMap[particle.icon];
-
-    return (
-      <motion.div
-        key={particle.id}
-        initial={{ opacity: 1, scale: 1, x: 0, y: 0 }}
-        animate={{ opacity: 0, scale: 0.3, x, y }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        style={{
-          position: "fixed",
-          left: particle.startX,
-          bottom: particle.startY,
-          pointerEvents: "none",
-          zIndex: 100000,
-        }}
-      >
-        <Icon size={size} strokeWidth={2.25} style={{ color: particle.color }} />
-      </motion.div>
-    );
-  };
-
-  const iconBtn =
-    "inline-flex items-center justify-center " +
-    "bg-transparent border-0 p-0 m-0 rounded-none shadow-none " +
-    "text-gray-800 transition-all duration-300 " +
-    "focus:outline-none cursor-pointer " +
-    "hover:text-orange-600 hover:scale-125";
-
-  const bubbleBase =
-    "absolute left-[calc(100%+14px)] top-1/2 -translate-y-1/2 " +
-    "select-text whitespace-nowrap " +
-    "rounded-full border border-black/10 bg-white/80 " +
-    "px-3 py-1 text-[11px] font-semibold tracking-[0.14em] uppercase text-black " +
-    "backdrop-blur";
-
-  // ✅ PDF מתוך public
   const cvPdfHref = "/Romi_Sinizkey_CV.pdf";
+
+  const TRIGGER_SIZE = 70;
+  const LOTTIE_SIZE = 70;
+  const IMG_SIZE = 35;
+
+  const ICONS = {
+    github: "/Side/github.jpg",
+    gmail: "/Side/gmail.jpg",
+    linkedin: "/Side/linkedin.jpg",
+    phone: "/Side/phone.jpg",
+    resume: "/Side/resume.jpg",
+  } as const;
+
+  const iconStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "transparent",
+    border: "none",
+    padding: 0,
+    cursor: "pointer",
+    transition: "transform 180ms ease",
+  };
+
+  // טריגר שקוף לגמרי
+  const triggerStyle: React.CSSProperties = {
+    width: TRIGGER_SIZE,
+    height: TRIGGER_SIZE,
+    background: "transparent",
+    border: "none",
+    outline: "none",
+    padding: 0,
+    position: "relative",
+    overflow: "visible",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+  };
+
+  const triggerHover: React.CSSProperties = {
+    transform: "scale(1.04)",
+  };
+
+  const bubbleBaseStyle: React.CSSProperties = {
+    position: "absolute",
+    left: "calc(100% + 12px)",
+    top: "50%",
+    transform: "translateY(-50%)",
+    borderRadius: 9999,
+    background: "black",
+    padding: "6px 10px",
+    fontSize: 11,
+    color: "white",
+    textDecoration: "none",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
+    whiteSpace: "nowrap",
+  };
+
+  const [hovered, setHovered] = useState<string | null>(null);
 
   return (
     <div
-      id="side-links"
       style={{
         position: "fixed",
         left: 24,
         bottom: 24,
         zIndex: 99999,
-        width: 48,
-        display: "flex",
-        flexDirection: "column",
-        gap: 16,
-        padding: "8px",
-        background: "rgba(255, 255, 255, 0.8)",
-        backdropFilter: "blur(10px)",
-        borderRadius: "20px",
-        border: "1px solid rgba(0, 0, 0, 0.1)",
-        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1), 0 0 20px rgba(234, 88, 12, 0.1)",
       }}
     >
-      {/* LinkedIn */}
-      {linkedin ? (
-        <div
-          className="relative"
-          style={{ width: 40, height: 40 }}
-          onMouseEnter={() => createBurst("linkedin", "#0077b5", 80, 216)}
-        >
+      <FloatingButton
+        trigger={({ toggle }) => (
+          <button
+            type="button"
+            aria-label="Open contact links"
+            title="Contact"
+            onClick={() => {
+              setReveal(null);
+              toggle();
+            }}
+            onMouseEnter={() => setHovered("trigger")}
+            onMouseLeave={() => setHovered(null)}
+            style={{
+              ...triggerStyle,
+              ...(hovered === "trigger" ? triggerHover : null),
+            }}
+          >
+            {/* LOTTIE תמיד מופיע */}
+            <span
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                pointerEvents: "none",
+              }}
+            >
+              <DotLottieReact
+                src="/Side/WaveAnimation.lottie"
+                autoplay
+                loop
+                style={{
+                  width: LOTTIE_SIZE,
+                  height: LOTTIE_SIZE,
+                  filter:
+                  "brightness(0) saturate(100%) contrast(260%) drop-shadow(0 0 10px rgba(0,0,0,0.32))",
+                }}
+              />
+            </span>
+
+            {/* CONTACT תמיד מופיע */}
+            <span
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                pointerEvents: "none",
+                color: "#000000",
+                fontWeight: 900,
+                fontSize: 14,
+                letterSpacing: "0.14em",
+                lineHeight: 1,
+                textShadow:
+                  "0 0 1px rgba(0,0,0,0.35), 0 0 6px rgba(255,255,255,0.75)",
+              }}
+            >
+              CONTACT
+            </span>
+          </button>
+        )}
+      >
+        {github && (
+          <motion.li variants={item}>
+            <a
+              href={github}
+              target="_blank"
+              rel="noreferrer"
+              onMouseEnter={() => setHovered("git")}
+              onMouseLeave={() => setHovered(null)}
+              style={{
+                ...iconStyle,
+                ...(hovered === "git" ? { transform: "scale(1.1)" } : null),
+              }}
+            >
+              <IconImg src={ICONS.github} alt="GitHub" size={IMG_SIZE} />
+            </a>
+          </motion.li>
+        )}
+
+        {linkedin && (
+          <motion.li variants={item}>
+            <a
+              href={linkedin}
+              target="_blank"
+              rel="noreferrer"
+              onMouseEnter={() => setHovered("in")}
+              onMouseLeave={() => setHovered(null)}
+              style={{
+                ...iconStyle,
+                ...(hovered === "in" ? { transform: "scale(1.1)" } : null),
+              }}
+            >
+              <IconImg src={ICONS.linkedin} alt="LinkedIn" size={IMG_SIZE} />
+            </a>
+          </motion.li>
+        )}
+
+        <motion.li variants={item}>
+          <div style={{ position: "relative" }}>
+            <button
+              type="button"
+              onClick={() => toggleReveal("email")}
+              onMouseEnter={() => setHovered("mail")}
+              onMouseLeave={() => setHovered(null)}
+              style={{
+                ...iconStyle,
+                ...(hovered === "mail" ? { transform: "scale(1.1)" } : null),
+              }}
+            >
+              <IconImg src={ICONS.gmail} alt="Gmail" size={IMG_SIZE} />
+            </button>
+
+            <AnimatePresence>
+              {reveal === "email" ? (
+                <motion.a
+                  href={`mailto:${profile.email}`}
+                  variants={bubble}
+                  initial="hidden"
+                  animate="show"
+                  exit="exit"
+                  style={bubbleBaseStyle}
+                >
+                  {profile.email}
+                </motion.a>
+              ) : null}
+            </AnimatePresence>
+          </div>
+        </motion.li>
+
+        <motion.li variants={item}>
+          <div style={{ position: "relative" }}>
+            <button
+              type="button"
+              onClick={() => toggleReveal("phone")}
+              onMouseEnter={() => setHovered("phone")}
+              onMouseLeave={() => setHovered(null)}
+              style={{
+                ...iconStyle,
+                ...(hovered === "phone" ? { transform: "scale(1.1)" } : null),
+              }}
+            >
+              <IconImg src={ICONS.phone} alt="Phone" size={IMG_SIZE} />
+            </button>
+
+            <AnimatePresence>
+              {reveal === "phone" ? (
+                <motion.a
+                  href="tel:0544276740"
+                  variants={bubble}
+                  initial="hidden"
+                  animate="show"
+                  exit="exit"
+                  style={bubbleBaseStyle}
+                >
+                  0544276740
+                </motion.a>
+              ) : null}
+            </AnimatePresence>
+          </div>
+        </motion.li>
+
+        <motion.li variants={item}>
           <a
-            href={linkedin}
+            href={cvPdfHref}
             target="_blank"
             rel="noreferrer"
-            className={iconBtn}
-            aria-label="LinkedIn"
-            title="LinkedIn"
-            style={{ width: 40, height: 40 }}
+            onMouseEnter={() => setHovered("pdf")}
+            onMouseLeave={() => setHovered(null)}
+            style={{
+              ...iconStyle,
+              ...(hovered === "pdf" ? { transform: "scale(1.1)" } : null),
+            }}
           >
-            <Linkedin size={20} strokeWidth={2.25} />
+            <IconImg src={ICONS.resume} alt="Resume" size={IMG_SIZE} />
           </a>
-        </div>
-      ) : null}
-
-      {/* GitHub */}
-      {github ? (
-        <div
-          className="relative"
-          style={{ width: 40, height: 40 }}
-          onMouseEnter={() => createBurst("github", "#000000", 80, 172)}
-        >
-          <a
-            href={github}
-            target="_blank"
-            rel="noreferrer"
-            className={iconBtn}
-            aria-label="GitHub"
-            title="GitHub"
-            style={{ width: 40, height: 40 }}
-          >
-            <Github size={20} strokeWidth={2.25} />
-          </a>
-        </div>
-      ) : null}
-
-      {/* Email */}
-      <div
-        className="relative"
-        style={{ width: 40, height: 40 }}
-        onMouseEnter={() => createBurst("mail", "#ea580c", 80, 128)}
-      >
-        <button
-          type="button"
-          className={iconBtn}
-          aria-label="Email"
-          title="Email"
-          onClick={() => toggle("email")}
-          style={{ width: 40, height: 40 }}
-        >
-          <Mail size={20} strokeWidth={2.25} />
-        </button>
-
-        <AnimatePresence>
-          {reveal === "email" ? (
-            <motion.a
-              href={`mailto:${profile.email}`}
-              variants={bubble}
-              initial="hidden"
-              animate="show"
-              exit="exit"
-              transition={{ duration: 0.18, ease: "easeOut" }}
-              className={bubbleBase}
-              style={{ textDecoration: "none" }}
-            >
-              {profile.email}
-            </motion.a>
-          ) : null}
-        </AnimatePresence>
-      </div>
-
-      {/* Phone */}
-      <div
-        className="relative"
-        style={{ width: 40, height: 40 }}
-        onMouseEnter={() => createBurst("phone", "#10b981", 80, 84)}
-      >
-        <button
-          type="button"
-          className={iconBtn}
-          aria-label="Phone"
-          title="Phone"
-          onClick={() => toggle("phone")}
-          style={{ width: 40, height: 40 }}
-        >
-          <Phone size={20} strokeWidth={2.25} />
-        </button>
-
-        <AnimatePresence>
-          {reveal === "phone" ? (
-            <motion.a
-              href="tel:0544276740"
-              variants={bubble}
-              initial="hidden"
-              animate="show"
-              exit="exit"
-              transition={{ duration: 0.18, ease: "easeOut" }}
-              className={bubbleBase}
-              style={{ textDecoration: "none" }}
-            >
-              0544276740
-            </motion.a>
-          ) : null}
-        </AnimatePresence>
-      </div>
-
-      {/* ✅ CV PDF (אייקון טופס) */}
-      <div
-        className="relative"
-        style={{ width: 40, height: 40 }}
-        onMouseEnter={() => createBurst("cv", "#a855f7", 80, 40)}
-      >
-        <a
-          href={cvPdfHref}
-          target="_blank"
-          rel="noreferrer"
-          className={iconBtn}
-          aria-label="Open CV PDF"
-          title="Open CV"
-          style={{ width: 40, height: 40 }}
-          onClick={() => setReveal(null)}
-        >
-          <FileText size={20} strokeWidth={2.25} />
-        </a>
-      </div>
-
-      {/* Icon Particles */}
-      <AnimatePresence>
-        {particles.map((particle) => renderIconParticle(particle))}
-      </AnimatePresence>
+        </motion.li>
+      </FloatingButton>
     </div>
   );
 }

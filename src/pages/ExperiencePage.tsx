@@ -1,15 +1,50 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { profile } from "../data/profile";
 
 export default function ExperiencePage() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-16">
-      <div className="flex items-center justify-between">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between mb-8"
+      >
         <h1 className="text-4xl font-semibold">Experience</h1>
         <Link to="/" className="text-white/70 hover:text-white transition">← Home</Link>
-      </div>
+      </motion.div>
 
-      <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6">
-        <div className="text-white/70">TODO: Experience content</div>
+      <div className="mt-8 space-y-6">
+        {profile.experience.map((exp, idx) => (
+          <motion.div
+            key={idx}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5, delay: idx * 0.1 }}
+            className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur hover:bg-white/10 transition"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-white">{exp.title}</h2>
+                <p className="text-white/60 mt-1">{exp.company}</p>
+                <p className="text-white/50 text-sm mt-2">{exp.years}</p>
+              </div>
+            </div>
+            {exp.bullets && (
+              <div className="mt-4">
+                <ul className="space-y-2">
+                  {exp.bullets.map((bullet, i) => (
+                    <li key={i} className="text-white/70 text-sm flex items-start">
+                      <span className="mr-3 text-orange-500">•</span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </motion.div>
+        ))}
       </div>
     </div>
   );

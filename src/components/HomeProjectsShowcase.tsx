@@ -27,14 +27,9 @@ function fxFromBadge(badge: string): FxKey {
 }
 
 export default function HomeProjectsShowcase() {
-  const projects = profile.projects ?? [];
-  const items = useMemo(() => projects.slice(0, 3), [projects]); // עד 3 פרויקטים
-  if (items.length === 0) return null;
-
-  const SHOW_AT = 180;
-  const HIDE_AT = 120;
-
-  const [show, setShow] = useState(false);
+  const projectsData = useMemo(() => profile.projects ?? [], []);
+  
+  const [show, setShow] = useState(() => window.scrollY > 180);
   const [dir, setDir] = useState<Dir>("down");
   const [activeFx, setActiveFx] = useState<FxKey>(null);
 
@@ -42,12 +37,19 @@ export default function HomeProjectsShowcase() {
   const raf = useRef<number | null>(null);
   const showRef = useRef(false);
 
+  // Memoize the items
+  const items = useMemo(() => projectsData?.slice(0, 3) ?? [], [projectsData]);
+  
+  const SHOW_AT = 180;
+  const HIDE_AT = 120;
+
+  // All hooks must be declared before any conditional returns
   // אם כבר גוללת מתחת לסף — תציג
   useEffect(() => {
     lastY.current = window.scrollY;
     const shouldShowNow = window.scrollY > SHOW_AT;
     showRef.current = shouldShowNow;
-    setShow(shouldShowNow);
+    // No setState here - we initialize it in lazy init above
   }, []);
 
   // פתיחה יזומה בלחיצה על Projects
@@ -57,8 +59,8 @@ export default function HomeProjectsShowcase() {
       showRef.current = true;
       setShow(true);
     };
-    window.addEventListener("home:projects:open", onOpen as any);
-    return () => window.removeEventListener("home:projects:open", onOpen as any);
+    window.addEventListener("home:projects:open", onOpen);
+    return () => window.removeEventListener("home:projects:open", onOpen);
   }, []);
 
   // גלילה: יורד → מופיע, עולה → נעלם
@@ -97,15 +99,21 @@ export default function HomeProjectsShowcase() {
     };
   }, []);
 
-    const enter =
-      dir === "down"
-        ? { opacity: 0, x: 120, scale: 0.985 }
-        : { opacity: 0, x: 60, scale: 0.992 };
+  const enter =
+    dir === "down"
+      ? { opacity: 0, x: 120, scale: 0.985 }
+      : { opacity: 0, x: 60, scale: 0.992 };
 
-    const exit =
-      dir === "up"
-        ? { opacity: 0, x: 120, scale: 0.985 }
-        : { opacity: 0, x: 60, scale: 0.992 };
+  const exit =
+    dir === "up"
+      ? { opacity: 0, x: 120, scale: 0.985 }
+      : { opacity: 0, x: 60, scale: 0.992 };
+
+  // Early render guard - only after all hooks
+  if (!items || items.length === 0) {
+    return null;
+  }
+
   return (
     <>
       <ProjectFxOverlay fx={activeFx} />
