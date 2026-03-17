@@ -18,7 +18,7 @@ function CanvaBackground() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/45 to-black/60" />
+      <div className="absolute inset-0 bg-linear-to-b from-black/35 via-black/45 to-black/60" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.25)_55%,rgba(0,0,0,0.65)_100%)]" />
     </div>
   );
@@ -420,7 +420,7 @@ function Modal({
               <div className="px-6 py-5 border-b border-black/10 flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
                   {icon && (
-                    <div className="mt-0.5 h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-fuchsia-600 text-white flex items-center justify-center">
+                    <div className="mt-0.5 h-10 w-10 rounded-2xl bg-linear-to-br from-indigo-600 to-fuchsia-600 text-white flex items-center justify-center">
                       {icon}
                     </div>
                   )}
@@ -518,12 +518,12 @@ function HeaderSection({ firstName, story, showHomeLink = true }: { firstName: s
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 120, damping: 20 }}
     >
-      <div className="h-1 w-20 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full mb-6" />
+      <div className="h-1 w-20 bg-linear-to-r from-cyan-400 to-purple-500 rounded-full mb-6" />
 
       <div className="mb-4">
         <h1 className="text-6xl md:text-7xl font-black leading-[1.1] drop-shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
           <span className="text-white">Meet </span>
-          <span className="bg-gradient-to-r from-cyan-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-cyan-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
             {firstName}
           </span>
           <span className="text-white">.</span>
@@ -542,7 +542,7 @@ function HeaderSection({ firstName, story, showHomeLink = true }: { firstName: s
             to="/"
             className="group relative px-7 py-3 rounded-2xl bg-white/16 text-white font-bold shadow-lg hover:bg-white/20 transition-all backdrop-blur overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-cyan-500/10 group-hover:via-purple-500/10 group-hover:to-pink-500/10 transition-all" />
+            <div className="absolute inset-0 bg-linear-to-r from-cyan-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-cyan-500/10 group-hover:via-purple-500/10 group-hover:to-pink-500/10 transition-all" />
             <span className="relative">← Home</span>
           </Link>
         )}
@@ -552,7 +552,7 @@ function HeaderSection({ firstName, story, showHomeLink = true }: { firstName: s
             href={`mailto:${profile.email}`}
             className="group relative px-7 py-3 rounded-2xl bg-white text-[#2b4cff] font-black shadow-lg hover:shadow-2xl transition-all overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 bg-linear-to-br from-cyan-400/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
             <span className="relative">Get in Touch</span>
           </a>
         )}
@@ -621,7 +621,7 @@ export function AboutPageContent({ embedded = false }: { embedded?: boolean }) {
       <AnimatePresence>
         {wheelHover && (
           <motion.div
-            className={`${embedded ? "absolute" : "fixed"} inset-0 z-[40] pointer-events-none`}
+            className={`${embedded ? "absolute" : "fixed"} inset-0 z-40 pointer-events-none`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -632,7 +632,7 @@ export function AboutPageContent({ embedded = false }: { embedded?: boolean }) {
         )}
       </AnimatePresence>
 
-      <div className="relative z-[10] mx-auto max-w-6xl px-6 py-10 pointer-events-auto">
+      <div className="relative z-10 mx-auto max-w-6xl px-6 py-10 pointer-events-auto">
         <HeaderSection firstName={firstName} story={story} showHomeLink={!embedded} />
 
         <div className="flex justify-center">

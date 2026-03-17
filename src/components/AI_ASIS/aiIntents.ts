@@ -166,7 +166,7 @@ export const AI_INTENTS: Record<
       "get in touch",
       "where can i reach you",
     ],
-    reply: "Here’s how to contact me — showing contact details.",
+    reply: "Here's how to contact me — showing contact details.",
     // חשוב: אל תכלול כאן "github" כדי שלא יגנוב את הכוונה של GitHub intent
     action: { type: "route", route: "/", anchorId: "side-links" },
   },

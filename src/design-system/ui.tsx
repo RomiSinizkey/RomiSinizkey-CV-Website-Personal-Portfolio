@@ -147,7 +147,7 @@ export const Label: React.FC<LabelProps> = ({
 
   return (
     <label className={`flex items-center gap-2 font-medium ${sizeClass} ${className}`}>
-      {icon && <span className="flex-shrink-0">{icon}</span>}
+      {icon && <span className="shrink-0">{icon}</span>}
       {children}
     </label>
   );

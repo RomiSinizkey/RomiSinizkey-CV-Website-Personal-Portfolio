@@ -1,18 +1,17 @@
-import { Outlet, useLocation } from "react-router-dom";
-import AIAssistantWidget from "../components/AIAssistantWidget";
-import TopNavbar from "../components/navbar/TopNavbar"; // <-- תעדכן לפי מיקום אמיתי
-import NameLogo from "../components/NameLogo";
+import { Outlet } from "react-router-dom";
+import { AIAssistantWidget } from "../components/AI_ASIS";
+import TopNavbar from "../components/navbar/TopNavbar";
+import MoltenCoreShader from "../components/BackGround";
 
 export default function RootLayout() {
-  const location = useLocation();
-  const isHomeRoute = location.pathname === "/";
-
   return (
     <>
-      <TopNavbar />
-      {isHomeRoute ? <NameLogo /> : null}
-      <AIAssistantWidget />
-      <Outlet />
+      <MoltenCoreShader />
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <TopNavbar />
+        <AIAssistantWidget />
+        <Outlet />
+      </div>
     </>
   );
 }

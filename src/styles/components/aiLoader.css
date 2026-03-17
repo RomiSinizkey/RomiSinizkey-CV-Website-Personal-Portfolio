@@ -1,0 +1,183 @@
+/* Uiverse-inspired OpenAI brutalist launcher button */
+
+.ai-loader-root {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  flex: 0 0 auto;
+  user-select: none;
+}
+
+.ai-loader-button-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  pointer-events: none;
+}
+
+.ai-loader-brutalist-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: var(--ai-loader-btn-size, 142px);
+  height: var(--ai-loader-btn-size, 142px);
+  color: #e5dede;
+  font-weight: 700;
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  pointer-events: none;
+}
+
+.ai-loader-button-1 {
+  background-color: #063525;
+  border: 3px solid #42c498;
+  border-radius: 12px;
+  box-shadow: 4px 4px 1px #000000;
+}
+
+.ai-loader-button-1::before,
+.ai-loader-button-1::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: 0.6s;
+}
+
+.ai-loader-button-1::before {
+  left: -100%;
+}
+
+.ai-loader-button-1::after {
+  left: 100%;
+}
+
+.ai-loader-openai-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 3;
+}
+
+.ai-loader-openai-icon {
+  width: var(--ai-loader-icon-size, 64px);
+  height: var(--ai-loader-icon-size, 64px);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.ai-loader-button-text-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+  text-align: center;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 3;
+  margin-top: 0;
+}
+
+.ai-loader-button-text-wrap span:first-child {
+  font-size: var(--ai-loader-title-size, 12px);
+  font-weight: 500;
+}
+
+.ai-loader-button-text-wrap span:last-child {
+  font-size: var(--ai-loader-subtitle-size, 16px);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.aiw-launcher-wrap:hover .ai-loader-button-1 {
+  background-color: #1a5c46;
+  border-color: #030504;
+  transform: translate(-6px, -6px) rotate(1deg);
+  box-shadow: 10px 10px 0 #000000, 15px 15px 20px rgba(64, 164, 122, 0.2);
+}
+
+.aiw-launcher-wrap:hover .ai-loader-button-1::before {
+  animation: aiLoaderSwipeRight 1.5s infinite;
+}
+
+.aiw-launcher-wrap:hover .ai-loader-button-1::after {
+  animation: aiLoaderSwipeLeft 1.5s infinite;
+}
+
+.aiw-launcher-wrap:hover .ai-loader-openai-logo {
+  transform: translateY(-10px);
+}
+
+.aiw-launcher-wrap:hover .ai-loader-openai-icon {
+  width: calc(var(--ai-loader-icon-size, 64px) * 0.62);
+  height: calc(var(--ai-loader-icon-size, 64px) * 0.62);
+  animation: aiLoaderSpinAndZoom 4s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+}
+
+.aiw-launcher-wrap:hover .ai-loader-button-text-wrap {
+  opacity: 1;
+  max-height: 80px;
+  margin-top: 8px;
+}
+
+.aiw-launcher-wrap:active .ai-loader-openai-icon,
+.aiw-launcher-wrap:active .ai-loader-button-text-wrap {
+  transform: scale(0.95);
+}
+
+@keyframes aiLoaderSwipeRight {
+  100% {
+    transform: translateX(200%) skew(-45deg);
+  }
+}
+
+@keyframes aiLoaderSwipeLeft {
+  100% {
+    transform: translateX(-200%) skew(-45deg);
+  }
+}
+
+@keyframes aiLoaderSpinAndZoom {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .ai-loader-brutalist-button {
+    width: min(var(--ai-loader-btn-size, 142px), 128px);
+    height: min(var(--ai-loader-btn-size, 142px), 128px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-loader-brutalist-button,
+  .ai-loader-openai-logo,
+  .ai-loader-openai-icon,
+  .ai-loader-button-text-wrap,
+  .ai-loader-button-1::before,
+  .ai-loader-button-1::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

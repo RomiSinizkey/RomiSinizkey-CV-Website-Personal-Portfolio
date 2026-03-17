@@ -121,7 +121,7 @@ export default function HomeProjectsShowcase() {
       <AnimatePresence>
         {show && (
           <motion.div
-            className="fixed right-8 bottom-8 z-[9998]"
+            className="fixed right-8 bottom-8 z-9998"
             style={{ right: 32, bottom: 70 }}
             initial={enter}
             animate={{ opacity: 1, x: 0, scale: 1 }}

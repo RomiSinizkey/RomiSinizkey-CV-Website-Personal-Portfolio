@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AI_INTENTS, SUGGESTIONS, type AiIntentKey } from "./ai/aiIntents";
-import AILoader from "./ui/ai-loader";
+import { AI_INTENTS, SUGGESTIONS, type AiIntentKey } from "./aiIntents";
+import AILoader from "./AILoader";
+import "../../styles/components/aiAssistantWidget.css";
 
 type Msg = { id: string; from: "user" | "ai"; text: string };
 
@@ -51,20 +52,17 @@ function TypingDots() {
   return (
     <span className="inline-flex items-center gap-1">
       <motion.span
-        className="h-1.5 w-1.5"
-        style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
+        className="h-1.5 w-1.5 rounded-full aiw-typing-dot"
         animate={{ y: [0, -3, 0] }}
         transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.span
-        className="h-1.5 w-1.5"
-        style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
+        className="h-1.5 w-1.5 rounded-full aiw-typing-dot"
         animate={{ y: [0, -3, 0] }}
         transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.12 }}
       />
       <motion.span
-        className="h-1.5 w-1.5"
-        style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
+        className="h-1.5 w-1.5 rounded-full aiw-typing-dot"
         animate={{ y: [0, -3, 0] }}
         transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.24 }}
       />
@@ -74,32 +72,31 @@ function TypingDots() {
 
 function AgentAvatar({ open }: { open: boolean }) {
   return (
-    <motion.div className="relative h-10 w-10" transition={{ type: "spring", stiffness: 260, damping: 22 }}>
+    <motion.div className="aiw-avatar" transition={{ type: "spring", stiffness: 260, damping: 22 }}>
       <motion.div
-        className="absolute inset-0 blur-[14px] opacity-25"
+        className="aiw-avatar-glow"
         animate={{ scale: [1, 1.06, 1] }}
         transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-        style={{ background: "radial-gradient(circle at 40% 35%, var(--accent), rgba(255,255,255,0) 62%)" }}
       />
       <motion.div
-        className="absolute inset-0 bg-white shadow-[0_18px_45px_rgba(0,0,0,0.16)]"
+        className="aiw-avatar-core"
         animate={{ y: [0, -1.2, 0] }}
         transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
       />
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[42%] flex gap-2">
+      <div className="aiw-avatar-eyes">
         <motion.div
-          className="h-2.5 w-2.5 bg-black/75"
+          className="aiw-avatar-eye"
           animate={{ scaleY: [1, 0.12, 1] }}
           transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="h-2.5 w-2.5 bg-black/75"
+          className="aiw-avatar-eye"
           animate={{ scaleY: [1, 0.12, 1] }}
           transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.1 }}
         />
       </div>
       <motion.div
-        className="absolute left-1/2 top-[62%] -translate-x-1/2 h-[3px] w-4 bg-black/55"
+        className="aiw-avatar-mouth"
         animate={{ width: open ? 18 : 14 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
       />
@@ -115,21 +112,20 @@ function SendIcon() {
   );
 }
 
-function ChevronIcon({ collapsed }: { collapsed: boolean }) {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      {collapsed ? (
-        <path d="M10 6l6 6-6 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      ) : (
-        <path d="M14 6l-6 6 6 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      )}
-    </svg>
-  );
-}
+
 
 type BtnPos = { x: number; y: number };
+type PanelSize = { width: number; height: number };
 const POS_KEY = "ai_btn_pos_fixed_v1";
 const MINI_KEY = "ai_btn_mini_fixed_v1";
+const SIZE_KEY = "ai_panel_size_v1";
+const LOADER_HIDDEN_KEY = "ai_loader_hidden_v1";
+
+const PANEL_MIN_W = 260;
+const PANEL_MAX_W = 520;
+const PANEL_MIN_H = 300;
+const PANEL_MAX_H = 700;
+const PANEL_RESIZE_STEP = 24;
 
 export default function AIAssistantWidget() {
   const navigate = useNavigate();
@@ -147,11 +143,25 @@ export default function AIAssistantWidget() {
 
   const [isMobile, setIsMobile] = useState(() => window.matchMedia("(max-width: 640px)").matches);
 
-  const [mini, setMini] = useState(() => {
+  const [mini] = useState(() => {
     try {
       return localStorage.getItem(MINI_KEY) === "1";
     } catch {
       return false;
+    }
+  });
+
+  const [panelSize, setPanelSize] = useState<PanelSize>(() => {
+    try {
+      const raw = localStorage.getItem(SIZE_KEY);
+      if (!raw) return { width: 320, height: 420 };
+      const parsed = JSON.parse(raw) as PanelSize;
+      return {
+        width: typeof parsed.width === "number" ? parsed.width : 320,
+        height: typeof parsed.height === "number" ? parsed.height : 420,
+      };
+    } catch {
+      return { width: 320, height: 420 };
     }
   });
 
@@ -182,19 +192,16 @@ export default function AIAssistantWidget() {
   const suppressOpenRef = useRef(false);
 
   const [showHint, setShowHint] = useState(false);
-  const hintTimerRef = useRef<number | null>(null);
 
-  const showHintFor = (ms: number) => {
-    setShowHint(true);
-    if (hintTimerRef.current) window.clearTimeout(hintTimerRef.current);
-    hintTimerRef.current = window.setTimeout(() => setShowHint(false), ms);
-  };
+  const [loaderHidden, setLoaderHidden] = useState(() => {
+    try {
+      return localStorage.getItem(LOADER_HIDDEN_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
 
-  useEffect(() => {
-    return () => {
-      if (hintTimerRef.current) window.clearTimeout(hintTimerRef.current);
-    };
-  }, []);
+  const hideHint = () => setShowHint(false);
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.matchMedia("(max-width: 640px)").matches);
@@ -214,6 +221,36 @@ export default function AIAssistantWidget() {
       localStorage.setItem(POS_KEY, JSON.stringify(btnPos));
     } catch {}
   }, [btnPos]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIZE_KEY, JSON.stringify(panelSize));
+    } catch {}
+  }, [panelSize]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LOADER_HIDDEN_KEY, loaderHidden ? "1" : "0");
+    } catch {}
+  }, [loaderHidden]);
+
+  useEffect(() => {
+    const onResize = () => {
+      const maxWByViewport = Math.max(PANEL_MIN_W, window.innerWidth - 24);
+      const maxHByViewport = Math.max(PANEL_MIN_H, window.innerHeight - 16);
+      const allowedMaxW = Math.min(PANEL_MAX_W, maxWByViewport);
+      const allowedMaxH = Math.min(PANEL_MAX_H, maxHByViewport);
+
+      setPanelSize((current) => ({
+        width: clamp(current.width, PANEL_MIN_W, allowedMaxW),
+        height: clamp(current.height, PANEL_MIN_H, allowedMaxH),
+      }));
+    };
+
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   useEffect(() => {
     const onResize = () => {
@@ -330,15 +367,30 @@ export default function AIAssistantWidget() {
     await answer(q);
   };
 
-  const panelW = isMobile ? "min(260px, calc(100vw - 24px))" : "260px";
-  const FULL_H = 300;
+  const maxWByViewport = Math.max(PANEL_MIN_W, window.innerWidth - 24);
+  const maxHByViewport = Math.max(PANEL_MIN_H, window.innerHeight - 16);
+  const allowedMaxW = Math.min(PANEL_MAX_W, maxWByViewport);
+  const allowedMaxH = Math.min(PANEL_MAX_H, maxHByViewport);
+
+  const panelWidth = clamp(panelSize.width, PANEL_MIN_W, allowedMaxW);
+  const panelHeight = clamp(panelSize.height, PANEL_MIN_H, allowedMaxH);
+
+  const canShrink = panelWidth > PANEL_MIN_W || panelHeight > PANEL_MIN_H;
+  const canGrow = panelWidth < allowedMaxW || panelHeight < allowedMaxH;
+
+  const resizePanel = (delta: number) => {
+    setPanelSize((current) => ({
+      width: clamp(current.width + delta, PANEL_MIN_W, allowedMaxW),
+      height: clamp(current.height + delta, PANEL_MIN_H, allowedMaxH),
+    }));
+  };
 
   const hostStyle: React.CSSProperties = {
     position: "fixed",
-    left: clamp(btnPos.x, 8, Math.max(8, window.innerWidth - 280)),
-    top: clamp(btnPos.y + 60, 8, Math.max(8, window.innerHeight - FULL_H - 8)),
-    height: `${FULL_H}px`,
-    width: panelW,
+    left: clamp(btnPos.x, 8, Math.max(8, window.innerWidth - panelWidth - 8)),
+    top: clamp(btnPos.y + 60, 8, Math.max(8, window.innerHeight - panelHeight - 8)),
+    height: `${panelHeight}px`,
+    width: `${panelWidth}px`,
     maxWidth: "calc(100vw - 24px)",
     zIndex: 2147483646,
     pointerEvents: "auto",
@@ -348,6 +400,7 @@ export default function AIAssistantWidget() {
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
+    hideHint();
     (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
 
     dragState.current = {
@@ -383,6 +436,7 @@ export default function AIAssistantWidget() {
   };
 
   const onPointerUp = () => {
+    hideHint();
     const st = dragState.current;
     dragState.current = null;
 
@@ -392,7 +446,24 @@ export default function AIAssistantWidget() {
     }
 
     if (st?.didDrag) return;
+    if (loaderHidden) return;
     setOpen(true);
+  };
+
+  const onLoaderTogglePointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    suppressOpenRef.current = true;
+    hideHint();
+  };
+
+  const onLoaderTogglePointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    suppressOpenRef.current = true;
+  };
+
+  const onLoaderToggleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setLoaderHidden((prev) => !prev);
   };
 
   return createPortal(
@@ -401,8 +472,8 @@ export default function AIAssistantWidget() {
         {open ? (
           <motion.div
             key="backdrop"
-            className="fixed inset-0"
-            style={{ zIndex: 2147483000, background: "rgba(0,0,0,0.65)" }}
+            className="fixed inset-0 aiw-backdrop"
+            style={{ zIndex: 2147483000 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -415,40 +486,46 @@ export default function AIAssistantWidget() {
         {open ? (
           <motion.div
             key="panelHost"
+            className="aiw-host"
             style={hostStyle}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ type: "spring", stiffness: 320, damping: 26 }}
           >
-            <div
-              style={{
-                width: panelW,
-                maxWidth: "calc(100vw - 24px)",
-                height: "100%",
-                background: "#fff",
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <div style={{ padding: "12px 12px 8px", display: "flex", alignItems: "center", gap: 10, flex: "0 0 auto" }}>
+            <div className="aiw-panel">
+              <div className="aiw-header">
                 <AgentAvatar open />
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(0,0,0,0.85)" }}>AI Assistant</div>
-                  <div style={{ fontSize: 11.5, color: "rgba(0,0,0,0.55)" }}>Ask me to navigate.</div>
+                <div className="aiw-header-meta">
+                  <div className="aiw-title">AI Assistant</div>
+                  <div className="aiw-subtitle">Ask me to navigate.</div>
                 </div>
 
-                <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
+                <div className="aiw-header-actions">
+                  <div className="aiw-size-controls" role="group" aria-label="Resize chat panel">
+                    <button
+                      type="button"
+                      onClick={() => resizePanel(-PANEL_RESIZE_STEP)}
+                      className="aiw-size-btn"
+                      aria-label="Smaller chat"
+                      disabled={!canShrink}
+                    >
+                      −
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => resizePanel(PANEL_RESIZE_STEP)}
+                      className="aiw-size-btn"
+                      aria-label="Larger chat"
+                      disabled={!canGrow}
+                    >
+                      +
+                    </button>
+                  </div>
                   <button
+                    type="button"
                     onClick={() => setOpen(false)}
-                    style={{
-                      padding: "6px 8px",
-                      fontSize: 11.5,
-                      fontWeight: 600,
-                      color: "rgba(0,0,0,0.65)",
-                      background: "transparent",
-                    }}
+                    className="aiw-close-btn"
                     title="Close"
                   >
                     Close
@@ -456,20 +533,13 @@ export default function AIAssistantWidget() {
                 </div>
               </div>
 
-              <div style={{ padding: "0 12px 8px", flex: "0 0 auto" }}>
-                <div style={{ display: "flex", gap: 8, overflowX: "auto" }}>
+              <div className="aiw-suggestions-wrap">
+                <div className="aiw-suggestions-row">
                   {SUGGESTIONS.map((s) => (
                     <button
                       key={s}
                       onClick={() => quickAsk(s)}
-                      style={{
-                        padding: "7px 9px",
-                        fontSize: 11.5,
-                        fontWeight: 600,
-                        background: "rgba(0,0,0,0.05)",
-                        color: "rgba(0,0,0,0.65)",
-                        whiteSpace: "nowrap",
-                      }}
+                      className="aiw-suggestion-btn"
                     >
                       {s}
                     </button>
@@ -477,45 +547,20 @@ export default function AIAssistantWidget() {
                 </div>
               </div>
 
-              <div style={{ padding: "0 12px 10px", flex: "1 1 auto", minHeight: 0 }}>
-                <div
-                  ref={scrollBoxRef}
-                  style={{
-                    background: "#f3f4f6",
-                    padding: 9,
-                    height: "100%",
-                    overflowY: "auto",
-                    overflowX: "hidden",
-                  }}
-                >
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div className="aiw-body-wrap">
+                <div ref={scrollBoxRef} className="aiw-scroll-box">
+                  <div className="aiw-messages-col">
                     {msgs.map((m) => (
-                      <div key={m.id} style={{ display: "flex", justifyContent: m.from === "user" ? "flex-end" : "flex-start" }}>
-                        <div
-                          style={{
-                            maxWidth: "85%",
-                            padding: "9px 10px",
-                            fontSize: 12.5,
-                            lineHeight: 1.35,
-                            color: m.from === "user" ? "white" : "rgba(0,0,0,0.82)",
-                            background: m.from === "user" ? "var(--accent)" : "#ffffff",
-                            boxShadow: m.from === "user" ? "0 10px 25px rgba(0,0,0,0.10)" : "0 6px 16px rgba(0,0,0,0.08)",
-                          }}
-                        >
+                      <div key={m.id} className={`aiw-message-row ${m.from === "user" ? "is-user" : "is-ai"}`}>
+                        <div className={`aiw-message-bubble ${m.from === "user" ? "is-user" : "is-ai"}`}>
                           {m.text}
                         </div>
                       </div>
                     ))}
 
                     {typing && (
-                      <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                        <div
-                          style={{
-                            background: "#fff",
-                            padding: "9px 10px",
-                            boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
-                          }}
-                        >
+                      <div className="aiw-message-row is-ai">
+                        <div className="aiw-message-bubble is-ai aiw-typing-bubble">
                           <TypingDots />
                         </div>
                       </div>
@@ -524,44 +569,26 @@ export default function AIAssistantWidget() {
                 </div>
               </div>
 
-              <div style={{ padding: "10px 12px 12px", background: "#ffffff", flex: "0 0 auto" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ flex: 1, background: "#f3f4f6", padding: "9px 10px" }}>
+              <div className="aiw-input-wrap">
+                <div className="aiw-input-row">
+                  <div className="aiw-input-shell">
                     <input
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") onSend();
                       }}
-                      style={{
-                        width: "100%",
-                        background: "transparent",
-                        outline: "none",
-                        fontSize: 13,
-                        color: "rgba(0,0,0,0.85)",
-                      }}
+                      className="aiw-input"
                       placeholder='Example: "Where are the projects?"'
                     />
                   </div>
 
                   <button
                     onClick={onSend}
-                    style={{
-                      background: "var(--accent)",
-                      color: "white",
-                      padding: "9px 12px",
-                      fontSize: 11.5,
-                      fontWeight: 700,
-                      letterSpacing: "0.14em",
-                      textTransform: "uppercase",
-                      boxShadow: "0 12px 30px rgba(0,0,0,0.16)",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                    }}
+                    className="aiw-send-btn"
                     aria-label="Send"
                   >
-                    <SendIcon /> Send
+                    <SendIcon /> <span>Send</span>
                   </button>
                 </div>
               </div>
@@ -573,15 +600,12 @@ export default function AIAssistantWidget() {
       {!open && (
         <div
           ref={btnWrapRef}
-          onPointerDown={(e) => {
-            onPointerDown(e);
-            if (e.pointerType !== "mouse") showHintFor(1200);
-          }}
+          onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
           onMouseEnter={() => {
-            if (!isMobile) setShowHint(true);
+            if (!isMobile && !loaderHidden) setShowHint(true);
           }}
           onMouseLeave={() => {
             if (!isMobile) setShowHint(false);
@@ -591,139 +615,40 @@ export default function AIAssistantWidget() {
             left: btnPos.x,
             top: btnPos.y,
             zIndex: 2147483647,
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 10,
-            touchAction: "none",
-            userSelect: "none",
-            cursor: "grab",
-            background: "transparent",
-            border: "none",
-            boxShadow: "none",
-            padding: 0,
           }}
+          className="aiw-launcher-wrap"
           aria-label="AI assistant button"
         >
-          {showHint && (
-            <div
-              style={{
-                position: "absolute",
-                left: 0,
-                top: "calc(100% + 10px)",
-                width: "max-content",
-                maxWidth: "min(260px, calc(100vw - 24px))",
-                padding: "10px 12px",
-                borderRadius: 12,
-                background: "rgba(15,15,15,0.92)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                boxShadow: "0 18px 55px rgba(0,0,0,0.30)",
-                color: "rgba(255,255,255,0.92)",
-                fontSize: 12.5,
-                lineHeight: 1.25,
-                pointerEvents: "none",
-                zIndex: 2147483647,
-              }}
-            >
-              <div style={{ fontWeight: 800, letterSpacing: "0.02em" }}>Tip</div>
-              <div style={{ marginTop: 4, color: "rgba(255,255,255,0.78)" }}>
+          {showHint && !loaderHidden && (
+            <div className="aiw-tip-popover">
+              <div className="aiw-tip-title">Tip</div>
+              <div className="aiw-tip-text">
                 Drag to move • Click to open
               </div>
 
-              <div
-                style={{
-                  position: "absolute",
-                  top: -6,
-                  left: 18,
-                  width: 12,
-                  height: 12,
-                  background: "rgba(15,15,15,0.92)",
-                  borderLeft: "1px solid rgba(255,255,255,0.12)",
-                  borderTop: "1px solid rgba(255,255,255,0.12)",
-                  transform: "rotate(45deg)",
-                }}
-              />
+              <div className="aiw-tip-arrow" />
             </div>
           )}
 
-          {!isMobile && (
+          {!loaderHidden && (
             <div
-              role="button"
-              tabIndex={0}
-              data-no-open
-              onPointerDown={(e) => {
-                e.stopPropagation();
-                suppressOpenRef.current = true;
-              }}
-              onPointerUp={(e) => {
-                e.stopPropagation();
-                suppressOpenRef.current = true;
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                suppressOpenRef.current = true;
-                setMini((v) => !v);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  suppressOpenRef.current = true;
-                  setMini((v) => !v);
-                }
-              }}
-              style={{
-                height: 28,
-                width: 28,
-                borderRadius: 9999,
-                display: "grid",
-                placeItems: "center",
-                background: "rgba(17,17,17,0.88)",
-                border: "1px solid rgba(255,255,255,0.14)",
-                color: "white",
-                cursor: "pointer",
-                flex: "0 0 auto",
-                boxShadow: "0 10px 24px rgba(0,0,0,0.20)",
-              }}
-              aria-label={mini ? "Expand" : "Collapse"}
-              title={mini ? "Expand" : "Collapse"}
+              className={`aiw-launcher-inner ${mini || isMobile ? "is-compact" : ""}`}
             >
-              <ChevronIcon collapsed={mini} />
+              <AILoader size={40} />
             </div>
           )}
 
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 10,
-              padding: mini || isMobile ? 0 : "0 10px 0 0",
-            }}
+          <button
+            type="button"
+            className={`aiw-loader-toggle ${loaderHidden ? "is-hidden" : ""}`}
+            onPointerDown={onLoaderTogglePointerDown}
+            onPointerUp={onLoaderTogglePointerUp}
+            onClick={onLoaderToggleClick}
+            aria-label={loaderHidden ? "Show AI launcher" : "Hide AI launcher"}
+            title={loaderHidden ? "Show launcher" : "Hide launcher"}
           >
-            <AILoader variant="button" size={isMobile ? "sm" : "md"} />
-
-            {!mini && !isMobile && (
-              <div
-                style={{
-                  padding: "0 14px 0 2px",
-                  height: 42,
-                  display: "flex",
-                  alignItems: "center",
-                  borderRadius: 9999,
-                  background: "rgba(17,17,17,0.88)",
-                  border: "1px solid rgba(255,255,255,0.10)",
-                  color: "white",
-                  boxShadow: "0 14px 44px rgba(0,0,0,0.20)",
-                  backdropFilter: "blur(10px)",
-                  fontSize: 13,
-                  fontWeight: 800,
-                  letterSpacing: "0.06em",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Ask AI
-              </div>
-            )}
-          </div>
+            {loaderHidden ? "+" : "−"}
+          </button>
         </div>
       )}
     </>,

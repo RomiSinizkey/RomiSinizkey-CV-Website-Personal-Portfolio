@@ -9,6 +9,16 @@ export default defineConfig(({ mode }) => ({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
-  // רק בפרודקשן (deploy) נוסיף base של הריפו
+  server: {
+    proxy: {
+      "/api/open-meteo-geocode": {
+        target: "https://geocoding-api.open-meteo.com",
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) =>
+          path.replace(/^\/api\/open-meteo-geocode/, ""),
+      },
+    },
+  },
   base: mode === "production" ? "/RomiSinizkey-CV-Website-Personal-Portfolio/" : "/",
 }));

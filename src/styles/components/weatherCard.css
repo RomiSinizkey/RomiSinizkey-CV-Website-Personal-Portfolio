@@ -1,0 +1,263 @@
+/* Weather Card — scoped from Uiverse.io by Praashoo7 */
+
+/* ── Wrapper (keeps same page position) ───────────────────────────── */
+.weather-cardm {
+  position: absolute;
+  width: 250px;
+  top: 46.64%;
+  right: clamp(80px, 10vw, 160px);
+  transform: translateY(-50%);
+  z-index: 35;
+  pointer-events: auto;
+}
+
+/* ── Stack container (hover target for both cards) ────────────────── */
+.weather-stack {
+  position: relative;
+  width: 250px;
+  height: 130px;
+}
+
+/* ── Main (front/top) card ─────────────────────────────────────────── */
+.weather-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 130px;
+  border-radius: 25px;
+  background: #2b2b2b;
+  color: #fff;
+  z-index: 3;
+  transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.55);
+}
+
+.weather-stack:hover .weather-card {
+  background-color: #ffe87c;
+  color: #111;
+  cursor: pointer;
+}
+
+/* weather icon */
+.weather-icon {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-size: 74px;
+  line-height: 1;
+}
+
+/* temperature */
+.weather-main {
+  font-size: 3em;
+  font-weight: 800;
+  position: absolute;
+  top: 14px;
+  right: 20px;
+  left: auto;
+  line-height: 1;
+}
+
+/* city name */
+.weather-mainsub {
+  position: absolute;
+  bottom: 14px;
+  right: 20px;
+  font-size: 1.02em;
+  font-weight: 500;
+  max-width: 11ch;
+  line-height: 1.3;
+  text-align: right;
+}
+
+/* ── Back card (visible above+below the front card) ────────────────── */
+.weather-card2 {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  width: 240px;
+  height: 130px;
+  overflow: hidden;
+  border-radius: 35px;
+  background: #1e1e1e;
+  color: #fff;
+  z-index: 2;
+  transition: top 0.4s ease-in-out, height 0.4s ease-in-out;
+}
+
+.weather-stack:hover .weather-card2 {
+  top: -64px;
+  height: 280px;
+}
+
+/* ── Upper row (Humidity + Wind) ────────────────────────────────────── */
+.weather-upper {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 1.2em;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.25s ease-in-out, transform 0.35s ease-in-out;
+}
+
+.weather-stack:hover .weather-upper {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.weather-humidity,
+.weather-air {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.weather-upper-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.weather-humiditytext,
+.weather-airtext {
+  font-size: 0.7em;
+  line-height: 1.4;
+  color: #e0e0e0;
+}
+
+/* ── Divider ─────────────────────────────────────────────────────────── */
+.weather-divider {
+  position: absolute;
+  top: 72px;
+  left: 10%;
+  width: 80%;
+  margin: 0;
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.weather-stack:hover .weather-divider {
+  opacity: 1;
+}
+
+/* ── Lower row (AQI / RealFeel / Pressure) ──────────────────────────── */
+.weather-lower {
+  position: absolute;
+  top: 152px;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  text-align: center;
+  color: #fff;
+  font-size: 0.72em;
+  padding: 0 0.4em;
+  opacity: 0;
+  transition: top 0.4s ease-in-out, opacity 0.25s ease-in-out;
+}
+
+.weather-stack:hover .weather-lower {
+  top: 196px;
+  opacity: 1;
+}
+
+.weather-mini-icon {
+  display: block;
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+/* ── AQI banner — direct child of card2, pinned to bottom ───────────── */
+.weather-card3 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 34px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.95em;
+  font-weight: 700;
+  border-bottom-left-radius: 35px;
+  border-bottom-right-radius: 35px;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: transform 0.4s ease-in-out, opacity 0.25s ease-in-out;
+}
+
+.weather-stack:hover .weather-card3 {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.weather-card3.is-good { background: limegreen; }
+.weather-card3.is-mid  { background: #facc15; }
+.weather-card3.is-bad  { background: #ef4444; color: #fff; }
+
+/* ── Error toast ─────────────────────────────────────────────────────── */
+.weather-error {
+  position: absolute;
+  top: 144px;
+  left: 5px;
+  width: 240px;
+  font-size: 11px;
+  line-height: 1.3;
+  color: #fee2e2;
+  background: rgba(127,29,29,0.85);
+  border: 1px solid rgba(254,202,202,0.3);
+  border-radius: 10px;
+  padding: 6px 8px;
+  z-index: 10;
+  transition: top 0.35s ease-in-out;
+}
+
+.weather-stack:hover ~ .weather-error {
+  top: 246px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .weather-cardm {
+    top: auto;
+    right: 16px;
+    bottom: 60px;
+    transform: scale(0.85);
+    transform-origin: bottom right;
+  }
+
+  .weather-error {
+    top: 148px;
+  }
+
+  .weather-stack:hover ~ .weather-error {
+    top: 252px;
+  }
+}
+
+@media (max-width: 640px) {
+  .weather-cardm {
+    right: 10px;
+    bottom: 52px;
+    transform: scale(0.75);
+    transform-origin: bottom right;
+  }
+
+  .weather-error {
+    top: 146px;
+  }
+
+  .weather-stack:hover ~ .weather-error {
+    top: 248px;
+  }
+}
