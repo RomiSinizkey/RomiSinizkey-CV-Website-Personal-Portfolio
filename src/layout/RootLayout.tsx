@@ -1,15 +1,17 @@
 import { Outlet } from "react-router-dom";
-import { AIAssistantWidget } from "../components/AI_ASIS";
-import TopNavbar from "../components/navbar/TopNavbar";
-import MoltenCoreShader from "../components/BackGround";
+import AIAssistantWidget from "@/components/assistant/AIAssistantWidget";
+import TopNavbar from "@/components/layout/TopNavbar";
 
-export default function RootLayout() {
+interface Props {
+  ready?: boolean;
+}
+
+export default function RootLayout({ ready = false }: Props) {
   return (
     <>
-      <MoltenCoreShader />
       <div style={{ position: "relative", zIndex: 1 }}>
         <TopNavbar />
-        <AIAssistantWidget />
+        <AIAssistantWidget ready={ready} />
         <Outlet />
       </div>
     </>

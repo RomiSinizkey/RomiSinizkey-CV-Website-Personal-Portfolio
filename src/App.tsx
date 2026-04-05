@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import RootLayout from "./layout/RootLayout";
-import BrutalistLoader from "./components/BrutalistLoader";
+import BrutalistLoader from "./components/shared/BrutalistLoader";
 
-import HomePage from "./pages/HomePage";
-import AboutPage from "./pages/AboutPage";
-import EducationPage from "./pages/EducationPage";
-import ExperiencePage from "./pages/ExperiencePage";
-import ProjectsPage from "./pages/ProjectsPage";
+import HomePage from "./pages/home/HomePage";
+import AboutPage from "./pages/about/AboutPage";
+import EducationPage from "./pages/education/EducationPage";
+import ExperiencePage from "./pages/experience/ExperiencePage";
+import ProjectsPage from "./pages/projects/ProjectsPage";
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -15,18 +15,17 @@ export default function App() {
   return (
     <>
       <BrutalistLoader onDone={() => setReady(true)} />
-      {ready && <Routes>
-      <Route path="/" element={<RootLayout />}>
-        <Route index element={<HomePage />} />
-        <Route path="about" element={<AboutPage />} />
-        <Route path="education" element={<EducationPage />} />
-        <Route path="experience" element={<ExperiencePage />} />
-        <Route path="projects" element={<ProjectsPage />} />
-        <Route path="skills" element={<AboutPage />} />
-        <Route path="languages" element={<AboutPage />} />
-        <Route path="military" element={<ExperiencePage />} />
-      </Route>
-    </Routes>}
+      <div style={{ visibility: ready ? "visible" : "hidden" }}>
+        <Routes>
+          <Route path="/" element={<RootLayout ready={ready} />}>
+            <Route index element={<HomePage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="education" element={<EducationPage />} />
+            <Route path="experience" element={<ExperiencePage />} />
+            <Route path="projects" element={<ProjectsPage />} />
+          </Route>
+        </Routes>
+      </div>
     </>
   );
 }

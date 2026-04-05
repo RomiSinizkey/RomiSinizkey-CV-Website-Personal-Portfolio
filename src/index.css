@@ -1,8 +1,6 @@
 @import "tailwindcss/preflight";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
-@import "./styles/components/homeHeroTitle.css";
 
 @custom-variant dark (&:is(.dark *));
 @tailwind utilities;
@@ -89,63 +87,6 @@ button{
 
 h1, h2, h3, h4, h5, h6, p{
   margin: 0;
-}
-
-/* =========================
-   STATIC BACKGROUND GRAIN
-========================= */
-
-body::before{
-  content:"";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.05;
-  background-image:
-    radial-gradient(rgba(255,255,255,0.03) 0.6px, transparent 0.6px);
-  background-size: 18px 18px;
-}
-
-/* =========================
-   SUBTLE VIGNETTE
-========================= */
-
-
-/* =========================
-   MOOD -> ACCENT
-========================= */
-
-body[data-mood="sod"]{ --accent:#f97316; }
-body[data-mood="chat"]{ --accent:#38bdf8; }
-
-/* =========================
-   SELECTION
-========================= */
-
-::selection{
-  background: color-mix(in srgb, var(--accent) 30%, transparent);
-  color: white;
-}
-
-/* =========================
-   AI HIGHLIGHT RING
-========================= */
-
-.ai-highlight{
-  position: relative;
-  border-radius: 18px;
-  outline: 2px solid color-mix(in srgb, var(--accent) 72%, transparent);
-  box-shadow:
-    0 0 0 8px color-mix(in srgb, var(--accent) 14%, transparent),
-    0 18px 50px rgba(0,0,0,0.28);
-  animation: aiPulse 1.8s ease-in-out;
-}
-
-@keyframes aiPulse{
-  0%   { transform: translateZ(0) scale(1); }
-  30%  { transform: translateZ(0) scale(1.01); }
-  100% { transform: translateZ(0) scale(1); }
 }
 
 .dark {

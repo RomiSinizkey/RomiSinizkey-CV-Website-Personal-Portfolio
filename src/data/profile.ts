@@ -11,7 +11,8 @@ export const profile: Profile = {
     { label: "LinkedIn", href: "https://www.linkedin.com/in/romi-sinizkey-30a7b7322/" }
   ],
   email: "sinizromi@gmail.com",
-  cv: "/cv.pdf",  
+  phone: "0544276740",
+  cv: "/Romi_Sinizkey_CV.pdf",
   education: [
     {
       institution: "The Open University of Israel",
@@ -36,24 +37,25 @@ export const profile: Profile = {
     { group: "Backend", items: ["Node.js", "Express", "Python"] },
     { group: "Tools", items: ["Docker", "Git", "SQL (MariaDB/MySQL)"] }
   ],
+  languages: ["Hebrew", "English"],
   projects: [
     {
-      name: "smart-order-dashboard",
+      name: "Smart Order Dashboard",
       desc: "A React+TS dashboard for order management with clean UI and API integration.",
       tech: ["React", "TypeScript", "Vite"],
       link: "https://github.com/RomiSinizkey/smart-order-dashboard",
     },
     {
-      name: "web-programming-chatroom",
-      desc: "A web chatroom project (web programming course).",
+      name: "Web Programming Chatroom",
+      desc: "A web chatroom project with Node.js backend and MariaDB database.",
       tech: ["Node.js", "Express", "EJS", "MariaDB"],
       link: "https://github.com/RomiSinizkey/web-programming-chatroom",
     },
     {
-    name: "GTA-Clone",
-    desc: "GTA clone project (open-source) – gameplay & systems exploration.",
-    tech: ["Unity", "C#"],
-    link: "https://github.com/GTA-Clone/GTA-Clone",
+      name: "GTA-Clone",
+      desc: "GTA clone project (open-source) – gameplay & systems exploration.",
+      tech: ["Unity", "C#"],
+      link: "https://github.com/GTA-Clone/GTA-Clone",
     },
   ]
 

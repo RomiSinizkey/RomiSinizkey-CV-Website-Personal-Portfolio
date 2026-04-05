@@ -1,4 +1,28 @@
 /* =========================
+   GLOBAL BRAND SURFACE
+========================= */
+
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  background-image:
+    radial-gradient(rgba(255,255,255,0.03) 0.6px, transparent 0.6px);
+  background-size: 18px 18px;
+}
+
+body[data-mood="sod"]{ --accent:#f97316; }
+body[data-mood="chat"]{ --accent:#38bdf8; }
+
+::selection{
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: white;
+}
+
+/* =========================
    PREMIUM ROMI LOGO
    (inherit font so navbar + logo match)
 ========================= */

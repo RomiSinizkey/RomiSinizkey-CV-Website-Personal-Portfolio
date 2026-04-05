@@ -30,7 +30,9 @@ export type Profile = {
   education: EducationItem[];
   experience: ExperienceItem[];
   skills: { group: string; items: string[] }[];
+  languages: string[];
   projects: ProjectItem[];
   email: string;
+  phone?: string;
   cv?: string;
 };

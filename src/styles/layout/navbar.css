@@ -1,0 +1,494 @@
+/* =========================
+   EXPANDING ICON NAVBAR
+========================= */
+
+.topNav {
+  position: fixed;
+  top: calc(0px + env(safe-area-inset-top));
+  right: calc(28px + env(safe-area-inset-right));
+  z-index: 99999;
+  width: min(820px, calc(100vw - 56px));
+  height: 104px;
+  --nav-origin-x: 58px;
+  transition: opacity 220ms ease, transform 300ms ease, filter 220ms ease;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.topNav.isCollapsed {
+  filter: saturate(0.95);
+}
+
+.topNav.isScrolled {
+  transform: translateY(3px);
+}
+
+.topNavToggle {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.98), rgba(37, 99, 235, 0.96));
+  box-shadow:
+    0 14px 24px rgba(37, 99, 235, 0.32),
+    0 0 0 8px rgba(255, 255, 255, 0.05),
+    0 0 22px rgba(255, 152, 86, 0.14);
+  overflow: hidden;
+  cursor: pointer;
+  pointer-events: auto;
+  appearance: none;
+  -webkit-appearance: none;
+  transform: translate(0, -50%);
+  transition: transform 300ms ease, background 300ms ease, box-shadow 300ms ease;
+}
+
+.topNavToggle::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03)),
+    linear-gradient(180deg, rgba(59, 130, 246, 0.92), rgba(37, 99, 235, 0.94));
+  z-index: 0;
+}
+
+.topNavToggle::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  opacity: 0.6;
+}
+
+.topNavToggle:hover,
+.topNavToggle.isOpen {
+  transform: translate(0, -50%) scale(1.08);
+  box-shadow:
+    0 18px 30px rgba(37, 99, 235, 0.36),
+    0 0 0 10px rgba(255, 255, 255, 0.06),
+    0 0 28px rgba(255, 152, 86, 0.18);
+}
+
+.topNavToggle:active {
+  transform: translate(0, -50%) scale(1.02);
+}
+
+.topNavBurgerWrap {
+  display: none;
+}
+
+.topNavTogglePlus {
+  position: relative;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  transition: transform 500ms ease;
+}
+
+.topNavToggle:hover .topNavTogglePlus,
+.topNavToggle.isOpen .topNavTogglePlus {
+  transform: rotate(45deg);
+}
+
+.topNavTogglePlusLine {
+  position: relative;
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  display: block;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.topNavTogglePlusLineVertical {
+  position: absolute;
+  transform: rotate(90deg);
+}
+
+.stackNav {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 320ms ease, visibility 220ms ease;
+}
+
+.topNav.isCollapsed .stackNav {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.92);
+}
+
+.topNav.isOpen .stackNav {
+  opacity: 1;
+  visibility: visible;
+}
+
+.stackNavRow {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stackNavItem {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  list-style: none;
+  transform: translate(0, -50%);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 500ms cubic-bezier(0.68, -0.55, 0.27, 1.55),
+    opacity 320ms ease;
+  transition-delay: var(--delay);
+}
+
+.topNav.isOpen .stackNavItem {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(var(--offset-x), -50%);
+}
+
+.stackNavItem::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 28px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--i), var(--j));
+  opacity: 0;
+  transform: translateX(-50%) scaleX(0.2);
+  transition: transform 220ms ease, opacity 220ms ease;
+}
+
+.stackNavItem:hover::before,
+.stackNavItem.isActive::before {
+  opacity: 1;
+  transform: translateX(-50%) scaleX(1);
+}
+
+.stackNavItem::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--i) 32%, transparent), transparent 70%);
+  transition: opacity 220ms ease, transform 220ms ease;
+  z-index: -1;
+  opacity: 0;
+}
+
+.stackNavItem:hover::after,
+.stackNavItem.isActive::after {
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+.stackBadge {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 48px;
+  overflow: visible;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.86);
+  transition: color 220ms ease, transform 220ms ease, opacity 220ms ease, width 240ms ease;
+}
+
+.stackBadgeIcon,
+.stackBadgeTitle {
+  position: absolute;
+}
+
+.stackBadgeIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  color: #94a3b8;
+  box-shadow:
+    0 16px 28px rgba(15, 23, 42, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  transition: width 240ms ease, height 240ms ease, transform 220ms ease, color 220ms ease, background 220ms ease, box-shadow 220ms ease, opacity 180ms ease;
+}
+
+.stackBadgeIcon svg {
+  width: 16px;
+  height: 16px;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.stackNavItem.isActive .stackBadgeIcon {
+  color: var(--i);
+  background: #ffffff;
+  transform: scale(1.1);
+  box-shadow:
+    0 18px 32px rgba(15, 23, 42, 0.2),
+    0 0 20px color-mix(in srgb, var(--i) 18%, transparent);
+}
+
+.stackNavItem:hover .stackBadge {
+  width: var(--hover-width);
+}
+
+.stackNavItem:hover .stackBadgeIcon {
+  width: var(--hover-width);
+  height: 40px;
+  color: transparent;
+  background: linear-gradient(90deg, #f4c56d 0%, #d76cf7 48%, #3b82f6 100%);
+  transform: scale(1);
+  box-shadow:
+    0 18px 34px rgba(15, 23, 42, 0.22),
+    0 8px 28px rgba(215, 108, 247, 0.24),
+    0 0 24px rgba(59, 130, 246, 0.2);
+}
+
+.stackNavItem:hover .stackBadgeIcon svg {
+  opacity: 0;
+  transform: scale(0.7);
+}
+
+.stackBadgeTitle {
+  color: #ffffff;
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+  text-align: center;
+  width: calc(var(--hover-width) - 10px);
+  max-width: calc(var(--hover-width) - 10px);
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 180ms ease, transform 180ms ease, color 180ms ease;
+  white-space: nowrap;
+  pointer-events: none;
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.18);
+}
+
+.stackNavItem:hover .stackBadgeTitle {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.stackNavItem:hover .stackBadge,
+.stackNavItem.isActive .stackBadge {
+  transform: translateY(-2px);
+}
+
+/* =========================
+   CYBER CLICK FX
+========================= */
+
+.stackBadge .csfxLayer,
+.topNavToggle .csfxLayer {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.stackBadge .csfxBurst,
+.topNavToggle .csfxBurst {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 1px;
+  height: 1px;
+}
+
+.stackBadge .csfxRing,
+.topNavToggle .csfxRing {
+  position: absolute;
+  left: -10px;
+  top: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: conic-gradient(
+    from 90deg,
+    rgba(236, 72, 153, 0.9),
+    rgba(59, 130, 246, 0.95),
+    rgba(34, 197, 94, 0.85),
+    rgba(250, 204, 21, 0.95),
+    rgba(236, 72, 153, 0.9)
+  );
+  filter: blur(0.2px);
+  opacity: 0;
+  transform: scale(0.25);
+  animation: csfx-ring 950ms cubic-bezier(.2, .9, .2, 1) forwards;
+}
+
+.stackBadge .csfxCore {
+  position: absolute;
+  left: -4px;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 0 0 8px rgba(59, 130, 246, 0.14),
+    0 0 26px rgba(236, 72, 153, 0.25);
+  opacity: 0;
+  animation: csfx-core 950ms ease-out forwards;
+}
+
+.stackBadge .csfxSweep {
+  position: absolute;
+  left: -70px;
+  top: -1px;
+  width: 140px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(236, 72, 153, 0.35),
+    rgba(59, 130, 246, 0.35),
+    rgba(255, 255, 255, 0)
+  );
+  opacity: 0;
+  transform: rotate(-18deg);
+  animation: csfx-sweep 950ms ease-out forwards;
+}
+
+.stackBadge .csfxChip {
+  position: absolute;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(17, 17, 17, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.16),
+    0 0 18px rgba(59, 130, 246, 0.14);
+  opacity: 0;
+  transform: translate(0, 0) scale(0.98);
+  animation: csfx-chip 950ms ease-out forwards;
+}
+
+.stackBadge .csfxChip1 { --dx: 54px; --dy: -20px; --rot: -10deg; --glow: rgba(236, 72, 153, 0.35); animation-delay: 0ms; }
+.stackBadge .csfxChip2 { --dx: 66px; --dy: 8px; --rot: 8deg; --glow: rgba(59, 130, 246, 0.35); animation-delay: 35ms; }
+.stackBadge .csfxChip3 { --dx: 38px; --dy: 24px; --rot: 14deg; --glow: rgba(34, 197, 94, 0.30); animation-delay: 70ms; }
+.stackBadge .csfxChip4 { --dx: -52px; --dy: -18px; --rot: -12deg; --glow: rgba(250, 204, 21, 0.32); animation-delay: 15ms; }
+.stackBadge .csfxChip5 { --dx: -66px; --dy: 8px; --rot: 10deg; --glow: rgba(59, 130, 246, 0.30); animation-delay: 50ms; }
+.stackBadge .csfxChip6 { --dx: -40px; --dy: 26px; --rot: 16deg; --glow: rgba(236, 72, 153, 0.28); animation-delay: 85ms; }
+.stackBadge .csfxChip7 { --dx: 0px; --dy: 36px; --rot: 0deg; --glow: rgba(34, 197, 94, 0.26); animation-delay: 105ms; }
+
+.stackBadge .csfxChip {
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.16),
+    0 0 22px var(--glow);
+}
+
+@keyframes csfx-ring {
+  0% { opacity: 0; transform: scale(0.25) rotate(0deg); }
+  14% { opacity: 1; }
+  100% { opacity: 0; transform: scale(3.2) rotate(210deg); }
+}
+
+@keyframes csfx-core {
+  0% { opacity: 0; transform: scale(0.6); }
+  12% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.35); }
+}
+
+@keyframes csfx-sweep {
+  0% { opacity: 0; transform: translateX(-18px) rotate(-18deg); }
+  18% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(26px) rotate(-18deg); }
+}
+
+@keyframes csfx-chip {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(0.98); filter: blur(0px); }
+  18% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(1.03); filter: blur(0.25px); }
+}
+
+@media (max-width: 900px) {
+  .topNav {
+    top: calc(0px + env(safe-area-inset-top));
+    right: calc(12px + env(safe-area-inset-right));
+    width: min(340px, calc(100vw - 20px));
+    height: 328px;
+    --nav-origin-x: 0px;
+  }
+
+  .topNav.isCollapsed {
+    height: 64px;
+  }
+
+  .stackNav {
+    top: 70px;
+    left: auto;
+    right: 0;
+    bottom: auto;
+    width: min(320px, calc(100vw - 24px));
+    transform: none;
+  }
+
+  .stackNavRow {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px 6px;
+    height: auto;
+    justify-items: center;
+  }
+
+  .topNav.isCollapsed .stackNav {
+    transform: translateY(-12px);
+  }
+
+  .topNav.isOpen .stackNav {
+    transform: translateY(0);
+  }
+
+  .stackNavItem,
+  .topNav.isOpen .stackNavItem {
+    position: static;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .stackBadge {
+    width: 100%;
+  }
+
+  .topNavToggle {
+    width: 52px;
+    height: 52px;
+    left: auto;
+    right: 0;
+    transform: translate(0, -50%);
+  }
+}

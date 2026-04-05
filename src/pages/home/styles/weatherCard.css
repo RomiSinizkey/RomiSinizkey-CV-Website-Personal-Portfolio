@@ -1,0 +1,259 @@
+/* From Uiverse.io by vinodjangid07 - adapted for existing WeatherCard logic */
+
+.weather-cardm {
+  position: absolute;
+  top: 200px;
+  right: 50px;
+  z-index: 35;
+  pointer-events: auto;
+}
+
+.weather-cardm--hidden {
+  width: fit-content;
+}
+
+.cardContainer {
+  width: fit-content;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  position: relative;
+  width: 220px;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 10px;
+  border-radius: 10px;
+  backdrop-filter: blur(30px);
+  background-color: rgba(65, 65, 65, 0.308);
+  border: 1px solid rgba(255, 255, 255, 0.089);
+  cursor: pointer;
+}
+
+.weather-visibility-btn {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  z-index: 2;
+  border: none;
+  background: transparent;
+  color: rgb(197, 197, 197);
+  font-size: 0.7em;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  line-height: 1.2;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.weather-visibility-btn:hover {
+  color: white;
+  transform: translateY(-1px);
+}
+
+.weather-restore-btn {
+  position: relative;
+  width: 8em;
+  height: 3em;
+  border-radius: 40em;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 18px;
+  color: white;
+  overflow: hidden;
+  isolation: isolate;
+  cursor: pointer;
+  background: transparent;
+}
+
+.weather-restore-text {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 40em;
+  line-height: 3em;
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.473),
+    rgba(150, 150, 150, 0.25)
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.weather-restore-blob {
+  position: absolute;
+  z-index: -1;
+  width: 5em;
+  height: 3em;
+  border-radius: 5em;
+  transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+}
+
+.weather-restore-blob:nth-child(2) {
+  left: 0;
+  top: 0;
+  background: #ff930f;
+}
+
+.weather-restore-blob:nth-child(3) {
+  left: 1.8em;
+  top: 0;
+  background: #bf0fff;
+}
+
+.weather-restore-blob:nth-child(4) {
+  left: 4em;
+  top: -1em;
+  background: #ff1b6b;
+}
+
+.weather-restore-blob:nth-child(5) {
+  left: 4.3em;
+  top: 1.6em;
+  background: #0061ff;
+}
+
+.weather-restore-btn:hover .weather-restore-blob:nth-child(2) {
+  background: #0061ff;
+}
+
+.weather-restore-btn:hover .weather-restore-blob:nth-child(3) {
+  background: #ff1b6b;
+}
+
+.weather-restore-btn:hover .weather-restore-blob:nth-child(4) {
+  background: #bf0fff;
+}
+
+.weather-restore-btn:hover .weather-restore-blob:nth-child(5) {
+  background: #ff930f;
+}
+
+.weather-restore-btn:hover .weather-restore-blob {
+  transform: scale(1.3);
+}
+
+.weather-restore-btn:active {
+  border: 2px solid white;
+}
+
+.city {
+  font-weight: 700;
+  font-size: 0.9em;
+  letter-spacing: 1.2px;
+  color: white;
+  max-width: 188px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weather {
+  font-weight: 500;
+  font-size: 0.7em;
+  letter-spacing: 1.2px;
+  color: rgb(197, 197, 197);
+}
+
+.weather-icon-wrap {
+  font-size: 50px;
+  line-height: 1;
+}
+
+.temp {
+  font-size: 1.8em;
+  color: white;
+}
+
+.minmaxContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.min,
+.max {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0px 20px;
+  gap: 4px;
+}
+
+.max {
+  align-items: flex-start;
+  border-left: 2px solid white;
+}
+
+.maxHeading,
+.minHeading {
+  font-size: 0.7em;
+  font-weight: 600;
+  color: white;
+}
+
+.maxTemp,
+.minTemp {
+  font-size: 0.95em;
+  font-weight: 500;
+  color: rgb(197, 197, 197);
+}
+
+.cardContainer::before {
+  width: 100px;
+  height: 100px;
+  content: "";
+  position: absolute;
+  background-color: rgb(144, 161, 255);
+  z-index: -1;
+  border-radius: 50%;
+  left: 100px;
+  top: 50px;
+  transition: all 1s;
+}
+
+.cardContainer:hover::before {
+  transform: translate(-50px, 50px);
+}
+
+.weather-error {
+  width: 220px;
+  margin-top: 10px;
+  font-size: 11px;
+  line-height: 1.35;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #fee2e2;
+  background: rgba(127, 29, 29, 0.85);
+  border: 1px solid rgba(254, 202, 202, 0.3);
+}
+
+@media (max-width: 1024px) {
+  .weather-cardm {
+    top: 20px;
+    right: 24px;
+    transform: scale(0.88);
+    transform-origin: top right;
+  }
+}
+
+@media (max-width: 640px) {
+  .weather-cardm {
+    top: 16px;
+    right: 12px;
+    transform: scale(0.76);
+    transform-origin: top right;
+  }
+}
