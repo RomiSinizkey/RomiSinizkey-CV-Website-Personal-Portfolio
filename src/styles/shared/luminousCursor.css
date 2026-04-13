@@ -1,0 +1,282 @@
+html.has-luminous-cursor,
+html.has-luminous-cursor body,
+html.has-luminous-cursor *,
+html.has-luminous-cursor *::before,
+html.has-luminous-cursor *::after {
+  cursor: none !important;
+}
+
+html.has-luminous-cursor input,
+html.has-luminous-cursor textarea,
+html.has-luminous-cursor [contenteditable="true"] {
+  cursor: text !important;
+}
+
+html.has-luminous-cursor [data-cursor-label] {
+  cursor: none !important;
+}
+
+.luminousCursorRoot {
+  --cursor-accent: #ffffff;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2147483647;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.luminousCursorRoot.is-visible {
+  opacity: 1;
+}
+
+.luminousCursorDot,
+.luminousCursorRing,
+.luminousCursorLabel {
+  position: fixed;
+  left: 0;
+  top: 0;
+  will-change: transform, opacity, box-shadow, border-color, background;
+  transform: translate3d(-100px, -100px, 0);
+}
+
+.luminousCursorDot,
+.luminousCursorRing {
+  border-radius: 999px;
+}
+
+.luminousCursorDot {
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle at center, #ffffff 0%, color-mix(in srgb, var(--cursor-accent) 72%, #ffffff) 58%, transparent 100%);
+  box-shadow:
+    0 0 10px color-mix(in srgb, var(--cursor-accent) 78%, transparent),
+    0 0 28px color-mix(in srgb, var(--cursor-accent) 42%, transparent);
+  transition: width 180ms ease, height 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+}
+
+.luminousCursorRing {
+  width: 34px;
+  height: 34px;
+  overflow: hidden;
+  border: 1.5px solid color-mix(in srgb, var(--cursor-accent) 78%, rgba(255, 255, 255, 0.4));
+  background: radial-gradient(circle at center, color-mix(in srgb, var(--cursor-accent) 10%, transparent) 0%, transparent 70%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--cursor-accent) 18%, transparent),
+    0 0 24px color-mix(in srgb, var(--cursor-accent) 24%, transparent);
+  transition: width 220ms ease, height 220ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease, opacity 180ms ease;
+}
+
+.luminousCursorLabel {
+  opacity: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: rgba(255, 255, 255, 0.98);
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  line-height: 1;
+  white-space: nowrap;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.72),
+    0 0 22px rgba(255, 255, 255, 0.42),
+    0 0 36px rgba(148, 163, 184, 0.24);
+  transition: opacity 160ms ease;
+}
+
+.luminousCursorRoot.is-label-muted .luminousCursorLabel {
+  color: rgba(255, 255, 255, 0.98);
+  text-shadow: none;
+}
+
+.luminousCursorRoot.is-label-dark .luminousCursorLabel {
+  color: rgba(23, 24, 27, 0.98);
+  text-shadow: none;
+}
+
+.luminousCursorRing::before,
+.luminousCursorRing::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.luminousCursorRing::before {
+  inset: 2px;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, #ffffff 34%, transparent) 0%,
+      color-mix(in srgb, var(--cursor-accent) 18%, transparent) 16%,
+      color-mix(in srgb, var(--cursor-accent) 92%, rgba(255, 255, 255, 0.08)) 100%
+    );
+  transform: scaleY(0);
+  transform-origin: center bottom;
+  opacity: 0;
+  transition: transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1), opacity 220ms ease;
+}
+
+.luminousCursorRing::after {
+  inset: 5px 7px auto 7px;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.08));
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 220ms ease, transform 420ms ease;
+}
+
+.luminousCursorRoot.is-active .luminousCursorDot {
+  width: 10px;
+  height: 10px;
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--cursor-accent) 92%, transparent),
+    0 0 34px color-mix(in srgb, var(--cursor-accent) 54%, transparent);
+}
+
+.luminousCursorRoot.is-active .luminousCursorRing {
+  width: 46px;
+  height: 46px;
+  border-color: color-mix(in srgb, var(--cursor-accent) 92%, rgba(255, 255, 255, 0.72));
+  background: radial-gradient(circle at center, color-mix(in srgb, var(--cursor-accent) 18%, transparent) 0%, transparent 76%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--cursor-accent) 24%, transparent),
+    0 0 28px color-mix(in srgb, var(--cursor-accent) 34%, transparent),
+    0 0 42px color-mix(in srgb, var(--cursor-accent) 20%, transparent);
+}
+
+.luminousCursorRoot.is-labeled .luminousCursorDot,
+.luminousCursorRoot.is-labeled .luminousCursorRing {
+  opacity: 0;
+}
+
+.luminousCursorRoot.is-labeled .luminousCursorLabel {
+  opacity: 1;
+}
+
+.luminousCursorRoot.is-glow-dot .luminousCursorRing,
+.luminousCursorRoot.is-glow-dot .luminousCursorLabel {
+  opacity: 0;
+}
+
+.luminousCursorRoot.is-glow-dot .luminousCursorDot {
+  width: 12px;
+  height: 12px;
+  opacity: 1;
+  background: radial-gradient(circle at center, #ffffff 0%, color-mix(in srgb, var(--cursor-accent) 82%, #ffffff) 42%, color-mix(in srgb, var(--cursor-accent) 38%, transparent) 72%, transparent 100%);
+  box-shadow:
+    0 0 14px color-mix(in srgb, var(--cursor-accent) 96%, transparent),
+    0 0 34px color-mix(in srgb, var(--cursor-accent) 62%, transparent),
+    0 0 54px color-mix(in srgb, var(--cursor-accent) 28%, transparent);
+}
+
+.luminousCursorRoot.is-magnify .luminousCursorLabel,
+.luminousCursorRoot.is-magnify .luminousCursorDot {
+  opacity: 0;
+}
+
+.luminousCursorRoot.is-magnify .luminousCursorRing {
+  width: 42px;
+  height: 42px;
+  overflow: visible;
+  border-width: 2px;
+  border-color: rgba(255, 255, 255, 0.92);
+  background: radial-gradient(circle at 34% 34%, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.04) 42%, transparent 68%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 22px rgba(255, 255, 255, 0.16),
+    0 0 40px color-mix(in srgb, var(--cursor-accent) 22%, transparent);
+  transform-origin: center;
+}
+
+.luminousCursorRoot.is-magnify .luminousCursorRing::before {
+  inset: 6px;
+  opacity: 1;
+  transform: scaleY(1);
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.32), transparent 62%);
+}
+
+.luminousCursorRoot.is-magnify .luminousCursorRing::after {
+  inset: auto;
+  width: 16px;
+  height: 3px;
+  right: -10px;
+  bottom: 1px;
+  opacity: 1;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.94), color-mix(in srgb, var(--cursor-accent) 74%, rgba(255, 255, 255, 0.82)));
+  transform: rotate(42deg);
+  transform-origin: center;
+}
+
+.luminousCursorRoot.is-active.is-filled .luminousCursorDot {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  background: transparent;
+  box-shadow:
+    none;
+}
+
+.luminousCursorRoot.is-active.is-filled .luminousCursorRing {
+  width: 38px;
+  height: 38px;
+  border-color: color-mix(in srgb, var(--cursor-accent) 96%, rgba(255, 255, 255, 0.82));
+  background: radial-gradient(circle at 50% 28%, rgba(255, 255, 255, 0.14), transparent 58%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--cursor-accent) 34%, transparent),
+    0 0 22px color-mix(in srgb, var(--cursor-accent) 42%, transparent),
+    0 0 36px color-mix(in srgb, var(--cursor-accent) 28%, transparent);
+}
+
+.luminousCursorRoot.is-active.is-filled .luminousCursorRing::before {
+  opacity: 1;
+  transform: scaleY(1);
+  animation: cursorLiquidFill 900ms cubic-bezier(0.2, 0.9, 0.2, 1), cursorLiquidSlosh 1.9s ease-in-out 900ms infinite;
+}
+
+.luminousCursorRoot.is-active.is-filled .luminousCursorRing::after {
+  opacity: 0.72;
+  transform: translateY(0);
+}
+
+@keyframes cursorLiquidFill {
+  0% {
+    transform: scaleY(0.04);
+  }
+
+  70% {
+    transform: scaleY(1.04);
+  }
+
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes cursorLiquidSlosh {
+  0%,
+  100% {
+    clip-path: polygon(0% 16%, 15% 12%, 34% 17%, 52% 11%, 72% 15%, 100% 10%, 100% 100%, 0% 100%);
+  }
+
+  50% {
+    clip-path: polygon(0% 12%, 18% 17%, 36% 11%, 54% 16%, 75% 12%, 100% 15%, 100% 100%, 0% 100%);
+  }
+}
+
+.luminousCursorRoot.is-pressed .luminousCursorDot {
+  width: 6px;
+  height: 6px;
+}
+
+.luminousCursorRoot.is-pressed .luminousCursorRing {
+  width: 28px;
+  height: 28px;
+  opacity: 0.92;
+}

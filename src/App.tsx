@@ -18,7 +18,7 @@ export default function App() {
       <div style={{ visibility: ready ? "visible" : "hidden" }}>
         <Routes>
           <Route path="/" element={<RootLayout ready={ready} />}>
-            <Route index element={<HomePage />} />
+            <Route index element={<HomePage ready={ready} />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="education" element={<EducationPage />} />
             <Route path="experience" element={<ExperiencePage />} />

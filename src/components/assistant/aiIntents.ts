@@ -1,4 +1,5 @@
 export type AiIntentKey =
+  | "home"
   | "projects"
   | "experience"
   | "education"
@@ -8,17 +9,10 @@ export type AiIntentKey =
   | "contact"
   | "github";
 
-export const SUGGESTIONS = [
-  "Show my projects",
-  "Open experience",
-  "Go to skills",
-  "How can I contact you?",
-  "Open GitHub",
-];
-
 export const AI_INTENTS: Record<
   AiIntentKey,
   {
+    label: string;
     keywords: string[];
     reply: string;
     action:
@@ -26,7 +20,25 @@ export const AI_INTENTS: Record<
       | { type: "external"; href: string };
   }
 > = {
+  home: {
+    label: "Home",
+    keywords: [
+      "home",
+      "go home",
+      "back home",
+      "main page",
+      "landing page",
+      "homepage",
+      "start",
+      "top",
+      "go to top",
+    ],
+    reply: "Taking you back to Home.",
+    action: { type: "route", route: "/", anchorId: "home-section" },
+  },
+
   projects: {
+    label: "Projects",
     keywords: [
       "project",
       "projects",
@@ -46,6 +58,7 @@ export const AI_INTENTS: Record<
   },
 
   experience: {
+    label: "Experience",
     keywords: [
       "experience",
       "work experience",
@@ -63,6 +76,7 @@ export const AI_INTENTS: Record<
   },
 
   education: {
+    label: "Education",
     keywords: [
       "education",
       "school",
@@ -81,6 +95,7 @@ export const AI_INTENTS: Record<
   },
 
   about: {
+    label: "About",
     keywords: [
       "about",
       "about you",
@@ -98,6 +113,7 @@ export const AI_INTENTS: Record<
   },
 
   skills: {
+    label: "Skills",
     keywords: [
       "skills",
       "skill",
@@ -116,6 +132,7 @@ export const AI_INTENTS: Record<
   },
 
   languages: {
+    label: "Languages",
     keywords: [
       "language",
       "languages",
@@ -132,6 +149,7 @@ export const AI_INTENTS: Record<
   },
 
   contact: {
+    label: "Contact",
     keywords: [
       "contact",
       "how do i contact",
@@ -148,12 +166,12 @@ export const AI_INTENTS: Record<
       "get in touch",
       "where can i reach you",
     ],
-    reply: "Here's how to contact me — showing contact details.",
-    // חשוב: אל תכלול כאן "github" כדי שלא יגנוב את הכוונה של GitHub intent
+    reply: "Here’s the contact area.",
     action: { type: "route", route: "/", anchorId: "side-links" },
   },
 
   github: {
+    label: "GitHub",
     keywords: [
       "github",
       "open github",

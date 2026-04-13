@@ -1,0 +1,120 @@
+.name-logo-shell {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  z-index: 30;
+  pointer-events: auto;
+  user-select: none;
+  isolation: isolate;
+}
+
+.name-logo-frame {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.name-logo-word {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  color: #f97316;
+  font-size: 2.25rem;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  -webkit-text-fill-color: #f97316;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 10px rgba(249, 115, 22, 0.14),
+    0 0 24px rgba(249, 115, 22, 0.08);
+  white-space: nowrap;
+}
+
+.name-logo-letter {
+  --cursor-color: #f97316;
+  display: inline-block;
+  position: relative;
+  background: transparent;
+  transform-origin: center center;
+  animation: name-logo-letter-pulse 3.8s ease-in-out infinite;
+  transition: text-shadow 260ms ease, filter 260ms ease, transform 260ms ease;
+  will-change: transform, filter;
+}
+
+.name-logo-letter::after {
+  content: attr(data-letter);
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  text-shadow: none;
+  pointer-events: none;
+}
+
+.name-logo-letter + .name-logo-letter {
+  margin-left: -0.02em;
+}
+
+.name-logo-letter:hover {
+  background: transparent;
+  text-shadow: none;
+  filter: brightness(1.04);
+  transform: translateY(-0.04em) scale(1.18);
+  animation: name-logo-letter-hover-float 1s ease-in-out infinite;
+}
+
+.name-logo-letter:hover::after {
+  clip-path: inset(0 0 0 0);
+  background: transparent;
+  text-shadow: none;
+}
+
+@media (min-width: 768px) {
+  .name-logo-word {
+    font-size: 2.75rem;
+  }
+}
+
+@keyframes name-logo-letter-pulse {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    filter: brightness(1);
+  }
+
+  25% {
+    transform: translateY(-0.012em) scale(1.015);
+    filter: brightness(1.04);
+  }
+
+  50% {
+    transform: translateY(0.01em) scale(0.996);
+    filter: brightness(1.08);
+  }
+
+  75% {
+    transform: translateY(-0.008em) scale(1.008);
+    filter: brightness(1.03);
+  }
+}
+
+@keyframes name-logo-letter-hover-float {
+  0%,
+  100% {
+    transform: translateY(-0.04em) scale(1.18);
+  }
+
+  50% {
+    transform: translateY(-0.07em) scale(1.215);
+  }
+}

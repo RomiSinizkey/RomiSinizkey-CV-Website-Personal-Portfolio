@@ -6,6 +6,7 @@ interface BadgeNav {
   id: string;
   label: string;
   sectionId: string;
+  routePath?: string;
   icon: "home" | "projects" | "about" | "education" | "experience" | "skills" | "languages";
   colorStart: string;
   colorEnd: string;
@@ -27,13 +28,13 @@ const cn = (...inputs: Array<string | false | null | undefined>) =>
   inputs.filter(Boolean).join(" ");
 
 const badges: BadgeNav[] = [
-  { id: "home", label: "Home", sectionId: "home-section", icon: "home", colorStart: "#60a5fa", colorEnd: "#2563eb" },
-  { id: "about", label: "About", sectionId: "about-section", icon: "about", colorStart: "#a78bfa", colorEnd: "#6366f1" },
-  { id: "projects", label: "Projects", sectionId: "projects-section", icon: "projects", colorStart: "#fb923c", colorEnd: "#f59e0b" },
-  { id: "education", label: "Education", sectionId: "education-section", icon: "education", colorStart: "#4ade80", colorEnd: "#84cc16" },
-  { id: "experience", label: "Experience", sectionId: "experience-section", icon: "experience", colorStart: "#22d3ee", colorEnd: "#2563eb" },
-  { id: "skills", label: "Skills", sectionId: "skills-section", icon: "skills", colorStart: "#2dd4bf", colorEnd: "#0ea5e9" },
-  { id: "languages", label: "Languages", sectionId: "languages-section", icon: "languages", colorStart: "#c084fc", colorEnd: "#d946ef" },
+  { id: "home", label: "Home", sectionId: "home-section", routePath: "/", icon: "home", colorStart: "#60a5fa", colorEnd: "#2563eb" },
+  { id: "about", label: "About", sectionId: "about-section", routePath: "/about", icon: "about", colorStart: "#f472b6", colorEnd: "#db2777" },
+  { id: "projects", label: "Projects", sectionId: "projects-section", routePath: "/projects", icon: "projects", colorStart: "#fb923c", colorEnd: "#ea580c" },
+  { id: "education", label: "Education", sectionId: "education-section", routePath: "/education", icon: "education", colorStart: "#a3e635", colorEnd: "#65a30d" },
+  { id: "experience", label: "Experience", sectionId: "experience-section", routePath: "/experience", icon: "experience", colorStart: "#f87171", colorEnd: "#b91c1c" },
+  { id: "skills", label: "Skills", sectionId: "skills-section", icon: "skills", colorStart: "#2dd4bf", colorEnd: "#0f766e" },
+  { id: "languages", label: "Languages", sectionId: "languages-section", icon: "languages", colorStart: "#c084fc", colorEnd: "#7c3aed" },
 ];
 
 function renderBadgeIcon(icon: BadgeNav["icon"]) {
@@ -83,29 +84,8 @@ function renderBadgeIcon(icon: BadgeNav["icon"]) {
   }
 }
 
-function getBadgeOffset(index: number, total: number) {
-  return -((total - index) * 66);
-}
-
 function getBadgeHoverWidth(label: string) {
   return Math.max(84, Math.min(116, label.length * 8 + 22));
-}
-
-function getResolvedBadgeOffset(
-  index: number,
-  total: number,
-  hoveredIndex: number | null,
-  hoveredLabel: string | null
-) {
-  const baseOffset = getBadgeOffset(index, total);
-
-  if (hoveredIndex === null || hoveredLabel === null || index >= hoveredIndex) {
-    return baseOffset;
-  }
-
-  const hoveredWidth = getBadgeHoverWidth(hoveredLabel);
-  const extraShift = Math.max(0, hoveredWidth - 62);
-  return baseOffset - extraShift;
 }
 
 function scrollToSection(sectionId: string) {
@@ -118,11 +98,10 @@ function scrollToSection(sectionId: string) {
 export default function TopNavbar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const routeActiveBadgeId = badges.find((badge) => badge.routePath === location.pathname)?.id ?? null;
 
-  const [collapsed, setCollapsed] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home-section");
-  const [hoveredBadgeIndex, setHoveredBadgeIndex] = useState<number | null>(null);
   const [fx, setFx] = useState<FX[]>([]);
   const timers = useRef<number[]>([]);
 
@@ -238,55 +217,22 @@ export default function TopNavbar() {
   };
 
   return (
-    <header className={cn("topNav", collapsed && "isCollapsed", !collapsed && "isOpen", scrolled && "isScrolled")}>
-      <button
-        className={cn("topNavToggle", !collapsed && "isOpen")}
-        type="button"
-        onClick={(e) => {
-          spawnFX(e, "Toggle");
-          setCollapsed((v) => !v);
-        }}
-        aria-label="Toggle navigation"
-        aria-expanded={!collapsed}
-      >
-        <span className="topNavBurgerWrap" aria-hidden="true">
-          <span className="topNavBurgerLine" />
-          <span className="topNavBurgerLine" />
-          <span className="topNavBurgerLine" />
-        </span>
-
-        <span className="topNavTogglePlus" aria-hidden="true">
-          <span className="topNavTogglePlusLine" />
-          <span className="topNavTogglePlusLine topNavTogglePlusLineVertical" />
-        </span>
-
-        <span className="csfxLayer csfxLayer--toggle" aria-hidden="true">
-          {fx
-            .filter((b) => b.owner === "Toggle")
-            .map((b) => (
-              <span key={b.id} className="csfxBurst" style={{ left: b.x, top: b.y } as CSSProperties}>
-                <span className="csfxRing" />
-              </span>
-            ))}
-        </span>
-      </button>
-
+    <header className={cn("topNav", scrolled && "isScrolled")}>
       <nav className="stackNav" aria-label="Primary">
         <ul className="stackNavRow">
           {badges.map((badge, index) => {
-            const isActive = location.pathname === "/" ? activeSection === badge.sectionId : false;
+            const isActive = location.pathname === "/"
+              ? activeSection === badge.sectionId
+              : routeActiveBadgeId === badge.id;
             const hoverWidth = getBadgeHoverWidth(badge.label);
 
             return (
               <li
                 key={badge.id}
                 className={cn("stackNavItem", isActive && "isActive")}
-                onMouseEnter={() => setHoveredBadgeIndex(index)}
-                onMouseLeave={() => setHoveredBadgeIndex((current) => (current === index ? null : current))}
                 style={{
                   "--i": badge.colorStart,
                   "--j": badge.colorEnd,
-                  "--offset-x": `${getResolvedBadgeOffset(index, badges.length, hoveredBadgeIndex, hoveredBadgeIndex === null ? null : badges[hoveredBadgeIndex]?.label ?? null)}px`,
                   "--hover-width": `${hoverWidth}px`,
                   "--delay": `${50 + index * 45}ms`,
                 } as CSSProperties}
@@ -295,6 +241,7 @@ export default function TopNavbar() {
                   href={`#${badge.sectionId}`}
                   onClick={onBadgeClick(badge)}
                   className="stackBadge"
+                  data-cursor-fill="solid"
                 >
                   <span className="stackBadgeIcon" aria-hidden="true">{renderBadgeIcon(badge.icon)}</span>
                   <span className="stackBadgeTitle">{badge.label}</span>

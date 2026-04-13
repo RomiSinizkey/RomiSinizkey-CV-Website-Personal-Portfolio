@@ -4,166 +4,47 @@
 
 .topNav {
   position: fixed;
-  top: calc(0px + env(safe-area-inset-top));
-  right: calc(28px + env(safe-area-inset-right));
+  top: calc(12px + env(safe-area-inset-top));
+  left: 50%;
   z-index: 99999;
-  width: min(820px, calc(100vw - 56px));
-  height: 104px;
-  --nav-origin-x: 58px;
+  width: min(980px, calc(100vw - 32px));
   transition: opacity 220ms ease, transform 300ms ease, filter 220ms ease;
   will-change: transform;
-  pointer-events: none;
-}
-
-.topNav.isCollapsed {
-  filter: saturate(0.95);
+  pointer-events: auto;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 12px 24px rgba(15, 23, 42, 0.22));
 }
 
 .topNav.isScrolled {
-  transform: translateY(3px);
-}
-
-.topNavToggle {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  width: 56px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(59, 130, 246, 0.98), rgba(37, 99, 235, 0.96));
-  box-shadow:
-    0 14px 24px rgba(37, 99, 235, 0.32),
-    0 0 0 8px rgba(255, 255, 255, 0.05),
-    0 0 22px rgba(255, 152, 86, 0.14);
-  overflow: hidden;
-  cursor: pointer;
-  pointer-events: auto;
-  appearance: none;
-  -webkit-appearance: none;
-  transform: translate(0, -50%);
-  transition: transform 300ms ease, background 300ms ease, box-shadow 300ms ease;
-}
-
-.topNavToggle::before {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  border-radius: inherit;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03)),
-    linear-gradient(180deg, rgba(59, 130, 246, 0.92), rgba(37, 99, 235, 0.94));
-  z-index: 0;
-}
-
-.topNavToggle::after {
-  content: "";
-  position: absolute;
-  inset: 7px;
-  border-radius: inherit;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  opacity: 0.6;
-}
-
-.topNavToggle:hover,
-.topNavToggle.isOpen {
-  transform: translate(0, -50%) scale(1.08);
-  box-shadow:
-    0 18px 30px rgba(37, 99, 235, 0.36),
-    0 0 0 10px rgba(255, 255, 255, 0.06),
-    0 0 28px rgba(255, 152, 86, 0.18);
-}
-
-.topNavToggle:active {
-  transform: translate(0, -50%) scale(1.02);
-}
-
-.topNavBurgerWrap {
-  display: none;
-}
-
-.topNavTogglePlus {
-  position: relative;
-  z-index: 1;
-  width: 24px;
-  height: 24px;
-  display: grid;
-  place-items: center;
-  transition: transform 500ms ease;
-}
-
-.topNavToggle:hover .topNavTogglePlus,
-.topNavToggle.isOpen .topNavTogglePlus {
-  transform: rotate(45deg);
-}
-
-.topNavTogglePlusLine {
-  position: relative;
-  width: 16px;
-  height: 2px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.96);
-  display: block;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-}
-
-.topNavTogglePlusLineVertical {
-  position: absolute;
-  transform: rotate(90deg);
+  transform: translateX(-50%) translateY(3px);
 }
 
 .stackNav {
-  position: absolute;
-  inset: 0;
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  pointer-events: none;
-  transition: opacity 220ms ease, transform 320ms ease, visibility 220ms ease;
-}
-
-.topNav.isCollapsed .stackNav {
-  opacity: 0;
-  visibility: hidden;
-  transform: scale(0.92);
-}
-
-.topNav.isOpen .stackNav {
-  opacity: 1;
-  visibility: visible;
+  pointer-events: auto;
 }
 
 .stackNavRow {
-  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
   width: 100%;
-  height: 100%;
   margin: 0;
-  padding: 0;
+  padding: 8px 10px;
   list-style: none;
 }
 
 .stackNavItem {
-  position: absolute;
-  top: 50%;
-  right: 0;
   list-style: none;
-  transform: translate(0, -50%);
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    transform 500ms cubic-bezier(0.68, -0.55, 0.27, 1.55),
-    opacity 320ms ease;
-  transition-delay: var(--delay);
-}
-
-.topNav.isOpen .stackNavItem {
+  position: relative;
   opacity: 1;
   pointer-events: auto;
-  transform: translate(var(--offset-x), -50%);
+  transition: transform 220ms ease, opacity 220ms ease;
 }
 
 .stackNavItem::before {
@@ -171,12 +52,13 @@
   position: absolute;
   left: 50%;
   bottom: -5px;
-  width: 28px;
-  height: 3px;
+  width: 24px;
+  height: 4px;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--i), var(--j));
   opacity: 0;
   transform: translateX(-50%) scaleX(0.2);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--i) 48%, transparent);
   transition: transform 220ms ease, opacity 220ms ease;
 }
 
@@ -209,12 +91,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 62px;
-  height: 48px;
+  width: 46px;
+  height: 38px;
   overflow: visible;
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.86);
-  transition: color 220ms ease, transform 220ms ease, opacity 220ms ease, width 240ms ease;
+  color: rgba(255, 255, 255, 0.96);
+  transition: color 420ms ease, transform 220ms ease, opacity 220ms ease, width 620ms ease;
 }
 
 .stackBadgeIcon,
@@ -223,42 +105,69 @@
 }
 
 .stackBadgeIcon {
-  width: 40px;
-  height: 40px;
+  width: 31px;
+  height: 31px;
   border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.95);
-  color: #94a3b8;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.96));
+  color: color-mix(in srgb, var(--i) 52%, #475569);
   box-shadow:
-    0 16px 28px rgba(15, 23, 42, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
-  transition: width 240ms ease, height 240ms ease, transform 220ms ease, color 220ms ease, background 220ms ease, box-shadow 220ms ease, opacity 180ms ease;
+    0 14px 28px rgba(15, 23, 42, 0.24),
+    0 0 0 1px rgba(255, 255, 255, 0.9),
+    0 0 20px color-mix(in srgb, var(--i) 20%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  transition: width 620ms ease, height 620ms ease, transform 320ms ease, color 420ms ease, background 620ms ease, box-shadow 420ms ease, opacity 260ms ease;
 }
 
 .stackBadgeIcon svg {
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
   transition: opacity 180ms ease, transform 180ms ease;
 }
 
 .stackNavItem.isActive .stackBadgeIcon {
-  color: var(--i);
-  background: #ffffff;
-  transform: scale(1.1);
+  width: var(--hover-width);
+  height: 31px;
+  color: transparent;
+  background: linear-gradient(90deg, var(--i), var(--j));
+  transform: scale(1);
   box-shadow:
-    0 18px 32px rgba(15, 23, 42, 0.2),
-    0 0 20px color-mix(in srgb, var(--i) 18%, transparent);
+    0 18px 34px rgba(15, 23, 42, 0.24),
+    0 8px 28px color-mix(in srgb, var(--i) 28%, transparent),
+    0 0 24px color-mix(in srgb, var(--j) 26%, transparent);
+}
+
+.stackNavItem.isActive .stackBadge {
+  width: var(--hover-width);
+}
+
+.stackNavItem.isActive .stackBadgeIcon svg {
+  opacity: 0;
+  transform: scale(0.7);
+}
+
+.stackNavItem.isActive .stackBadgeTitle {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .stackNavItem:hover .stackBadge {
   width: var(--hover-width);
 }
 
+.stackNavItem:hover .stackBadgeIcon,
+.stackNavItem.isActive:hover .stackBadgeIcon {
+  box-shadow:
+    0 20px 36px rgba(15, 23, 42, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.96),
+    0 0 30px color-mix(in srgb, var(--j) 36%, transparent);
+}
+
 .stackNavItem:hover .stackBadgeIcon {
   width: var(--hover-width);
-  height: 40px;
+  height: 31px;
   color: transparent;
   background: linear-gradient(90deg, #f4c56d 0%, #d76cf7 48%, #3b82f6 100%);
   transform: scale(1);
@@ -275,8 +184,8 @@
 
 .stackBadgeTitle {
   color: #ffffff;
-  font-size: 0.64rem;
-  font-weight: 500;
+  font-size: 0.68rem;
+  font-weight: 700;
   letter-spacing: 0;
   line-height: 1;
   text-transform: uppercase;
@@ -285,10 +194,12 @@
   max-width: calc(var(--hover-width) - 10px);
   opacity: 0;
   transform: scale(0.92);
-  transition: opacity 180ms ease, transform 180ms ease, color 180ms ease;
+  transition: opacity 360ms ease, transform 360ms ease, color 360ms ease;
   white-space: nowrap;
   pointer-events: none;
-  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.18);
+  text-shadow:
+    0 1px 10px rgba(255, 255, 255, 0.24),
+    0 0 14px rgba(255, 255, 255, 0.18);
 }
 
 .stackNavItem:hover .stackBadgeTitle {
@@ -305,24 +216,21 @@
    CYBER CLICK FX
 ========================= */
 
-.stackBadge .csfxLayer,
-.topNavToggle .csfxLayer {
+.stackBadge .csfxLayer {
   pointer-events: none;
   position: absolute;
   inset: 0;
   z-index: 3;
 }
 
-.stackBadge .csfxBurst,
-.topNavToggle .csfxBurst {
+.stackBadge .csfxBurst {
   position: absolute;
   transform: translate(-50%, -50%);
   width: 1px;
   height: 1px;
 }
 
-.stackBadge .csfxRing,
-.topNavToggle .csfxRing {
+.stackBadge .csfxRing {
   position: absolute;
   left: -10px;
   top: -10px;
@@ -436,59 +344,31 @@
 
 @media (max-width: 900px) {
   .topNav {
-    top: calc(0px + env(safe-area-inset-top));
-    right: calc(12px + env(safe-area-inset-right));
-    width: min(340px, calc(100vw - 20px));
-    height: 328px;
-    --nav-origin-x: 0px;
-  }
-
-  .topNav.isCollapsed {
-    height: 64px;
+    top: calc(10px + env(safe-area-inset-top));
+    width: min(720px, calc(100vw - 18px));
   }
 
   .stackNav {
-    top: 70px;
-    left: auto;
-    right: 0;
-    bottom: auto;
-    width: min(320px, calc(100vw - 24px));
-    transform: none;
-  }
-
-  .stackNavRow {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px 6px;
-    height: auto;
-    justify-items: center;
-  }
-
-  .topNav.isCollapsed .stackNav {
-    transform: translateY(-12px);
-  }
-
-  .topNav.isOpen .stackNav {
-    transform: translateY(0);
-  }
-
-  .stackNavItem,
-  .topNav.isOpen .stackNavItem {
-    position: static;
-    opacity: 1;
-    pointer-events: auto;
-    transform: none;
-  }
-
-  .stackBadge {
     width: 100%;
   }
 
-  .topNavToggle {
-    width: 52px;
-    height: 52px;
-    left: auto;
-    right: 0;
-    transform: translate(0, -50%);
+  .stackNavRow {
+    gap: 4px;
+    padding: 8px 8px;
+  }
+
+  .stackBadge {
+    width: 42px;
+    height: 34px;
+  }
+
+  .stackBadgeIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .stackBadgeIcon svg {
+    width: 12px;
+    height: 12px;
   }
 }

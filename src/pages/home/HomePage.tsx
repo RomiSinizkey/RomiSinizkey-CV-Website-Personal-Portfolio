@@ -7,18 +7,21 @@ import LanguagesSectionContent from "./components/LanguagesSectionContent";
 import NameLogo from "./components/NameLogo";
 import SideLinks from "./components/SideLinks";
 import SkillsSectionContent from "./components/SkillsSectionContent";
-import WeatherCard from "./components/WeatherCard";
+import UnderConstructionOverlay from "@/components/shared/UnderConstructionOverlay";
 import { AboutPageContent } from "../about/components/AboutPageContent";
 import { EducationSectionContent } from "../education/components/EducationSectionContent";
 import { ExperienceSectionContent } from "../experience/components/ExperienceSectionContent";
 import { ProjectsSectionContent } from "../projects/components/ProjectsSectionContent";
 import "./styles/homePage.css";
 
-export default function HomePage() {
+interface HomePageProps {
+  ready?: boolean;
+}
+
+export default function HomePage({ ready = false }: HomePageProps) {
   const location = useLocation();
-  const [robotSceneUrl] = useState(
-    () => `https://my.spline.design/nexbotrobotcharacterconcept-RXF98eJ6aQt4FOd1COVXVCbe/?v=${Date.now()}`
-  );
+  const robotSceneUrl = "https://prod.spline.design/qSFbDZTu6VOP7iPp/scene.splinecode";
+  const [activeSection, setActiveSection] = useState("home-section");
 
   const scrollToSection = (sectionId: string) => {
     const el = document.getElementById(sectionId);
@@ -34,88 +37,128 @@ export default function HomePage() {
     if (!s) return;
 
     requestAnimationFrame(() => {
-      if (s) {
-        scrollToSection(s);
-      }
+      scrollToSection(s);
     });
   }, [location.state]);
 
+  useEffect(() => {
+    const sectionIds = [
+      "home-section",
+      "about-section",
+      "projects-section",
+      "education-section",
+      "experience-section",
+      "skills-section",
+      "languages-section",
+    ];
+
+    const sections = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+        if (visibleEntries.length > 0) {
+          setActiveSection(visibleEntries[0].target.id);
+        }
+      },
+      {
+        threshold: [0.2, 0.35, 0.5, 0.7],
+        rootMargin: "-10% 0px -10% 0px",
+      }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, []);
+
+  const shouldShowOverlay = activeSection !== "home-section";
+
   return (
     <div className="relative w-full overflow-x-hidden">
-      {/* Particle Text Effect Background */}
+      {shouldShowOverlay && <UnderConstructionOverlay />}
+
       <ParticleTextEffect />
 
-      {/* Home Section */}
       <section
         id="home-section"
         className="relative overflow-hidden"
-        style={{ minHeight: "140vh" }}
+        style={{ minHeight: "160vh" }}
       >
-        <InteractiveRobotSpline
-          key={robotSceneUrl}
-          scene={robotSceneUrl}
-          className="absolute inset-x-0 top-[200px] z-0 h-screen w-full"
-        />
-
-        <button
-          type="button"
-          className="homepage-scroll-indicator pointer-events-auto"
-          aria-label="Scroll down"
-          onClick={() => scrollToSection("about-section")}
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-[250px] z-0 h-screen w-full overflow-hidden"
         >
-          <div className="homepage-scrolldown">
-            <div className="homepage-chevrons">
-              <div className="homepage-chevrondown"></div>
-              <div className="homepage-chevrondown"></div>
-            </div>
-          </div>
-        </button>
+          <InteractiveRobotSpline
+            key={robotSceneUrl}
+            scene={robotSceneUrl}
+            className="h-full w-full"
+          />
+        </div>
 
         <div className="pointer-events-none absolute inset-0 z-20">
-          <NameLogo />
+          {ready ? (
+            <div className="pointer-events-auto">
+              <NameLogo />
+            </div>
+          ) : null}
 
-          <div className="flex h-full w-full items-center justify-center translate-y-[15vh] translate-x-[190px] md:translate-x-[200px]">
+          <div className="absolute top-[120px] left-[485px] sm:top-[170px] md:top-[210px] lg:top-[230px]">
             <HomeHeroTitle />
           </div>
         </div>
-
-        <WeatherCard />
       </section>
 
-      {/* About Section */}
-      <section id="about-section" className="relative z-20 min-h-screen px-4 py-14 md:px-6 md:py-20">
+      <section
+        id="about-section"
+        className="relative z-20 min-h-[120vh] px-4 py-20 md:px-6 md:py-28"
+      >
         <div className="mx-auto w-full max-w-6xl">
           <AboutPageContent embedded />
         </div>
       </section>
 
-      {/* Projects Section */}
-      <section id="projects-section" className="relative z-20 min-h-screen px-6 py-24">
+      <section
+        id="projects-section"
+        className="relative z-20 min-h-[120vh] px-6 py-28"
+      >
         <ProjectsSectionContent embedded />
       </section>
 
-      {/* Education Section */}
-      <section id="education-section" className="relative z-20 min-h-screen px-6 py-24">
+      <section
+        id="education-section"
+        className="relative z-20 min-h-[120vh] px-6 py-28"
+      >
         <EducationSectionContent embedded />
       </section>
 
-      {/* Experience Section */}
-      <section id="experience-section" className="relative z-20 min-h-screen px-6 py-24">
+      <section
+        id="experience-section"
+        className="relative z-20 min-h-[120vh] px-6 py-28"
+      >
         <ExperienceSectionContent embedded />
       </section>
 
-      {/* Skills Section */}
-      <section id="skills-section" className="relative z-20 min-h-screen px-6 py-24">
+      <section
+        id="skills-section"
+        className="relative z-20 min-h-[120vh] px-6 py-28"
+      >
         <SkillsSectionContent />
       </section>
 
-      {/* Languages Section */}
-      <section id="languages-section" className="relative z-20 min-h-screen px-6 py-24">
+      <section
+        id="languages-section"
+        className="relative z-20 min-h-[120vh] px-6 py-28"
+      >
         <LanguagesSectionContent />
       </section>
 
       <SideLinks />
-
     </div>
   );
 }
