@@ -107,7 +107,7 @@ export default function HomePage({ ready = false }: HomePageProps) {
           </div>
         ) : null}
 
-        <div className="absolute inset-0 z-20 flex flex-col items-center pt-[110px] translate-x-[380px]">
+        <div className="absolute inset-0 z-20 flex flex-col items-center pt-[110px] translate-x-[350px]">
           <HomeHeroTitle />
         </div>
       </section>
