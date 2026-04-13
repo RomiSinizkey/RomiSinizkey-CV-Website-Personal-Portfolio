@@ -33,46 +33,44 @@ export default function HomeHeroTitle() {
   };
 
   return (
-    <div className="homeHeroTitle relative z-20 inline-block w-max max-w-none px-4">
-      <div className="flex flex-col items-center text-center">
-        <p className="whitespace-nowrap text-[38px] font-medium leading-none tracking-tight text-white sm:text-[48px] md:text-[60px]">
-          Student of
-        </p>
+    <div className="relative z-20 flex flex-col items-center text-center px-4">
+      <p className="text-center whitespace-nowrap text-[clamp(28px,3.6vw,54px)] font-medium leading-none tracking-tight text-white">
+        Student of
+      </p>
 
-        <div className="relative mt-10 md:mt-12">
-          <div className="absolute inset-0 rounded-lg bg-linear-to-r from-orange-400/30 via-sky-400/20 to-orange-400/30 blur-2xl" />
+      <div className="relative mt-6 md:mt-8">
+        <div className="pointer-events-none absolute inset-0 rounded-lg bg-linear-to-r from-orange-400/30 via-sky-400/20 to-orange-400/30 blur-2xl" />
 
-          <div
-            className="heroComputerscienceWrap relative z-10"
-            aria-label={COMPUTER_SCIENCE_TITLE}
-            onPointerMove={updateActiveChar}
-            onPointerEnter={updateActiveChar}
-            onPointerLeave={() => setActiveCharIndex(null)}
+        <div
+          className="relative z-10"
+          aria-label={COMPUTER_SCIENCE_TITLE}
+          onPointerMove={updateActiveChar}
+          onPointerEnter={updateActiveChar}
+          onPointerLeave={() => setActiveCharIndex(null)}
+        >
+          <p
+            className="
+              text-center whitespace-nowrap
+              text-[clamp(36px,5.2vw,78px)]
+              font-black tracking-[-0.04em] leading-[1.02]
+              text-orange-500
+            "
+            data-cursor="interactive"
+            data-cursor-fill="solid"
           >
-            <p
-              className="
-                logoAccent heroComputerscienceText relative z-10 whitespace-nowrap
-                text-[52px] font-extrabold tracking-tight
-                leading-[1.06] sm:text-[68px] sm:leading-[1.05]
-                md:text-[92px] md:leading-[1.03]
-              "
-              data-cursor="interactive"
-              data-cursor-fill="solid"
-            >
-              {COMPUTER_SCIENCE_CHARS.map((char, index) => (
-                <span
-                  key={`${char}-${index}`}
-                  data-char-index={index}
-                  data-cursor="interactive"
-                  data-cursor-fill="solid"
-                  className={`heroComputerscienceChar${char === " " ? " is-space" : ""}${activeCharIndex === index ? " is-active" : ""}`}
-                  aria-hidden="true"
-                >
-                  {char === " " ? "\u00A0" : char}
-                </span>
-              ))}
-            </p>
-          </div>
+            {COMPUTER_SCIENCE_CHARS.map((char, index) => (
+              <span
+                key={`${char}-${index}`}
+                data-char-index={index}
+                data-cursor="interactive"
+                data-cursor-fill="solid"
+                className={`heroComputerscienceChar${char === " " ? " is-space" : ""}${activeCharIndex === index ? " is-active" : ""}`}
+                aria-hidden="true"
+              >
+                {char === " " ? "\u00A0" : char}
+              </span>
+            ))}
+          </p>
         </div>
       </div>
     </div>

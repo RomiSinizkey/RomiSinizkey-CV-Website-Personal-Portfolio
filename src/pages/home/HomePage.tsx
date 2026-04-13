@@ -101,16 +101,14 @@ export default function HomePage({ ready = false }: HomePageProps) {
           />
         </div>
 
-        <div className="pointer-events-none absolute inset-0 z-20">
-          {ready ? (
-            <div className="pointer-events-auto">
-              <NameLogo />
-            </div>
-          ) : null}
-
-          <div className="absolute top-[120px] left-[485px] sm:top-[170px] md:top-[210px] lg:top-[230px]">
-            <HomeHeroTitle />
+        {ready ? (
+          <div className="pointer-events-auto absolute left-0 top-0 z-30">
+            <NameLogo />
           </div>
+        ) : null}
+
+        <div className="absolute inset-0 z-20 flex flex-col items-center pt-[110px] translate-x-[410px]">
+          <HomeHeroTitle />
         </div>
       </section>
 

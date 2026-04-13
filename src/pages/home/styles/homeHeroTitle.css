@@ -194,6 +194,7 @@
   --cursor-color: #f97316;
   color: #f97316;
   -webkit-text-fill-color: #f97316;
+  font-weight: 900;
   transform-origin: center 72%;
   transition: transform 120ms ease, filter 120ms ease, text-shadow 120ms ease;
   will-change: transform;
