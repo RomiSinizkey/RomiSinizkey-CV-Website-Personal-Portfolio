@@ -3,13 +3,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { Application } from '@splinetool/runtime';
 
-interface InteractiveRobotSplineProps {
+
+import type { RefObject } from 'react';
+export interface InteractiveRobotSplineProps {
   scene: string;
   className?: string;
+  canvasRef?: RefObject<HTMLCanvasElement | null>;
 }
 
-export function InteractiveRobotSpline({ scene, className }: InteractiveRobotSplineProps) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+export function InteractiveRobotSpline({ scene, className, canvasRef }: InteractiveRobotSplineProps) {
+  const internalCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const actualCanvasRef = canvasRef ?? internalCanvasRef;
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const usesIframeEmbed = scene.includes('my.spline.design');
@@ -21,8 +25,7 @@ export function InteractiveRobotSpline({ scene, className }: InteractiveRobotSpl
       return;
     }
 
-    const canvas = canvasRef.current;
-
+    const canvas = actualCanvasRef.current;
     if (!canvas) return;
 
     let isCancelled = false;
@@ -64,7 +67,7 @@ export function InteractiveRobotSpline({ scene, className }: InteractiveRobotSpl
 
   return (
     <div className={`relative ${className ?? ""}`} data-cursor="interactive">
-      <canvas ref={canvasRef} className="h-full w-full" />
+      <canvas ref={actualCanvasRef} className="h-full w-full" />
 
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-900 text-white pointer-events-none">

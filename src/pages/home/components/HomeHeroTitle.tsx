@@ -35,16 +35,16 @@ export default function HomeHeroTitle() {
   };
 
   return (
-    <div className="homeHeroTitle relative z-20 mx-auto flex w-fit flex-col items-center justify-center text-center">
-      <p className="text-center whitespace-nowrap text-[clamp(28px,3.6vw,54px)] font-medium leading-none tracking-tight text-white">
+    <div className="homeHeroTitle pointer-events-none relative z-20 mx-auto flex w-fit flex-col items-center justify-center text-center">
+      <p className="pointer-events-auto text-center whitespace-nowrap text-[clamp(28px,3.6vw,54px)] font-medium leading-none tracking-tight text-white">
         Student of
       </p>
 
-      <div className="relative mt-4 md:mt-6 flex justify-center">
+      <div className="relative mt-4 flex justify-center md:mt-6">
         <div className="pointer-events-none absolute inset-0 rounded-lg bg-linear-to-r from-orange-400/30 via-sky-400/20 to-orange-400/30 blur-2xl" />
 
         <div
-          className="relative z-10 flex justify-center pointer-events-auto"
+          className="pointer-events-auto relative z-10 flex justify-center"
           aria-label={COMPUTER_SCIENCE_TITLE}
           onPointerMove={updateActiveChar}
           onPointerEnter={updateActiveChar}
@@ -66,7 +66,9 @@ export default function HomeHeroTitle() {
                 data-char-index={index}
                 data-cursor="interactive"
                 data-cursor-fill="solid"
-                className={`heroComputerscienceChar${char === " " ? " is-space" : ""}${activeCharIndex === index ? " is-active" : ""}`}
+                className={`heroComputerscienceChar${
+                  char === " " ? " is-space" : ""
+                }${activeCharIndex === index ? " is-active" : ""}`}
                 aria-hidden="true"
               >
                 {char === " " ? "\u00A0" : char}
