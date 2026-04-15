@@ -107,7 +107,7 @@ export default function HomePage({ ready = false }: HomePageProps) {
           </div>
         ) : null}
 
-       <div className="absolute left-1/2 top-1/2 z-20 w-full max-w-fit -translate-x-1/2 -translate-y-[320%] px-4">
+       <div className="pointer-events-none absolute left-1/2 top-1/2 z-20 w-full max-w-fit -translate-x-1/2 -translate-y-[320%] px-4">
         <HomeHeroTitle />
       </div>
       </section>

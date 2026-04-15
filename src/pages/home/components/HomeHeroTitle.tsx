@@ -44,7 +44,7 @@ export default function HomeHeroTitle() {
         <div className="pointer-events-none absolute inset-0 rounded-lg bg-linear-to-r from-orange-400/30 via-sky-400/20 to-orange-400/30 blur-2xl" />
 
         <div
-          className="relative z-10 flex justify-center"
+          className="relative z-10 flex justify-center pointer-events-auto"
           aria-label={COMPUTER_SCIENCE_TITLE}
           onPointerMove={updateActiveChar}
           onPointerEnter={updateActiveChar}
