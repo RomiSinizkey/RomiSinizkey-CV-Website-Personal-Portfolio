@@ -280,3 +280,11 @@ html.has-luminous-cursor [data-cursor-label] {
   height: 28px;
   opacity: 0.92;
 }
+html.has-luminous-cursor textarea[data-cursor-label] {
+  cursor: none !important;
+}
+
+.luminousCursorRoot.is-labeled .luminousCursorDot,
+.luminousCursorRoot.is-labeled .luminousCursorRing {
+  opacity: 0 !important;
+}

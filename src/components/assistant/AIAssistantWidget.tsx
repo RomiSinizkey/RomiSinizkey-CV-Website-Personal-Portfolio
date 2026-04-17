@@ -1,7 +1,10 @@
 import * as React from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import MountainVistaParallax from "@/components/ui/mountain-vista-bg";
+
+import { AI_INTENTS, type AiIntentKey } from "./aiIntents";
+import { detectIntent } from "./detectIntent";
 import "../../styles/assistant/aiAssistantWidget.css";
 
 interface AIAssistantWidgetProps {
@@ -12,32 +15,29 @@ interface PromptWindowProps {
   onClose: () => void;
 }
 
-function MessageText({ message }: { message: string }) {
-  const tokens = React.useMemo(
-    () => message.trim().split(/\s+/).filter(Boolean),
-    [message]
-  );
-
-  return (
-    <span className="aiw-chat-text">
-      {tokens.map((token, index) => (
-        <span key={`word-${index}`} className="aiw-chat-word">
-          <span data-cursor-mode="glow-dot">{token}</span>
-        </span>
-      ))}
-    </span>
-  );
+interface ChatMessage {
+  id: string;
+  role: "ai" | "user";
+  text: string;
+  intent?: AiIntentKey | null;
 }
 
 async function mockAiReply(userMessage: string): Promise<string> {
-  await new Promise((r) => setTimeout(r, 700));
-  return `AI: (mock) You said: "${userMessage}"`;
+  await new Promise((r) => setTimeout(r, 650));
+  return `I understood: "${userMessage}"`;
 }
 
 function PromptWindow({ onClose }: PromptWindowProps) {
+  const navigate = useNavigate();
+
   const [draft, setDraft] = React.useState("");
-  const [messages, setMessages] = React.useState<string[]>([
-    "👋 Hey! Ask me anything about Romi — projects, skills, or experience.",
+  const [messages, setMessages] = React.useState<ChatMessage[]>([
+    {
+      id: "welcome",
+      role: "ai",
+      text: "Ask me about Romi — projects, skills, experience, education, contact, or GitHub.",
+      intent: null,
+    },
   ]);
   const [loading, setLoading] = React.useState(false);
   const [hovered, setHovered] = React.useState(false);
@@ -56,17 +56,18 @@ function PromptWindow({ onClose }: PromptWindowProps) {
     )}px`;
   }, [draft]);
 
-  const scrollToBottom = React.useCallback((behavior: ScrollBehavior = "smooth") => {
-    scrollRef.current?.scrollIntoView({ behavior, block: "end" });
-  }, []);
+  const scrollToBottom = React.useCallback(
+    (behavior: ScrollBehavior = "smooth") => {
+      scrollRef.current?.scrollIntoView({ behavior, block: "end" });
+    },
+    []
+  );
 
   const handleScroll = React.useCallback(() => {
     const el = scrollContainerRef.current;
     if (!el) return;
 
-    const isNearBottom =
-      el.scrollHeight - el.scrollTop - el.clientHeight < 80;
-
+    const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
     setAutoScroll(isNearBottom);
   }, []);
 
@@ -78,11 +79,39 @@ function PromptWindow({ onClose }: PromptWindowProps) {
 
   const hasContent = draft.trim().length > 0;
 
+  const runIntentAction = React.useCallback(
+    (intentKey: AiIntentKey) => {
+      const intent = AI_INTENTS[intentKey];
+      const action = intent.action;
+
+      if (action.type === "external") {
+        window.open(action.href, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      navigate(action.route, {
+        state: action.anchorId ? { scrollTo: action.anchorId } : undefined,
+      });
+    },
+    [navigate]
+  );
+
   const handleSubmit = React.useCallback(async () => {
     if (!hasContent || loading) return;
 
     const userMsg = draft.trim();
-    setMessages((current) => [...current, userMsg]);
+    const intent = detectIntent(userMsg);
+
+    setMessages((current) => [
+      ...current,
+      {
+        id: `${Date.now()}-user`,
+        role: "user",
+        text: userMsg,
+        intent,
+      },
+    ]);
+
     setDraft("");
     setLoading(true);
     setAutoScroll(true);
@@ -92,27 +121,42 @@ function PromptWindow({ onClose }: PromptWindowProps) {
     }, 0);
 
     try {
-      const aiReply = await mockAiReply(userMsg);
-      setMessages((current) => [...current, aiReply]);
+      const aiReply = intent ? AI_INTENTS[intent].reply : await mockAiReply(userMsg);
+
+      setMessages((current) => [
+        ...current,
+        {
+          id: `${Date.now()}-ai`,
+          role: "ai",
+          text: aiReply.replace(/^AI:\s*/i, "").trim(),
+          intent,
+        },
+      ]);
+
+      if (intent) {
+        setTimeout(() => {
+          runIntentAction(intent);
+        }, 320);
+      }
     } finally {
       setLoading(false);
       setTimeout(() => {
         textareaRef.current?.focus();
       }, 0);
     }
-  }, [draft, hasContent, loading]);
+  }, [draft, hasContent, loading, runIntentAction]);
 
   return (
     <div
       className="aiw-shell"
-      style={{ height: 460, width: "min(380px, calc(100vw - 24px))" }}
+      style={{ height: 470, width: "min(390px, calc(100vw - 20px))" }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <div className="aiw-topbar">
         <div className="aiw-topbar__meta">
           <div className="aiw-topbar__dot" />
-          <span className="aiw-topbar__label">AI ASSISTANT</span>
+          <span className="aiw-topbar__label">AI Assistant</span>
         </div>
 
         <button
@@ -121,16 +165,12 @@ function PromptWindow({ onClose }: PromptWindowProps) {
           className="aiw-inline-close"
           aria-label="Close chat"
         >
-          CLOSE
+          ✕
         </button>
       </div>
 
       <div className="aiw-main">
         <div className="aiw-messages-stage">
-          <div className="aiw-bg-layer">
-            <MountainVistaParallax />
-          </div>
-
           <div className="aiw-bg-overlay" />
           <div className="aiw-messages-fade-top" />
           <div className="aiw-messages-fade-bottom" />
@@ -140,44 +180,47 @@ function PromptWindow({ onClose }: PromptWindowProps) {
             className="aiw-messages-list"
             onScroll={handleScroll}
           >
-            {messages.map((message, index) => {
-              const isAiMessage = index === 0 || message.startsWith("AI:");
-              return (
+            <AnimatePresence initial={false}>
+              {messages.map((message) => (
                 <motion.div
-                  key={`${message}-${index}`}
-                  initial={{ opacity: 0, y: 10, scale: 0.985 }}
+                  key={message.id}
+                  initial={{ opacity: 0, y: 14, scale: 0.985 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
                   className={cn(
-                    "aiw-chat-message-row",
-                    isAiMessage ? "is-ai" : "is-user"
+                    "aiw-message-row",
+                    message.role === "user" ? "is-user" : "is-ai"
                   )}
                 >
                   <div
                     className={cn(
-                      "aiw-chat-bubble",
-                      isAiMessage ? "is-ai" : "is-user"
+                      "aiw-message-bubble",
+                      message.role === "user" ? "is-user" : "is-ai"
                     )}
                   >
-                    <MessageText message={message} />
+                    <p className="aiw-message-text">{message.text}</p>
                   </div>
                 </motion.div>
-              );
-            })}
+              ))}
 
-            {loading && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="aiw-chat-message-row is-ai"
-              >
-                <div className="aiw-chat-bubble is-ai aiw-typing-bubble">
-                  <span className="aiw-typing-dot" />
-                  <span className="aiw-typing-dot" />
-                  <span className="aiw-typing-dot" />
-                </div>
-              </motion.div>
-            )}
+              {loading && (
+                <motion.div
+                  key="typing"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                  className="aiw-message-row is-ai"
+                >
+                  <div className="aiw-message-bubble is-ai is-typing">
+                    <span className="aiw-typing-dot" />
+                    <span className="aiw-typing-dot" />
+                    <span className="aiw-typing-dot" />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <div ref={scrollRef} />
           </div>
@@ -200,20 +243,21 @@ function PromptWindow({ onClose }: PromptWindowProps) {
         <div
           className="aiw-input-bar"
           style={{
-            opacity: hovered ? 1 : 0.38,
-            transform: hovered ? "translateY(0)" : "translateY(8px)",
-            pointerEvents: "auto",
+            opacity: hovered ? 1 : 0.05,
+            transform: hovered ? "translateY(0)" : "translateY(10px)",
+            pointerEvents: hovered ? "auto" : "none",
           }}
         >
-          <div className="aiw-input-shell-modern aiw-input-shell-no-bg">
+          <div className="aiw-input-shell-modern">
             <textarea
               id="portfolio-assistant-input"
               ref={textareaRef}
-              data-cursor-label="WRITE"
-              data-cursor-label-tone="light"
               value={draft}
               rows={1}
-              placeholder="Type your message here..."
+              placeholder="Ask something..."
+              data-cursor-label="WRITE"
+              data-cursor-label-tone="muted"
+              style={{ ["--cursor-color" as string]: "#5B21B6" }}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={async (event) => {
                 if (event.key === "Enter" && !event.shiftKey) {
@@ -230,7 +274,6 @@ function PromptWindow({ onClose }: PromptWindowProps) {
               onClick={handleSubmit}
               className={cn("aiw-send-fancy", !hasContent && "is-disabled")}
               disabled={!hasContent || loading}
-              data-cursor-mode="glow-dot"
               aria-label="Send message"
             >
               <span className="aiw-send-fancy__icon-shell">
@@ -242,7 +285,7 @@ function PromptWindow({ onClose }: PromptWindowProps) {
                   >
                     <path d="M0 0h24v24H0z" fill="none" />
                     <path
-                      d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"
+                      d="M3.4 20.4 21 12 3.4 3.6 3.4 10.2 15 12 3.4 13.8Z"
                       fill="currentColor"
                     />
                   </svg>
@@ -277,7 +320,7 @@ export default function AIAssistantWidget({
             <motion.button
               type="button"
               aria-label="Close assistant prompt"
-              className="fixed inset-0 z-2147483640 bg-black/30 backdrop-blur-[2px]"
+              className="fixed inset-0 z-2147483640 bg-black/45 backdrop-blur-[4px]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -286,9 +329,9 @@ export default function AIAssistantWidget({
 
             <motion.section
               id="portfolio-ai-chat"
-              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              initial={{ opacity: 0, y: 18, scale: 0.985 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 14, scale: 0.985 }}
+              exit={{ opacity: 0, y: 10, scale: 0.985 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
               className="fixed right-[12px] top-[86px] z-2147483641 sm:right-[8px] sm:top-[92px]"
             >
@@ -299,21 +342,77 @@ export default function AIAssistantWidget({
       </AnimatePresence>
 
       {!open && (
-        <div
-          className="aiw-launcher-wrap"
-          style={{ position: "fixed", top: 14, right: 8, zIndex: 2147483642 }}
-        >
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="aiw-launcher-button"
-            aria-expanded={open}
-            aria-controls="portfolio-ai-chat"
-          >
-            <span>ASK AI</span>
-          </button>
+       <div className="aiw-launcher-wrap">
+          <AnimatedLauncherButton open={open} setOpen={setOpen} />
         </div>
       )}
     </>
+  );
+}
+
+const LAUNCHER_TEXT = "ASK AI";
+
+function AnimatedLauncherButton({
+  open,
+  setOpen,
+}: {
+  open: boolean;
+  setOpen: (v: boolean) => void;
+}) {
+  const [activeIdx, setActiveIdx] = React.useState(0);
+  const [hovered, setHovered] = React.useState(false);
+
+  React.useEffect(() => {
+    if (hovered) return;
+
+    const validIndexes = LAUNCHER_TEXT.split("")
+      .map((char, idx) => ({ char, idx }))
+      .filter((item) => item.char !== " ")
+      .map((item) => item.idx);
+
+    const interval = setInterval(() => {
+      setActiveIdx((prev) => {
+        const currentPos = validIndexes.indexOf(prev);
+        const nextPos = currentPos === -1 ? 0 : (currentPos + 1) % validIndexes.length;
+        return validIndexes[nextPos];
+      });
+    }, 1600);
+
+    return () => clearInterval(interval);
+  }, [hovered]);
+
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      className="aiw-launcher-button aiw-launcher-animated"
+      aria-expanded={open}
+      aria-controls="portfolio-ai-chat"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <span className="aiw-launcher-text" aria-hidden="true">
+        {LAUNCHER_TEXT.split("").map((char, i) => {
+          const isSpace = char === " ";
+          const isActive = !hovered && i === activeIdx && !isSpace;
+
+          return (
+            <span
+              key={i}
+              className={`aiw-launcher-letter${isSpace ? " is-space" : ""}${isActive ? " active" : ""}`}
+            >
+              {!isSpace && (
+                <span className="aiw-launcher-letter-fill" aria-hidden="true">
+                  {char}
+                </span>
+              )}
+              <span className="aiw-launcher-letter-base">
+                {isSpace ? "\u00A0" : char}
+              </span>
+            </span>
+          );
+        })}
+      </span>
+    </button>
   );
 }

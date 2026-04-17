@@ -1,7 +1,6 @@
 import NameLogo from "./components/NameLogo";
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import { ParticleTextEffect } from "./ui/particle-text-effect";
 import HomeHeroTitle from "./components/HomeHeroTitle";
 import LanguagesSectionContent from "./components/LanguagesSectionContent";
 import SideLinks from "./components/SideLinks";
@@ -12,10 +11,6 @@ import { EducationSectionContent } from "../education/components/EducationSectio
 import { ExperienceSectionContent } from "../experience/components/ExperienceSectionContent";
 import { ProjectsSectionContent } from "../projects/components/ProjectsSectionContent";
 import "./styles/homePage.css";
-
-// interface HomePageProps {
-//   ready?: boolean;
-// }
 
 export default function HomePage() {
   const location = useLocation();
@@ -76,30 +71,26 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
 
-
   const shouldShowOverlay = activeSection !== "home-section";
 
   return (
     <div className="relative w-full overflow-x-hidden">
       {shouldShowOverlay && <UnderConstructionOverlay />}
 
-      <ParticleTextEffect />
-
       <section
-        id="home-section"
-        ref={homeSectionRef}
-        className="relative overflow-hidden"
-        style={{ minHeight: "160vh" }}
-      >
-        {/* NameLogo at the top left */}
-        <div className="pointer-events-auto absolute left-0 top-0 z-30">
-          <NameLogo />
-        </div>
-        {/* Hero title remains centered */}
-        <div className="pointer-events-none absolute left-1/2 top-1/2 z-20 w-fit -translate-x-1/2 -translate-y-[320%] px-4">
-          <HomeHeroTitle />
-        </div>
-      </section>
+      id="home-section"
+      ref={homeSectionRef}
+      className="relative min-h-screen"
+    >
+      <div className="pointer-events-auto absolute top-4 left-4 z-30">
+        <NameLogo />
+      </div>
+
+      {/* TRUE CENTER */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+        <HomeHeroTitle />
+      </div>
+    </section>
 
       <section
         id="about-section"

@@ -35,8 +35,8 @@ export default function HomeHeroTitle() {
   };
 
   return (
-    <div className="homeHeroTitle pointer-events-none relative z-20 mx-auto flex w-fit flex-col items-center justify-center text-center">
-      <p className="pointer-events-auto text-center whitespace-nowrap text-[clamp(28px,3.6vw,54px)] font-medium leading-none tracking-tight text-white">
+    <div className="homeHeroTitle pointer-events-none relative z-20 flex flex-col items-center justify-center text-center">
+      <p className="pointer-events-auto text-center text-[clamp(28px,3.6vw,54px)] font-medium leading-none tracking-tight text-white">
         Student of
       </p>
 
@@ -52,9 +52,9 @@ export default function HomeHeroTitle() {
         >
           <p
             className="
-              text-center whitespace-nowrap
+              text-center
               text-[clamp(36px,5.2vw,78px)]
-              font-black tracking-[-0.04em] leading-[1.02]
+              font-black leading-[1.02] tracking-[-0.04em]
               text-orange-500
             "
             data-cursor="interactive"
@@ -64,8 +64,6 @@ export default function HomeHeroTitle() {
               <span
                 key={`${char}-${index}`}
                 data-char-index={index}
-                data-cursor="interactive"
-                data-cursor-fill="solid"
                 className={`heroComputerscienceChar${
                   char === " " ? " is-space" : ""
                 }${activeCharIndex === index ? " is-active" : ""}`}

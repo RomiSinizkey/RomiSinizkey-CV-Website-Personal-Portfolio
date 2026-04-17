@@ -54,7 +54,7 @@ export const AI_INTENTS: Record<
       "stuff you built",
     ],
     reply: "Got it — taking you to Projects.",
-    action: { type: "route", route: "/", anchorId: "projects-preview" },
+    action: { type: "route", route: "/", anchorId: "projects-section" },
   },
 
   experience: {
