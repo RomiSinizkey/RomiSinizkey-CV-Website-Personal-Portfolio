@@ -125,6 +125,13 @@ src/
 ---
 
 Last update: April 2026
+- The home page embeds an external Spline scene and uses cache-busting to avoid stale loads
+- The src/types folder is currently empty (for future extensions)
+- All CSS files are separated by domain (assistant, layout, shared, etc.)
+
+---
+
+Last update: April 2026
 - כל קובצי ה-CSS מופרדים לפי תחום (assistant, layout, shared וכו')
 
 ---
