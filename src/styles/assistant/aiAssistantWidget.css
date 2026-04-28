@@ -1,132 +1,220 @@
 /* =========================================================
   1) ASK AI LAUNCHER BUTTON
-  All styles below are only for the ASK AI launcher button
+  Styles for the floating "ASK AI" button
+  ========================================================= */
+/* =========================================================
+  2) CHAT WINDOW SHELL
+  Main container of the chat UI
+  ========================================================= */
+/* Fixed animated background (Sparkles) */
+/* =========================================================
+  3) TOP BAR
+  Header area (AI Assistant + close button)
+  ========================================================= */
+/* =========================================================
+  4) MESSAGES AREA
+  Scrollable chat messages
+  ========================================================= */
+/* =========================================================
+  5) SCROLL TO BOTTOM BUTTON
+  Positioned at top-right of chat
+  ========================================================= */
+/* =========================================================
+  6) INPUT AREA
+  Message input + send button
+  ========================================================= */
+/* =========================================================
+  7) AI TEXT ANIMATION
+  One letter fills at a time
+  ========================================================= */
+/* =========================================================
+  8) MOBILE ADJUSTMENTS
+  ========================================================= */
+/* From Uiverse.io by vinodjangid07 - Send Button */
+.Btn {
+  width: 45px;
+  height: 45px;
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  border: 2.5px solid #fff !important; /* White border, enforced */
+  border-radius: 50% !important;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.Btn.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.arrow path {
+  fill: white;
+}
+
+.text {
+  font-size: 0.7em;
+  width: 100px;
+  position: absolute;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  bottom: -18px;
+  opacity: 0;
+  transition-duration: .7s;
+}
+
+.Btn:hover .text {
+  opacity: 1;
+  transition-duration: .7s;
+}
+
+.Btn:hover .arrow {
+  animation: slide-in-bottom .7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+}
+
+@keyframes slide-in-bottom {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+/* From Uiverse.io by vinodjangid07 - Send Button */
+.Btn {
+  width: 45px;
+  height: 45px;
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  border: none;
+}
+
+.Btn.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.arrow path {
+  fill: white;
+}
+
+.text {
+  font-size: 0.7em;
+  width: 100px;
+  position: absolute;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  bottom: -18px;
+  opacity: 0;
+  transition-duration: .7s;
+}
+
+.Btn:hover .text {
+  opacity: 1;
+  transition-duration: .7s;
+}
+
+.Btn:hover .arrow {
+  animation: slide-in-bottom .7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+}
+
+@keyframes slide-in-bottom {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+/* הסתרת שורת הקלט בזמן גלילה בצ'אט */
+.aiw-input-bar.hide-on-scroll {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.25s;
+}
+/* =========================================================
+  1) ASK AI LAUNCHER BUTTON
+  Styles for the floating "ASK AI" button
   ========================================================= */
 
 .aiw-launcher-wrap {
   position: fixed;
-  top: 30px;   
-  right: 20px; 
+  top: 30px;
+  right: 20px;
   z-index: 2147483642;
   display: inline-flex;
   align-items: center;
   background: transparent;
   border: none;
-  box-shadow: none;
   padding: 0;
 }
 
 .aiw-launcher-button {
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
   background: transparent;
-  box-shadow: none;
-  padding: 0;
-  min-width: 0;
-  min-height: 0;
-  overflow: visible;
+  border: none;
   cursor: pointer;
-  transition:
-    transform 220ms ease,
-    filter 220ms ease,
-    opacity 220ms ease;
+  transition: transform 220ms ease, filter 220ms ease;
 }
 
 .aiw-launcher-button:hover {
   transform: translateY(-1px) scale(1.02);
-  filter: brightness(1.04);
-}
-
-.aiw-launcher-button:active {
-  transform: scale(0.985);
-}
-
-.aiw-launcher-button:focus-visible {
-  outline: none;
-}
-
-.aiw-launcher-animated {
-  font-size: 0;
 }
 
 .aiw-launcher-text {
   display: inline-flex;
-  align-items: flex-end;
   gap: 0.02em;
-  position: relative;
 }
 
 .aiw-launcher-letter {
-  position: relative;
-  display: inline-block;
   font-family: "Montserrat", sans-serif;
   font-size: 1.22rem;
   font-weight: 800;
   letter-spacing: 0.2em;
-  line-height: 1;
-  text-transform: uppercase;
-  user-select: none;
-}
-
-.aiw-launcher-letter.is-space {
-  width: 0.5em;
-}
-
-.aiw-launcher-letter-base,
-.aiw-launcher-letter-fill {
-  display: block;
-  white-space: pre;
-  line-height: 1;
 }
 
 .aiw-launcher-letter-base {
-  position: relative;
-  z-index: 1;
   color: rgba(255, 255, 255, 0.18);
-  text-shadow:
-    0 0 8px rgba(255, 255, 255, 0.05),
-    0 0 14px rgba(255, 255, 255, 0.03);
   -webkit-text-stroke: 1px rgba(255, 255, 255, 0.22);
 }
 
 .aiw-launcher-letter-fill {
   position: absolute;
-  left: 0;
-  bottom: 0;
   color: #ff8a00;
   clip-path: inset(100% 0 0 0);
-  z-index: 2;
-  pointer-events: none;
   transition: clip-path 1.55s cubic-bezier(0.22, 1, 0.36, 1);
-  text-shadow:
-    0 0 10px rgba(255, 138, 0, 0.2),
-    0 0 20px rgba(255, 138, 0, 0.12);
-}
-
-/* Each time, only one letter fills from bottom to top */
-.aiw-launcher-letter.active .aiw-launcher-letter-fill {
-  clip-path: inset(0 0 0 0);
-}
-
-/* On hover, all letters fill */
-.aiw-launcher-animated:hover .aiw-launcher-letter-fill {
-  clip-path: inset(0 0 0 0);
 }
 
 .aiw-launcher-letter.active .aiw-launcher-letter-fill,
 .aiw-launcher-animated:hover .aiw-launcher-letter-fill {
-  text-shadow:
-    0 0 12px rgba(255, 138, 0, 0.26),
-    0 0 24px rgba(255, 138, 0, 0.16);
+  clip-path: inset(0 0 0 0);
 }
 
 
 /* =========================================================
-  2) CHAT SHELL / WINDOW
-  All styles below are for the main chat window shell
+  2) CHAT WINDOW SHELL
+  Main container of the chat UI
   ========================================================= */
 
 .aiw-shell {
@@ -135,166 +223,120 @@
   flex-direction: column;
   overflow: hidden;
   border-radius: 26px;
-  border: none;
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.05), transparent 32%),
-    linear-gradient(180deg, rgba(7, 7, 7, 0.985), rgba(0, 0, 0, 0.992));
-  box-shadow:
-    0 26px 70px rgba(0, 0, 0, 0.62),
-    0 6px 20px rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(18px) saturate(1.04);
+  background: transparent;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.62);
 }
 
-.aiw-main {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  flex-direction: column;
-}
-
-.aiw-messages-stage {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
+.aiw-bg-fixed {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
   overflow: hidden;
 }
 
-.aiw-bg-overlay {
+.aiw-bg-fixed::before {
+  content: "AI";
   position: absolute;
-  inset: 0;
-  z-index: 1;
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.045), transparent 24%),
-    radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.025), transparent 22%);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 8rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.07);
+  letter-spacing: 0.1em;
+  user-select: none;
   pointer-events: none;
+  z-index: -1;
+  font-family: "Montserrat", sans-serif;
 }
 
-.aiw-messages-fade-top,
-.aiw-messages-fade-bottom {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 32px;
-  z-index: 4;
-  pointer-events: none;
+.aiw-bg-fixed > * {
+  position: relative;
+  z-index: 0;
 }
 
-.aiw-messages-fade-top {
-  top: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.95), transparent);
+.aiw-main,
+.aiw-topbar {
+  position: relative;
+  z-index: 2;
 }
 
-.aiw-messages-fade-bottom {
-  bottom: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.95), transparent);
+
+.aiw-send-fancy__icon {
+  width: 40px;
+  height: 40px;
+  display: block;
+  fill: #000;
+  transition: transform 0.22s;
 }
 
 
 /* =========================================================
-  3) CHAT TOP BAR
-  All styles below are for the chat window top bar
+  3) TOP BAR
+.aiw-message-row {
+  Header area (AI Assistant + close button)
   ========================================================= */
 
 .aiw-topbar {
-  position: relative;
-  z-index: 6;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  min-height: 46px;
-  padding: 12px 14px 8px;
-  background: transparent;
-}
-
-.aiw-topbar__meta {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-}
-
-.aiw-topbar__dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: #ffffff;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.55);
+  padding: 12px 14px;
 }
 
 .aiw-topbar__label {
-  color: rgba(255, 255, 255, 0.96);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  color: white;
+  font-size: 0.8rem;
 }
 
 .aiw-inline-close {
-  border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.58);
-  border-radius: 999px;
-  width: 30px;
-  height: 30px;
-  font-size: 0.95rem;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    color 180ms ease,
-    background 180ms ease,
-    transform 180ms ease;
-}
-
-.aiw-inline-close:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffffff;
-  transform: scale(1.03);
+  border: none;
   cursor: pointer;
 }
 
 
 /* =========================================================
-   4) CHAT MESSAGES AREA
-   כל מה שמתחת קשור לאזור ההודעות
-   ========================================================= */
+  4) MESSAGES AREA
+  Scrollable chat messages
+  ========================================================= */
+
+.aiw-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.aiw-messages-stage {
+  flex: 1;
+  overflow: hidden;
+}
 
 .aiw-messages-list {
-  position: relative;
-  z-index: 3;
   height: 100%;
-  min-height: 0;
   overflow-y: auto;
-  overflow-x: hidden;
-  padding: 6px 12px 74px;
+  padding: 6px 12px 90px; /* Prevent overlap with input */
   display: flex;
   flex-direction: column;
   gap: 7px;
-  scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
-
+/* Minimal thin scrollbar (safe version) */
 .aiw-messages-list::-webkit-scrollbar {
-  width: 4px;
-}
-
-.aiw-messages-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
+  width: 3px; /* 👈 דק */
 }
 
 .aiw-messages-list::-webkit-scrollbar-track {
-  background: transparent;
+  background: transparent; /* 👈 בלי רקע לבן */
+}
+
+.aiw-messages-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18); /* 👈 כמעט בלתי נראה */
+  border-radius: 999px;
 }
 
 .aiw-message-row {
   display: flex;
-  width: 100%;
-}
-
-.aiw-message-row.is-ai {
-  justify-content: flex-start;
 }
 
 .aiw-message-row.is-user {
@@ -302,135 +344,92 @@
 }
 
 .aiw-message-bubble {
-  max-width: min(74%, 270px);
+  max-width: 74%;
+  min-width: 0;
+
   padding: 10px 13px;
   border-radius: 20px;
+
+  overflow: hidden;
+  white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: anywhere;
-  backdrop-filter: blur(8px);
-  transition:
-    transform 180ms ease,
-    box-shadow 180ms ease,
-    background 180ms ease;
+}
+.aiw-message-text {
+  margin: 0;
+  max-width: 100%;
+  min-width: 0;
+
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
+  font-size: 0.94rem;
+  line-height: 1.45;
 }
 
 .aiw-message-bubble.is-ai {
-  background: rgba(255, 255, 255, 0.045);
-  color: rgba(255, 255, 255, 0.96);
-  border-top-left-radius: 11px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
 }
 
 .aiw-message-bubble.is-user {
   background: #f3f3f3;
-  color: #000000;
-  border-top-right-radius: 11px;
-  box-shadow:
-    0 6px 18px rgba(255, 255, 255, 0.08),
-    0 1px 5px rgba(255, 255, 255, 0.04);
-}
-
-.aiw-message-bubble:hover {
-  transform: translateY(-1px);
-}
-
-.aiw-message-bubble.is-typing {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 54px;
-  justify-content: center;
-}
-
-.aiw-message-text {
-  margin: 0;
-  font-size: 0.94rem;
-  line-height: 1.45;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-
-.aiw-typing-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
-  animation: aiwTyping 1s infinite ease-in-out;
-}
-
-.aiw-typing-dot:nth-child(2) {
-  animation-delay: 0.14s;
-}
-
-.aiw-typing-dot:nth-child(3) {
-  animation-delay: 0.28s;
-}
-
-@keyframes aiwTyping {
-  0%,
-  80%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.34;
-  }
-  40% {
-    transform: translateY(-3px);
-    opacity: 1;
-  }
+  color: black;
 }
 
 
 /* =========================================================
-   5) SCROLL TO BOTTOM BUTTON
-   כל מה שמתחת קשור לכפתור החץ הקטן בתוך הצ'אט
-   ========================================================= */
+  5) SCROLL TO BOTTOM BUTTON
+  Positioned at top-right of chat
+  ========================================================= */
 
 .aiw-scroll-bottom-btn {
   position: absolute;
+  top: 60px;
   right: 12px;
-  bottom: 14px;
-  z-index: 7;
+  z-index: 21;
   width: 34px;
   height: 34px;
-  border: none;
   border-radius: 999px;
-  background: #f3f3f3;
-  color: #000000;
-  font-size: 0.95rem;
-  line-height: 1;
+  background: rgba(0, 0, 0, 0.8); /* 👈 שחור */
+  color: #ffffff; /* 👈 החץ לבן */
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  box-shadow:
-    0 6px 16px rgba(255, 255, 255, 0.08),
-    0 2px 8px rgba(255, 255, 255, 0.04);
-  transition:
-    transform 180ms ease,
-    box-shadow 180ms ease,
-    filter 180ms ease;
-}
 
-.aiw-scroll-bottom-btn:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.02);
+  cursor: pointer;
 }
 
 
 /* =========================================================
-   6) CHAT INPUT AREA
-   כל מה שמתחת קשור לשורת הכתיבה והשליחה
-   ========================================================= */
+  6) INPUT AREA
+  Message input + send button
+  ========================================================= */
 
 .aiw-input-bar {
   position: absolute;
   left: 10px;
   right: 10px;
   bottom: 10px;
-  z-index: 8;
-  transition:
-    opacity 180ms ease,
-    transform 180ms ease;
+  z-index: 20;
+
+  /* Hidden by default (no React state needed) */
+  opacity: 0.05;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+
+/* Show input on hover */
+.aiw-shell:hover .aiw-input-bar,
+.aiw-input-bar:focus-within {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .aiw-input-shell-modern {
@@ -438,151 +437,111 @@
   align-items: flex-end;
   gap: 8px;
   border-radius: 999px;
-  border: none;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 7px 7px 7px 13px;
+  background: rgba(10, 10, 10, 0.75);
   backdrop-filter: blur(18px);
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.42),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transition:
-    background 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
-}
-
-.aiw-input-shell-modern:hover {
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 12px 34px rgba(0, 0, 0, 0.46),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  padding: 8px;
+  overflow: hidden;
 }
 
 .aiw-textarea {
-  min-height: 22px;
-  height: 22px;
-  max-height: 84px;
   flex: 1;
-  resize: none;
-  overflow-y: auto;
+  min-width: 0;
+  min-height: 22px;
+  max-height: 72px;
+
   background: transparent;
-  padding: 5px 0 4px;
-  font-size: 0.93rem;
-  line-height: 1.45;
-  color: rgba(255, 255, 255, 0.98);
   border: none;
   outline: none;
+  color: white;
+
+  padding: 7px 6px 6px 0;
+  resize: none;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
+  line-height: 1.35;
   box-sizing: border-box;
-  scrollbar-width: none;
-  font-family: inherit;
 }
 
-.aiw-textarea::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
+/* Thin textarea scrollbar */
 .aiw-textarea::-webkit-scrollbar {
-  width: 0;
+  width: 2px;
 }
+
+.aiw-textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.aiw-textarea::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+}
+
 
 .aiw-send-fancy {
-  position: static;
   width: 36px;
   height: 36px;
-  min-width: 36px;
-  min-height: 36px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
   border-radius: 999px;
-  background: #f3f3f3;
-  color: #000000;
-  box-shadow:
-    0 6px 16px rgba(255, 255, 255, 0.1),
-    0 2px 8px rgba(255, 255, 255, 0.05);
-  transition:
-    transform 180ms ease,
-    box-shadow 180ms ease,
-    filter 180ms ease;
-  flex-shrink: 0;
-}
-
-.aiw-send-fancy:hover:not(.is-disabled) {
-  transform: translateY(-1px) scale(1.02);
-  filter: brightness(1.02);
+  background: white;
   cursor: pointer;
-}
-
-.aiw-send-fancy:active:not(.is-disabled) {
-  transform: scale(0.96);
-}
-
-.aiw-send-fancy.is-disabled {
-  opacity: 0.34;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.aiw-send-fancy__icon-shell,
-.aiw-send-fancy__icon-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.aiw-send-fancy__icon {
-  width: 13px;
-  height: 13px;
-  fill: currentColor;
 }
 
 
 /* =========================================================
-   7) MOBILE
-   כל מה שמתחת קשור רק למסכים קטנים
-   ========================================================= */
+  7) AI TEXT ANIMATION
+  One letter fills at a time
+  ========================================================= */
+
+.ai-fill-text {
+  display: inline-flex;
+  gap: 0.08em;
+  font-size: 2.2rem;
+  font-weight: 900;
+}
+
+.ai-fill-letter {
+  position: relative;
+  color: transparent;
+  -webkit-text-stroke: 1px white;
+}
+
+.ai-fill-letter::before {
+  content: attr(data-letter);
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #fff, #7dd3fc, #818cf8);
+  -webkit-background-clip: text;
+  background-clip: text;  clip-path: inset(100% 0 0 0);
+  animation: fill 8s infinite;
+}
+
+.ai-fill-letter:nth-child(2)::before {
+  animation-delay: 4s;
+}
+
+@keyframes fill {
+  0% { clip-path: inset(100% 0 0 0); }
+  40% { clip-path: inset(0 0 0 0); }
+  60% { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(100% 0 0 0); }
+}
+
+
+/* =========================================================
+  8) MOBILE ADJUSTMENTS
+  ========================================================= */
 
 @media (max-width: 640px) {
   .aiw-shell {
     border-radius: 22px;
   }
 
-  .aiw-launcher-wrap {
-    top: 42px;
-    right: 14px;
-  }
-
-  .aiw-launcher-letter {
-    font-size: 0.96rem;
-    letter-spacing: 0.16em;
-  }
-
-  .aiw-messages-list {
-    padding: 6px 10px 72px;
-    gap: 6px;
-  }
-
-  .aiw-message-bubble {
-    max-width: 82%;
-    padding: 10px 12px;
-  }
-
-  .aiw-message-text {
-    font-size: 0.91rem;
-  }
-
   .aiw-input-bar {
-    left: 8px;
-    right: 8px;
     bottom: 8px;
-  }
-
-  .aiw-scroll-bottom-btn {
-    right: 10px;
-    bottom: 12px;
-    width: 32px;
-    height: 32px;
   }
 }

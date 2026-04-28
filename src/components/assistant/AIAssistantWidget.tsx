@@ -3,9 +3,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
+import { SparklesLine } from "@/components/ui/AIBackGround/SparklesLine";
+
 import { AI_INTENTS, type AiIntentKey } from "./aiIntents";
 import { detectIntent } from "./detectIntent";
 import "../../styles/assistant/aiAssistantWidget.css";
+
+const MemoSparklesLine = React.memo(SparklesLine);
 
 interface AIAssistantWidgetProps {
   ready?: boolean;
@@ -40,12 +44,13 @@ function PromptWindow({ onClose }: PromptWindowProps) {
     },
   ]);
   const [loading, setLoading] = React.useState(false);
-  const [hovered, setHovered] = React.useState(false);
   const [autoScroll, setAutoScroll] = React.useState(true);
 
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
   const scrollContainerRef = React.useRef<HTMLDivElement | null>(null);
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
+  const [hideInputBar, setHideInputBar] = React.useState(false);
+  const scrollTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   React.useEffect(() => {
     if (!textareaRef.current) return;
@@ -67,15 +72,27 @@ function PromptWindow({ onClose }: PromptWindowProps) {
     const el = scrollContainerRef.current;
     if (!el) return;
 
-    const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
-    setAutoScroll(isNearBottom);
+    // Hide input bar while scrolling
+    setHideInputBar(true);
+    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+    scrollTimeout.current = setTimeout(() => {
+      setHideInputBar(false);
+    }, 320);
+
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    setAutoScroll(distanceFromBottom < 12);
   }, []);
 
   React.useEffect(() => {
-    if (autoScroll) {
-      scrollToBottom("smooth");
-    }
-  }, [messages, loading, autoScroll, scrollToBottom]);
+    if (!autoScroll) return;
+
+    requestAnimationFrame(() => {
+      const el = scrollContainerRef.current;
+      if (!el) return;
+
+      el.scrollTop = el.scrollHeight;
+    });
+  }, [messages, loading, autoScroll]);
 
   const hasContent = draft.trim().length > 0;
 
@@ -146,13 +163,20 @@ function PromptWindow({ onClose }: PromptWindowProps) {
     }
   }, [draft, hasContent, loading, runIntentAction]);
 
-  return (
+    return (
     <div
       className="aiw-shell"
-      style={{ height: 470, width: "min(390px, calc(100vw - 20px))" }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      style={{
+        height: 470,
+        width: "min(390px, calc(100vw - 20px))",
+      }}
+      
     >
+      {/* Fixed background */}
+      <div className="aiw-bg-fixed">
+        <MemoSparklesLine  />
+      </div>
+
       <div className="aiw-topbar">
         <div className="aiw-topbar__meta">
           <div className="aiw-topbar__dot" />
@@ -171,10 +195,6 @@ function PromptWindow({ onClose }: PromptWindowProps) {
 
       <div className="aiw-main">
         <div className="aiw-messages-stage">
-          <div className="aiw-bg-overlay" />
-          <div className="aiw-messages-fade-top" />
-          <div className="aiw-messages-fade-bottom" />
-
           <div
             ref={scrollContainerRef}
             className="aiw-messages-list"
@@ -240,14 +260,8 @@ function PromptWindow({ onClose }: PromptWindowProps) {
           )}
         </div>
 
-        <div
-          className="aiw-input-bar"
-          style={{
-            opacity: hovered ? 1 : 0.05,
-            transform: hovered ? "translateY(0)" : "translateY(10px)",
-            pointerEvents: hovered ? "auto" : "none",
-          }}
-        >
+        
+        <div className={cn("aiw-input-bar", hideInputBar && "hide-on-scroll")}> 
           <div className="aiw-input-shell-modern">
             <textarea
               id="portfolio-assistant-input"
@@ -272,25 +286,13 @@ function PromptWindow({ onClose }: PromptWindowProps) {
             <button
               type="button"
               onClick={handleSubmit}
-              className={cn("aiw-send-fancy", !hasContent && "is-disabled")}
+              className={cn("Btn", !hasContent && "is-disabled")}
               disabled={!hasContent || loading}
               aria-label="Send message"
             >
-              <span className="aiw-send-fancy__icon-shell">
-                <span className="aiw-send-fancy__icon-wrap">
-                  <svg
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    className="aiw-send-fancy__icon"
-                  >
-                    <path d="M0 0h24v24H0z" fill="none" />
-                    <path
-                      d="M3.4 20.4 21 12 3.4 3.6 3.4 10.2 15 12 3.4 13.8Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </span>
-              </span>
+              <svg height="1.2em" className="arrow" viewBox="0 0 512 512">
+                <path d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z"></path>
+              </svg>
             </button>
           </div>
         </div>

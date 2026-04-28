@@ -28,7 +28,7 @@ body[data-mood="chat"]{ --accent:#38bdf8; }
 ========================= */
 
 .logoName{
-  font-size: 44px;              /* קצת יותר קטן ומודרני */
+  font-size: 44px;            
   font-weight: 800;
   letter-spacing: -0.03em;
   font-family: inherit;
