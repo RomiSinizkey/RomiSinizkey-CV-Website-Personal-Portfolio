@@ -10,7 +10,6 @@ import { AboutPageContent } from "../about/components/AboutPageContent";
 import { EducationSectionContent } from "../education/components/EducationSectionContent";
 import { ExperienceSectionContent } from "../experience/components/ExperienceSectionContent";
 import { ProjectsSectionContent } from "../projects/components/ProjectsSectionContent";
-import "./styles/homePage.css";
 
 export default function HomePage() {
   const location = useLocation();

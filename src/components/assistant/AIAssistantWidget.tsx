@@ -7,7 +7,7 @@ import { SparklesLine } from "@/components/assistant/AIBackGround/SparklesLine";
 
 import { AI_INTENTS, type AiIntentKey } from "./aiIntents";
 import { detectIntent } from "./detectIntent";
-import "../../styles/assistant/aiAssistantWidget.css";
+import "./styles/aiAssistantWidget.css";
 
 const MemoSparklesLine = React.memo(SparklesLine);
 

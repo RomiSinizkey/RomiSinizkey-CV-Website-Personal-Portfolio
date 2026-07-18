@@ -1,6 +1,4 @@
-//
 import { useEffect, useState } from "react";
-import "../../styles/assistant/aiAssistantWidget.css";
 
 const WORDS = ["UNDER", "CONSTRUCTION"];
 const ANIMATION_DURATION = 2100; // ms

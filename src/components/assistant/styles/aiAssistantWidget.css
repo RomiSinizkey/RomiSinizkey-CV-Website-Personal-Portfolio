@@ -2,159 +2,6 @@
   1) ASK AI LAUNCHER BUTTON
   Styles for the floating "ASK AI" button
   ========================================================= */
-/* =========================================================
-  2) CHAT WINDOW SHELL
-  Main container of the chat UI
-  ========================================================= */
-/* Fixed animated background (Sparkles) */
-/* =========================================================
-  3) TOP BAR
-  Header area (AI Assistant + close button)
-  ========================================================= */
-/* =========================================================
-  4) MESSAGES AREA
-  Scrollable chat messages
-  ========================================================= */
-/* =========================================================
-  5) SCROLL TO BOTTOM BUTTON
-  Positioned at top-right of chat
-  ========================================================= */
-/* =========================================================
-  6) INPUT AREA
-  Message input + send button
-  ========================================================= */
-/* =========================================================
-  7) AI TEXT ANIMATION
-  One letter fills at a time
-  ========================================================= */
-/* =========================================================
-  8) MOBILE ADJUSTMENTS
-  ========================================================= */
-/* From Uiverse.io by vinodjangid07 - Send Button */
-.Btn {
-  width: 45px;
-  height: 45px;
-  background: black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  cursor: pointer;
-  position: relative;
-  border: 2.5px solid #fff !important; /* White border, enforced */
-  border-radius: 50% !important;
-  box-sizing: border-box;
-  transition: border-color 0.2s;
-}
-
-.Btn.is-disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-.arrow path {
-  fill: white;
-}
-
-.text {
-  font-size: 0.7em;
-  width: 100px;
-  position: absolute;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  bottom: -18px;
-  opacity: 0;
-  transition-duration: .7s;
-}
-
-.Btn:hover .text {
-  opacity: 1;
-  transition-duration: .7s;
-}
-
-.Btn:hover .arrow {
-  animation: slide-in-bottom .7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-}
-
-@keyframes slide-in-bottom {
-  0% {
-    transform: translateY(10px);
-    opacity: 0;
-  }
-
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-/* From Uiverse.io by vinodjangid07 - Send Button */
-.Btn {
-  width: 45px;
-  height: 45px;
-  background: black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  cursor: pointer;
-  position: relative;
-  border: none;
-}
-
-.Btn.is-disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-.arrow path {
-  fill: white;
-}
-
-.text {
-  font-size: 0.7em;
-  width: 100px;
-  position: absolute;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  bottom: -18px;
-  opacity: 0;
-  transition-duration: .7s;
-}
-
-.Btn:hover .text {
-  opacity: 1;
-  transition-duration: .7s;
-}
-
-.Btn:hover .arrow {
-  animation: slide-in-bottom .7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-}
-
-@keyframes slide-in-bottom {
-  0% {
-    transform: translateY(10px);
-    opacity: 0;
-  }
-
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-/* הסתרת שורת הקלט בזמן גלילה בצ'אט */
-.aiw-input-bar.hide-on-scroll {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transition: opacity 0.25s;
-}
-/* =========================================================
-  1) ASK AI LAUNCHER BUTTON
-  Styles for the floating "ASK AI" button
-  ========================================================= */
 
 .aiw-launcher-wrap {
   position: fixed;
@@ -227,6 +74,7 @@
   box-shadow: 0 26px 70px rgba(0, 0, 0, 0.62);
 }
 
+/* Fixed animated background (Sparkles) */
 .aiw-bg-fixed {
   position: absolute;
   inset: 0;
@@ -262,19 +110,8 @@
   z-index: 2;
 }
 
-
-.aiw-send-fancy__icon {
-  width: 40px;
-  height: 40px;
-  display: block;
-  fill: #000;
-  transition: transform 0.22s;
-}
-
-
 /* =========================================================
   3) TOP BAR
-.aiw-message-row {
   Header area (AI Assistant + close button)
   ========================================================= */
 
@@ -323,15 +160,15 @@
 }
 /* Minimal thin scrollbar (safe version) */
 .aiw-messages-list::-webkit-scrollbar {
-  width: 3px; /* 👈 דק */
+  width: 3px;
 }
 
 .aiw-messages-list::-webkit-scrollbar-track {
-  background: transparent; /* 👈 בלי רקע לבן */
+  background: transparent;
 }
 
 .aiw-messages-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.18); /* 👈 כמעט בלתי נראה */
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 999px;
 }
 
@@ -392,8 +229,8 @@
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.8); /* 👈 שחור */
-  color: #ffffff; /* 👈 החץ לבן */
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
 
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -482,13 +319,52 @@
   border-radius: 999px;
 }
 
-
-.aiw-send-fancy {
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  background: white;
+/* Send button — from Uiverse.io by vinodjangid07 */
+.Btn {
+  width: 45px;
+  height: 45px;
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   cursor: pointer;
+  position: relative;
+  border: 2.5px solid #fff;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.Btn.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.Btn .arrow path {
+  fill: white;
+}
+
+.Btn:hover .arrow {
+  animation: slide-in-bottom .7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+}
+
+@keyframes slide-in-bottom {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Input bar hidden while the chat is scrolling */
+.aiw-input-bar.hide-on-scroll {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.25s;
 }
 
 
@@ -516,7 +392,8 @@
   inset: 0;
   background: linear-gradient(180deg, #fff, #7dd3fc, #818cf8);
   -webkit-background-clip: text;
-  background-clip: text;  clip-path: inset(100% 0 0 0);
+  background-clip: text;
+  clip-path: inset(100% 0 0 0);
   animation: fill 8s infinite;
 }
 
