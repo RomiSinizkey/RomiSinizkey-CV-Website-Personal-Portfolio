@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import "../../styles/shared/brutalistLoader.css";
+import "./styles/brutalistLoader.css";
 
 const MIN_DISPLAY_MS = 3800; // minimum milliseconds the loader stays visible
 

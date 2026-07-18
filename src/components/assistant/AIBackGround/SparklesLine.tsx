@@ -1,6 +1,6 @@
 "use client";
 
-import { BackGroundAI } from "@/components/ui/AIBackGround/BackGroundAI";
+import { BackGroundAI } from "@/components/assistant/AIBackGround/BackGroundAI";
 
 export function SparklesLine() {
   return (

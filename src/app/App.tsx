@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import RootLayout from "./layout/RootLayout";
-import BrutalistLoader from "./components/shared/BrutalistLoader";
+import RootLayout from "./RootLayout";
+import BrutalistLoader from "../components/shared/BrutalistLoader";
 
-import HomePage from "./pages/home/HomePage";
-import AboutPage from "./pages/about/AboutPage";
-import EducationPage from "./pages/education/EducationPage";
-import ExperiencePage from "./pages/experience/ExperiencePage";
-import ProjectsPage from "./pages/projects/ProjectsPage";
+import HomePage from "../pages/home/HomePage";
+import AboutPage from "../pages/about/AboutPage";
+import EducationPage from "../pages/education/EducationPage";
+import ExperiencePage from "../pages/experience/ExperiencePage";
+import ProjectsPage from "../pages/projects/ProjectsPage";
 
 export default function App() {
   const [ready, setReady] = useState(false);

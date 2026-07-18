@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
-import { SparklesLine } from "@/components/ui/AIBackGround/SparklesLine";
+import { SparklesLine } from "@/components/assistant/AIBackGround/SparklesLine";
 
 import { AI_INTENTS, type AiIntentKey } from "./aiIntents";
 import { detectIntent } from "./detectIntent";

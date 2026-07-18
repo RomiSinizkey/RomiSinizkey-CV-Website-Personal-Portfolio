@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import "../../styles/shared/luminousCursor.css";
+import "./styles/luminousCursor.css";
 
 const DEFAULT_CURSOR_COLOR = "#ffffff";
 const FILLED_CURSOR_SELECTOR = "[data-cursor-fill='solid']";

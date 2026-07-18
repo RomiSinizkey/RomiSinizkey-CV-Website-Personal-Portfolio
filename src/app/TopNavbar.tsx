@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { CSSProperties, MouseEvent } from "react";
+import "./styles/navbar.css";
 
 interface BadgeNav {
   id: string;

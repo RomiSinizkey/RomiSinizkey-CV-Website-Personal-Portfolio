@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Particle = {
   x: number;
@@ -41,7 +41,7 @@ export default function ScrollReactiveBackground() {
     height: typeof window !== "undefined" ? window.innerHeight : 1080,
   });
 
-  const particles = useMemo<Particle[]>(() => {
+  const [particles] = useState<Particle[]>(() => {
     const count = 70;
     return Array.from({ length: count }, () => ({
       x: Math.random(),
@@ -51,7 +51,7 @@ export default function ScrollReactiveBackground() {
       drift: (Math.random() - 0.5) * 0.0006,
       alpha: Math.random() * 0.35 + 0.08,
     }));
-  }, []);
+  });
 
   useEffect(() => {
     const onResize = () => {
