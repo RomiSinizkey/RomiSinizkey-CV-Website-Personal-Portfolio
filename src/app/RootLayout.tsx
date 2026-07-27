@@ -31,7 +31,7 @@ export default function RootLayout({ ready = false }: Props) {
         <ScrollProgressBar />
         <TopNavbar />
         <AIAssistantWidget ready={ready} />
-        <Outlet />
+        <Outlet context={{ ready }} />
       </div>
     </div>
   );

@@ -1,0 +1,433 @@
+/* =========================
+   LOADING SCREEN — LOGO INTRO
+========================= */
+
+.logo-loader-overlay {
+  --dur: 3.8s;
+  --word-dur: 1.85s;
+  --purple: #8a2be2;
+  --indigo: #6a5cff;
+  --cyan: #00d4ff;
+
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top, rgba(88, 28, 135, 0.18), transparent 34%),
+    radial-gradient(circle at bottom, rgba(14, 165, 233, 0.12), transparent 32%),
+    linear-gradient(180deg, #05060a 0%, #090b12 100%);
+  opacity: 1;
+  transition: opacity 0.6s ease;
+  pointer-events: all;
+}
+
+.logo-loader-overlay.ll-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ll-stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.ll-word-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* fully visible (default opacity) until the delay below elapses, then fades */
+  animation: ll-word-fade-out 0.35s ease forwards;
+  animation-delay: 1.5s;
+}
+
+.ll-word {
+  display: inline-flex;
+  font-family: "Poppins", "Geist Variable", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(2.6rem, 8.5vw, 4.6rem);
+  letter-spacing: 0.22em;
+  color: #fff;
+  text-transform: uppercase;
+  animation: ll-word-glow-flash 0.35s ease forwards;
+  animation-delay: 1.3s;
+  filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+}
+
+.ll-word-letter {
+  position: relative;
+  display: inline-block;
+  color: transparent;
+}
+
+.ll-word-letter::before,
+.ll-word-letter::after {
+  content: attr(data-letter);
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.ll-word-letter::before {
+  -webkit-text-stroke: 1.4px rgba(255, 255, 255, 0.9);
+  color: transparent;
+  opacity: 0;
+  animation: ll-word-outline-in 0.32s ease forwards;
+  animation-delay: calc(var(--i) * 0.08s);
+}
+
+.ll-word-letter::after {
+  background: linear-gradient(180deg, var(--cyan), var(--indigo) 45%, var(--purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  clip-path: inset(100% 0 0 0);
+  animation: ll-word-fill-rise 0.38s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation-delay: calc(var(--i) * 0.08s + 0.1s);
+}
+
+.ll-mark {
+  position: relative;
+  width: clamp(150px, 22vw, 220px);
+  aspect-ratio: 1 / 1;
+}
+
+.ll-guide,
+.ll-glyph-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ll-guide circle,
+.ll-guide line {
+  fill: none;
+  stroke: rgba(138, 43, 226, 0.45);
+  stroke-width: 1;
+  opacity: 0;
+}
+
+.ll-guide circle {
+  stroke-dasharray: 6 6;
+  transform-origin: center;
+  animation: ll-guide-spin var(--dur) linear forwards, ll-guide-fade var(--dur) ease forwards;
+  animation-delay: var(--word-dur);
+}
+
+.ll-guide line {
+  animation: ll-guide-fade var(--dur) ease forwards;
+  animation-delay: var(--word-dur);
+}
+
+.ll-glyph-svg {
+  filter: drop-shadow(0 0 0 rgba(0, 212, 255, 0));
+  animation: ll-glyph-glow var(--dur) ease forwards;
+  animation-delay: var(--word-dur);
+}
+
+.ll-glyph-outline,
+.ll-glyph-fill {
+  font-family: "Poppins", "Geist Variable", system-ui, sans-serif;
+  font-size: 168px;
+  font-weight: 800;
+}
+
+.ll-glyph-outline {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.5;
+  opacity: 0;
+  animation: ll-glyph-outline-in var(--dur) ease forwards;
+  animation-delay: var(--word-dur);
+}
+
+.ll-glyph-fill {
+  fill: url(#ll-grad);
+  stroke: none;
+  clip-path: inset(100% 0 0 0);
+  animation: ll-glyph-fill-rise var(--dur) cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation-delay: var(--word-dur);
+}
+
+.ll-dot {
+  position: absolute;
+  left: 26%;
+  top: 64%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 rgba(0, 212, 255, 0);
+  opacity: 0;
+  animation: ll-dot-travel var(--dur) ease forwards;
+  animation-delay: var(--word-dur);
+}
+
+.ll-dot-trail {
+  position: absolute;
+  left: 26%;
+  top: calc(64% - 1px);
+  width: 48%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85) 75%, #fff);
+  filter: blur(0.5px);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: ll-trail-grow var(--dur) ease forwards;
+  animation-delay: var(--word-dur);
+}
+
+.ll-wordmark {
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: ll-wordmark-in var(--dur) ease forwards;
+  animation-delay: var(--word-dur);
+}
+
+.ll-name {
+  font-family: "Poppins", "Geist Variable", system-ui, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.ll-name span {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+}
+
+.ll-title {
+  margin-top: 0.35rem;
+  font-family: "Poppins", "Geist Variable", system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.35em;
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+
+@keyframes ll-word-outline-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ll-word-fill-rise {
+  0% {
+    clip-path: inset(100% 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes ll-word-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes ll-word-glow-flash {
+  0% {
+    filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 30px rgba(0, 212, 255, 0.5));
+  }
+  100% {
+    filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+}
+
+@keyframes ll-guide-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(35deg);
+  }
+}
+
+@keyframes ll-guide-fade {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  28% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes ll-glyph-outline-in {
+  0%,
+  8% {
+    opacity: 0;
+  }
+  26%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes ll-glyph-fill-rise {
+  0%,
+  34% {
+    clip-path: inset(100% 0 0 0);
+  }
+  82%,
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes ll-glyph-glow {
+  0%,
+  78% {
+    filter: drop-shadow(0 0 0 rgba(0, 212, 255, 0));
+  }
+  92% {
+    filter: drop-shadow(0 0 18px rgba(0, 212, 255, 0.55)) drop-shadow(0 0 32px rgba(138, 43, 226, 0.35));
+  }
+  100% {
+    filter: drop-shadow(0 0 14px rgba(0, 212, 255, 0.4)) drop-shadow(0 0 26px rgba(138, 43, 226, 0.28));
+  }
+}
+
+@keyframes ll-dot-travel {
+  0%,
+  84% {
+    left: 26%;
+    opacity: 0;
+    box-shadow: 0 0 0 rgba(0, 212, 255, 0);
+  }
+  88% {
+    opacity: 1;
+    box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.6);
+  }
+  95% {
+    left: 70%;
+    opacity: 1;
+    box-shadow: 0 0 8px 3px rgba(0, 212, 255, 0.8);
+  }
+  98% {
+    left: 74%;
+    opacity: 1;
+    box-shadow: 0 0 16px 6px rgba(0, 212, 255, 1);
+  }
+  100% {
+    left: 74%;
+    opacity: 1;
+    box-shadow: 0 0 10px 3px rgba(0, 212, 255, 0.6);
+  }
+}
+
+@keyframes ll-trail-grow {
+  0%,
+  86% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  95% {
+    opacity: 0.9;
+    transform: scaleX(0.92);
+  }
+  98% {
+    opacity: 0.9;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes ll-wordmark-in {
+  0%,
+  92% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .ll-name {
+    font-size: 1rem;
+    letter-spacing: 0.24em;
+  }
+
+  .ll-title {
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ll-word-stage {
+    display: none !important;
+  }
+
+  .ll-guide {
+    display: none;
+  }
+
+  .ll-glyph-svg,
+  .ll-glyph-outline,
+  .ll-glyph-fill,
+  .ll-wordmark {
+    animation: none !important;
+    clip-path: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .ll-glyph-svg {
+    filter: drop-shadow(0 0 14px rgba(0, 212, 255, 0.4)) drop-shadow(0 0 26px rgba(138, 43, 226, 0.28)) !important;
+  }
+
+  .ll-dot {
+    animation: none !important;
+    opacity: 1 !important;
+    left: 74% !important;
+    box-shadow: 0 0 10px 3px rgba(0, 212, 255, 0.6) !important;
+  }
+
+  .ll-dot-trail {
+    display: none;
+  }
+}

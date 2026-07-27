@@ -2,8 +2,8 @@ import NameLogo from "./components/NameLogo";
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import HomeHeroTitle from "./components/HomeHeroTitle";
+import HomeQuickLinks from "./components/HomeQuickLinks";
 import LanguagesSectionContent from "./components/LanguagesSectionContent";
-import SideLinks from "./components/SideLinks";
 import SkillsSectionContent from "./components/SkillsSectionContent";
 import UnderConstructionOverlay from "@/components/shared/UnderConstructionOverlay";
 import { AboutPageContent } from "../about/components/AboutPageContent";
@@ -86,8 +86,9 @@ export default function HomePage() {
       </div>
 
       {/* TRUE CENTER */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
         <HomeHeroTitle />
+        <HomeQuickLinks />
       </div>
     </section>
 
@@ -134,8 +135,6 @@ export default function HomePage() {
       >
         <LanguagesSectionContent />
       </section>
-
-      <SideLinks />
     </div>
   );
 }

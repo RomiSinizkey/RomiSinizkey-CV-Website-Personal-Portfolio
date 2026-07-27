@@ -242,7 +242,6 @@ export default function TopNavbar() {
                   href={`#${badge.sectionId}`}
                   onClick={onBadgeClick(badge)}
                   className="stackBadge"
-                  data-cursor-fill="solid"
                 >
                   <span className="stackBadgeIcon" aria-hidden="true">{renderBadgeIcon(badge.icon)}</span>
                   <span className="stackBadgeTitle">{badge.label}</span>

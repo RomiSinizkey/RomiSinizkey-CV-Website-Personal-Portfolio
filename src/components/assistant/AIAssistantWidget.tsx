@@ -269,9 +269,6 @@ function PromptWindow({ onClose }: PromptWindowProps) {
               value={draft}
               rows={1}
               placeholder="Ask something..."
-              data-cursor-label="WRITE"
-              data-cursor-label-tone="muted"
-              style={{ ["--cursor-color" as string]: "#5B21B6" }}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={async (event) => {
                 if (event.key === "Enter" && !event.shiftKey) {

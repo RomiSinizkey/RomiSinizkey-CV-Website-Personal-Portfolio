@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import RootLayout from "./RootLayout";
-import BrutalistLoader from "../components/shared/BrutalistLoader";
+import LogoLoader from "../components/shared/LogoLoader";
 
 import HomePage from "../pages/home/HomePage";
 import AboutPage from "../pages/about/AboutPage";
@@ -14,7 +14,7 @@ export default function App() {
 
   return (
     <>
-      <BrutalistLoader onDone={() => setReady(true)} />
+      <LogoLoader onDone={() => setReady(true)} />
       <div style={{ visibility: ready ? "visible" : "hidden" }}>
         <Routes>
           <Route path="/" element={<RootLayout ready={ready} />}>

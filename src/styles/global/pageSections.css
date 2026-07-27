@@ -3,7 +3,8 @@
   line-height: 2.5rem;
   font-weight: 900;
   letter-spacing: -0.025em;
-  color: #0f172a;
+  color: #ffffff;
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
 @media (min-width: 768px) {

@@ -1,9 +1,8 @@
-@import "tailwindcss/preflight";
+@import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
-@tailwind utilities;
 
 /* =========================
    GLOBAL BASE (PORTFOLIO / PREMIUM)
@@ -61,6 +60,7 @@ html, body, #root{
 html{
   font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   scroll-behavior: smooth;
+  background: var(--bg);
 }
 
 body{

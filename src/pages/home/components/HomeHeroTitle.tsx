@@ -58,7 +58,6 @@ export default function HomeHeroTitle() {
               text-orange-500
             "
             data-cursor="interactive"
-            data-cursor-fill="solid"
           >
             {COMPUTER_SCIENCE_CHARS.map((char, index) => (
               <span
