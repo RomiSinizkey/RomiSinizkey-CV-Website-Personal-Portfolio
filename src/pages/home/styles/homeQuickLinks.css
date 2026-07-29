@@ -3,12 +3,15 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 22px;
+  gap: 22px;
+  margin-top: 38px;
   pointer-events: auto;
 }
 
 .homeQuickLinkBtn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -25,12 +28,26 @@
   letter-spacing: 0.04em;
   text-decoration: none;
   text-transform: uppercase;
-  transition: color 200ms ease, border-color 200ms ease, background 200ms ease, box-shadow 200ms ease;
+  transition: color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.homeQuickLinkBtn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, #ff9a3c 0%, #ff6a00 100%);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 900ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.homeQuickLinkBtn:hover::before {
+  transform: scaleY(1);
 }
 
 .homeQuickLinkBtn:hover {
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.08);
-  background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 154, 60, 0.5);
+  box-shadow: 0 10px 20px rgba(255, 106, 0, 0.3), 0 0 0 1px rgba(255, 154, 60, 0.25);
 }

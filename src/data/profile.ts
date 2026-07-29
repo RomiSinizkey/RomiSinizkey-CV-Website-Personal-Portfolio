@@ -39,7 +39,7 @@ export type Profile = {
 
 export const profile: Profile = {
   fullName: "Romi Sinizkey",
-  headline: "Computer Science Student | Full-Stack Developer",
+  headline: "Computer Science Student | Software Engineer",
   location: "Israel",
   summary:
     "I build clean, maintainable software. Strong with React + TypeScript, Node.js, Docker and SQL. I like shipping features with solid architecture and great UX.",

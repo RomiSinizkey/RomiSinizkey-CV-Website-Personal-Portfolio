@@ -142,15 +142,6 @@ function HeaderSection({ firstName, story, showHomeLink = true }: { firstName: s
                 <span className="relative">← Home</span>
               </Link>
             )}
-
-            {profile.email && (
-              <a
-                href={`mailto:${profile.email}`}
-                className="group relative px-7 py-3 rounded-2xl bg-orange-500 text-white font-black shadow-lg hover:bg-orange-400 hover:shadow-2xl transition-all overflow-hidden"
-              >
-                <span className="relative">Get in Touch</span>
-              </a>
-            )}
           </div>
         </div>
 
