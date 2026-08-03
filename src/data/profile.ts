@@ -39,10 +39,10 @@ export type Profile = {
 
 export const profile: Profile = {
   fullName: "Romi Sinizkey",
-  headline: "Computer Science Student | Software Engineer",
-  location: "Israel",
+  headline: "Computer Science Student | Software Developer",
+  location: "Israel, Tzur Hadassah",
   summary:
-    "I build clean, maintainable software. Strong with React + TypeScript, Node.js, Docker and SQL. I like shipping features with solid architecture and great UX.",
+    "3rd-year Computer Science student with strong foundations in algorithms, data structures, operating systems, and web development. I work hands-on with Python, JavaScript, C, C++, and SQL, and I'm currently building a live production platform at a startup — full-stack, from customer order search to data management and system integration. Looking for an internship or entry-level role where I can keep growing as a backend, full-stack, or frontend engineer.",
   socials: [
     { label: "GitHub", href: "https://github.com/RomiSinizkey" },
     { label: "LinkedIn", href: "https://www.linkedin.com/in/romi-sinizkey-30a7b7322/" }
@@ -52,20 +52,21 @@ export const profile: Profile = {
   cv: "/Romi_Sinizkey_CV.pdf",
   education: [
     {
-      institution: "The Open University of Israel",
-      degree: "B.Sc. in Computer Science (Year 1)",
-      years: "2024–Present",
-      details: ["Algorithms, Data Structures, Systems, and more"]
+      institution: "Jerusalem Multidisciplinary College",
+      degree: "B.Sc. in Computer Science",
+      years: "2023–2027",
+      details: ["Grade: 88", "Algorithms, Data Structures, Systems, and more"]
     }
   ],
   experience: [
     {
-      title: "Sales Agent",
-      company: "Bug Computers",
-      years: "Post-service",
+      title: "Full Stack Engineer",
+      company: "Bridgify",
+      years: "Dec 2025 (Temporary)",
       bullets: [
-        "Customer-facing role: diagnosing needs and recommending tech solutions",
-        "Strong communication, responsibility, and teamwork"
+        "Building both frontend and backend features on a live production platform, including UIs with React and server-side logic with Python",
+        "Designing, developing, and improving system components, and integrating new features into existing systems",
+        "Collaborating closely with the development team on feature development, debugging, and maintaining production-quality code"
       ]
     }
   ],

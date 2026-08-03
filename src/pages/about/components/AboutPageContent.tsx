@@ -1,9 +1,7 @@
-import { useMemo, type CSSProperties, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Code2, Server, User, Wrench } from "lucide-react";
+import { GraduationCap, History, MapPin, Rocket, User } from "lucide-react";
 import { profile } from "@/data/profile";
-import "../styles/skillFlipCard.css";
 import "../styles/idBadge.css";
 
 function IdBadge({ name, role }: { name: string; role: string }) {
@@ -44,69 +42,30 @@ function CanvaBackground() {
   );
 }
 
-type CardData = {
-  key: string;
-  title: string;
-  subtitle: string;
-  icon: ReactNode;
-  items: string[];
-  accent: string;
-  accentSoft: string;
-  accentStrong: string;
-};
+function QuickFacts() {
+  const currentEducation = profile.education[0];
+  const pastRole = profile.experience[0];
 
-function SkillFlipCard({ data }: { data: CardData }) {
+  const facts = [
+    profile.location ? { icon: <MapPin size={15} />, label: profile.location } : null,
+    currentEducation ? { icon: <GraduationCap size={15} />, label: currentEducation.degree } : null,
+    pastRole ? { icon: <History size={15} />, label: `Former: ${pastRole.title} @ ${pastRole.company} (temporary)` } : null,
+    { icon: <Rocket size={15} />, label: "Open to internship / entry-level roles" },
+  ].filter((fact): fact is NonNullable<typeof fact> => fact !== null);
+
+  if (facts.length === 0) return null;
+
   return (
-    <div
-      className="skillFlipCard"
-      style={
-        {
-          "--accent": data.accent,
-          "--accent-soft": data.accentSoft,
-          "--accent-strong": data.accentStrong,
-        } as CSSProperties
-      }
-    >
-      <div className="skillFlipCardInner">
-        <div className="skillFlipCardBack">
-          <div className="skillFlipCardBackContent">
-            {data.icon}
-            <strong>{data.title}</strong>
-            <span>Hover to see skills</span>
-          </div>
+    <div className="mt-6 flex flex-wrap gap-3">
+      {facts.map((fact, index) => (
+        <div
+          key={index}
+          className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-2 text-sm font-semibold text-white/85 backdrop-blur"
+        >
+          <span className="text-orange-400">{fact.icon}</span>
+          {fact.label}
         </div>
-
-        <div className="skillFlipCardFront">
-          <div className="skillFlipCardBg">
-            <div className="skillFlipCardCircle" />
-            <div className="skillFlipCardCircle skillFlipCardCircleRight" />
-            <div className="skillFlipCardCircle skillFlipCardCircleBottom" />
-          </div>
-
-          <div className="skillFlipCardFrontContent">
-            <small className="skillFlipCardBadge">{data.title}</small>
-
-            <div className="skillFlipCardDescription">
-              <div className="skillFlipCardTitleRow">
-                <span>{data.subtitle}</span>
-                {data.icon}
-              </div>
-
-              <div className="skillFlipCardItems">
-                {data.items.map((item) => (
-                  <span key={item} className="skillFlipCardItem">
-                    {item}
-                  </span>
-                ))}
-              </div>
-
-              <p className="skillFlipCardFooter">
-                {data.items.length} {data.items.length === 1 ? "skill" : "skills"}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      ))}
     </div>
   );
 }
@@ -131,7 +90,9 @@ function HeaderSection({ firstName, story, showHomeLink = true }: { firstName: s
             {profile.headline}
           </p>
 
-          <p className="mt-5 text-lg text-white/70 max-w-2xl leading-relaxed">{story}</p>
+          <p className="mt-5 text-lg text-white/70 max-w-none leading-loose">{story}</p>
+
+          <QuickFacts />
 
           <div className="mt-8 flex flex-wrap gap-4">
             {showHomeLink && (
@@ -157,55 +118,6 @@ export function AboutPageContent({ embedded = false }: { embedded?: boolean }) {
     profile.summary ??
     "Computer Science student obsessed with clean architecture, performance, and shipping products that matter.";
 
-  const SKILL_GROUP_META: Record<string, { icon: ReactNode; subtitle: string; accent: string; accentSoft: string; accentStrong: string }> = {
-    Frontend: {
-      icon: <Code2 size={18} />,
-      subtitle: "Building fast, accessible interfaces",
-      accent: "#f97316",
-      accentSoft: "#fdba74",
-      accentStrong: "#ea580c",
-    },
-    Backend: {
-      icon: <Server size={18} />,
-      subtitle: "APIs, data, and server-side logic",
-      accent: "#3b82f6",
-      accentSoft: "#7dd3fc",
-      accentStrong: "#2563eb",
-    },
-    Tools: {
-      icon: <Wrench size={18} />,
-      subtitle: "Everyday development toolkit",
-      accent: "#8b5cf6",
-      accentSoft: "#c4b5fd",
-      accentStrong: "#6d28d9",
-    },
-  };
-
-  const cards: CardData[] = useMemo(
-    () =>
-      profile.skills.map((group) => {
-        const meta = SKILL_GROUP_META[group.group] ?? {
-          icon: <Code2 size={18} />,
-          subtitle: group.items.join(", "),
-          accent: "#94a3b8",
-          accentSoft: "#cbd5e1",
-          accentStrong: "#64748b",
-        };
-
-        return {
-          key: group.group,
-          title: group.group,
-          subtitle: meta.subtitle,
-          icon: meta.icon,
-          items: group.items,
-          accent: meta.accent,
-          accentSoft: meta.accentSoft,
-          accentStrong: meta.accentStrong,
-        };
-      }),
-    []
-  );
-
   return (
     <div className={`relative min-h-screen overflow-hidden w-full ${embedded ? "rounded-[28px]" : ""}`}>
       {embedded ? (
@@ -214,16 +126,8 @@ export function AboutPageContent({ embedded = false }: { embedded?: boolean }) {
         <CanvaBackground />
       )}
 
-      <div className="relative z-10 mx-auto max-w-6xl px-6 py-10 pointer-events-auto">
+      <div className="relative z-10 mx-auto max-w-7xl px-6 py-10 pointer-events-auto">
         <HeaderSection firstName={firstName} story={story} showHomeLink={!embedded} />
-
-        <div className="flex justify-center">
-          <div className="flex items-start justify-center flex-wrap" style={{ gap: "16px" }}>
-            {cards.map((card) => (
-              <SkillFlipCard key={card.key} data={card} />
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );

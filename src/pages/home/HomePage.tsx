@@ -96,7 +96,7 @@ export default function HomePage() {
         id="about-section"
         className="relative z-20 min-h-[120vh] px-4 py-20 md:px-6 md:py-28"
       >
-        <div className="mx-auto w-full max-w-6xl">
+        <div className="mx-auto w-full max-w-7xl">
           <AboutPageContent embedded />
         </div>
       </section>

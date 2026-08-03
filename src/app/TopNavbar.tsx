@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { CSSProperties, MouseEvent } from "react";
 import "./styles/navbar.css";
@@ -11,18 +11,6 @@ interface BadgeNav {
   icon: "home" | "projects" | "about" | "education" | "experience" | "skills" | "languages";
   colorStart: string;
   colorEnd: string;
-}
-
-type FX = {
-  id: string;
-  owner: string;
-  x: number;
-  y: number;
-  glyphs: string[];
-};
-
-function uid() {
-  return Math.random().toString(16).slice(2) + Date.now().toString(16);
 }
 
 const cn = (...inputs: Array<string | false | null | undefined>) =>
@@ -103,8 +91,7 @@ export default function TopNavbar() {
 
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home-section");
-  const [fx, setFx] = useState<FX[]>([]);
-  const timers = useRef<number[]>([]);
+  const [pinnedId, setPinnedId] = useState<string | null>(null);
 
   useEffect(() => {
     const syncScrolled = () => {
@@ -172,37 +159,9 @@ export default function TopNavbar() {
     };
   }, [location.pathname]);
 
-  useEffect(() => {
-    return () => {
-      timers.current.forEach((timer) => window.clearTimeout(timer));
-      timers.current = [];
-    };
-  }, []);
-
-  const spawnFX = (e: MouseEvent, owner: string) => {
-    const target = e.currentTarget as HTMLElement;
-    const r = target.getBoundingClientRect();
-    const x = e.clientX - r.left;
-    const y = e.clientY - r.top;
-
-    const pool = ["<>", "{ }", "[]", "()", "=>", "&&", "||", "git", "API", "SQL", "TS", "UI", "0", "1"];
-    const glyphs = Array.from({ length: 7 }, (_, i) =>
-      pool[(Math.floor((x + y + i * 19) * 7) % pool.length + pool.length) % pool.length]
-    );
-
-    const id = uid();
-    setFx((prev) => [...prev, { id, owner, x, y, glyphs }]);
-
-    const t = window.setTimeout(() => {
-      setFx((prev) => prev.filter((b) => b.id !== id));
-    }, 950);
-
-    timers.current.push(t);
-  };
-
   const onBadgeClick = (badge: BadgeNav) => (e: MouseEvent) => {
-    spawnFX(e, badge.label);
     e.preventDefault();
+    setPinnedId(badge.id);
     setActiveSection(badge.sectionId);
 
     if (location.pathname !== "/") {
@@ -220,7 +179,7 @@ export default function TopNavbar() {
   return (
     <header className={cn("topNav", scrolled && "isScrolled")}>
       <nav className="stackNav" aria-label="Primary">
-        <ul className="stackNavRow">
+        <ul className="stackNavRow" onMouseLeave={() => setPinnedId(null)}>
           {badges.map((badge, index) => {
             const isActive = location.pathname === "/"
               ? activeSection === badge.sectionId
@@ -230,7 +189,8 @@ export default function TopNavbar() {
             return (
               <li
                 key={badge.id}
-                className={cn("stackNavItem", isActive && "isActive")}
+                className={cn("stackNavItem", isActive && "isActive", pinnedId === badge.id && "isPinned")}
+                onMouseEnter={() => setPinnedId(badge.id)}
                 style={{
                   "--i": badge.colorStart,
                   "--j": badge.colorEnd,
@@ -245,23 +205,6 @@ export default function TopNavbar() {
                 >
                   <span className="stackBadgeIcon" aria-hidden="true">{renderBadgeIcon(badge.icon)}</span>
                   <span className="stackBadgeTitle">{badge.label}</span>
-
-                  <span className="csfxLayer" aria-hidden="true">
-                    {fx
-                      .filter((b) => b.owner === badge.label)
-                      .map((b) => (
-                        <span key={b.id} className="csfxBurst" style={{ left: b.x, top: b.y } as CSSProperties}>
-                          <span className="csfxRing" />
-                          <span className="csfxCore" />
-                          <span className="csfxSweep" />
-                          {b.glyphs.map((g, i) => (
-                            <span key={i} className={`csfxChip csfxChip${i + 1}`}>
-                              {g}
-                            </span>
-                          ))}
-                        </span>
-                      ))}
-                  </span>
                 </a>
               </li>
             );
