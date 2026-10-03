@@ -15,8 +15,8 @@ interface Props {
 
 export default function RootLayout({ ready = false }: Props) {
   const location = useLocation();
-  const isProjectsPage = location.pathname === "/projects";
-  const shouldShowOverlay = isProjectsPage && import.meta.env.PROD;
+  const isHomeOrAbout = location.pathname === "/" || location.pathname === "/about";
+  const shouldShowOverlay = !isHomeOrAbout && import.meta.env.PROD;
 
   return (
     <div className="root-layout">
