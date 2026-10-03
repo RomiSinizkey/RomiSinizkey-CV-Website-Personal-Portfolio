@@ -70,7 +70,7 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
 
-  const shouldShowOverlay = activeSection !== "home-section" && import.meta.env.PROD;
+  const shouldShowOverlay = activeSection === "projects-section" && import.meta.env.PROD;
 
   return (
     <div className="relative w-full overflow-x-hidden">
