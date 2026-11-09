@@ -167,7 +167,8 @@ export const AI_INTENTS: Record<
       "where can i reach you",
     ],
     reply: "Here’s the contact area.",
-    action: { type: "route", route: "/", anchorId: "side-links" },
+    // Contact links (Contact / Resume / LinkedIn / GitHub) live under the hero title.
+    action: { type: "route", route: "/", anchorId: "home-section" },
   },
 
   github: {

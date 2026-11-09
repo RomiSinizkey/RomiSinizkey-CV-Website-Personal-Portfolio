@@ -3,11 +3,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
-import { SparklesLine } from "@/components/assistant/AIBackGround/SparklesLine";
+import { SparklesLine } from "./SparklesLine";
 
 import { AI_INTENTS, type AiIntentKey } from "./aiIntents";
 import { detectIntent } from "./detectIntent";
-import "./styles/aiAssistantWidget.css";
+import "./AIAssistantWidget.css";
 
 const MemoSparklesLine = React.memo(SparklesLine);
 
@@ -109,8 +109,12 @@ function PromptWindow({ onClose }: PromptWindowProps) {
       navigate(action.route, {
         state: action.anchorId ? { scrollTo: action.anchorId } : undefined,
       });
+
+      // Close the panel (same as the ✕ button) so the destination is visible.
+      // External links open in a new tab, so the chat stays open for those.
+      onClose();
     },
-    [navigate]
+    [navigate, onClose]
   );
 
   const handleSubmit = React.useCallback(async () => {

@@ -31,23 +31,8 @@ export default defineConfig(({ mode }) => ({
             return "motion-vendor";
           }
 
-          if (id.includes("@lottiefiles") || id.includes("lottie-web")) {
-            return "lottie-vendor";
-          }
-
           return "vendor";
         },
-      },
-    },
-  },
-  server: {
-    proxy: {
-      "/api/open-meteo-geocode": {
-        target: "https://geocoding-api.open-meteo.com",
-        changeOrigin: true,
-        secure: true,
-        rewrite: (path) =>
-          path.replace(/^\/api\/open-meteo-geocode/, ""),
       },
     },
   },

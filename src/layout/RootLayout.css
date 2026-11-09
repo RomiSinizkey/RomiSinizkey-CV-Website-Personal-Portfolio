@@ -1,0 +1,37 @@
+.root-layout {
+  position: relative;
+  min-height: 100vh;
+  background: #000;
+  overflow-x: hidden;
+}
+
+.background-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.content-wrapper {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+}
+
+/* Standalone pages (/about, /projects, ...): start content below the fixed navbar and ASK AI
+   launcher. Desktop (>= 1024px) is unchanged; phones need more room because the navbar
+   moves to its own row below the logo/launcher (see TopNavbar.css). */
+@media (max-width: 1023px) {
+  .content-wrapper.is-subpage {
+    padding-top: 56px;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper.is-subpage {
+    padding-top: 112px;
+  }
+}

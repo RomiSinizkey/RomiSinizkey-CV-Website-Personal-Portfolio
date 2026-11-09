@@ -49,7 +49,8 @@ export const profile: Profile = {
   ],
   email: "sinizromi@gmail.com",
   phone: "0544276740",
-  cv: "/Romi_Sinizkey_CV.pdf",
+  // File lives in public/. BASE_URL keeps the link valid under the GitHub Pages sub-path.
+  cv: `${import.meta.env.BASE_URL}Romi_cv.pdf`,
   education: [
     {
       institution: "Jerusalem Multidisciplinary College",
