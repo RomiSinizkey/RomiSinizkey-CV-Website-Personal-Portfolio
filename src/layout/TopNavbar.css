@@ -1,297 +1,288 @@
 /* =========================
-   EXPANDING ICON NAVBAR
+   DESKTOP / TABLET NAVIGATION (>= 641px): FLOATING PILL
+   Dark navy glass bar centered on the same row as the ROMI logo and ASK AI (center at 44px).
+   Home, About, Projects, Experience + a "More" dropdown (Education, Skills, Languages).
 ========================= */
 
 .topNav {
   position: fixed;
-  top: calc(12px + env(safe-area-inset-top));
+  top: calc(22px + env(safe-area-inset-top));
   left: 50%;
-  z-index: 99999;
-  width: min(980px, calc(100vw - 32px));
-  transition: opacity 220ms ease, transform 300ms ease, filter 220ms ease;
-  will-change: transform;
-  pointer-events: auto;
+  z-index: 99999; /* above Under Construction (99998), below ASK AI */
   transform: translateX(-50%);
-  filter: drop-shadow(0 12px 24px rgba(15, 23, 42, 0.22));
 }
 
-.topNav.isScrolled {
-  transform: translateX(-50%) translateY(3px);
-}
-
-.stackNav {
+.pillNav {
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  pointer-events: auto;
+  height: 44px;
+  padding: 4px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(11, 16, 32, 0.62);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-.stackNavRow {
+.pillList {
   display: flex;
-  justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 4px;
-  width: 100%;
+  gap: 2px;
+  height: 100%;
   margin: 0;
-  padding: 8px 10px;
+  padding: 0;
   list-style: none;
 }
 
-.stackNavItem {
-  list-style: none;
+.pillLink {
   position: relative;
-  opacity: 1;
-  pointer-events: auto;
-  transition: transform 220ms ease, opacity 220ms ease;
-}
-
-.stackNavItem::after {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--i) 32%, transparent), transparent 70%);
-  transition: opacity 220ms ease, transform 220ms ease;
-  z-index: -1;
-  opacity: 0;
-}
-
-.stackNavItem.isActive::after,
-.stackNavItem.isPinned:not(.isActive)::after {
-  opacity: 1;
-  transform: scale(1.04);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.24), transparent 70%);
-}
-
-.stackBadge {
-  position: relative;
-  z-index: 2;
-  display: flex;
+  z-index: 1;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 38px;
-  overflow: visible;
+  gap: 4px;
+  height: 34px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.96);
-  transition: color 420ms ease, transform 220ms ease, opacity 220ms ease, width 650ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 200ms ease, background-color 200ms ease;
 }
 
-.stackBadgeIcon,
-.stackBadgeTitle {
-  position: absolute;
+/* Hover: a light warm tint (the orange fill belongs to the current item only). */
+.pillLink:hover {
+  color: #fed7aa;
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.stackBadgeIcon {
-  width: 31px;
-  height: 31px;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.96));
-  color: color-mix(in srgb, var(--i) 52%, #475569);
-  box-shadow:
-    0 14px 28px rgba(15, 23, 42, 0.24),
-    0 0 0 1px rgba(255, 255, 255, 0.9),
-    0 0 20px color-mix(in srgb, var(--i) 20%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
-  transition: width 650ms cubic-bezier(0.34, 1.56, 0.64, 1), height 650ms cubic-bezier(0.34, 1.56, 0.64, 1), transform 320ms ease, color 420ms ease, background 620ms ease, box-shadow 420ms ease, opacity 260ms ease;
+/* The current item keeps the muted color underneath; the orange "water" layer fills it.
+   Its background comes from the sliding indicator. */
+.pillLink.isActive,
+.pillLink.isActive:hover {
+  color: rgba(255, 255, 255, 0.72);
+  background: transparent;
 }
 
-.stackBadgeIcon svg {
-  width: 13px;
-  height: 13px;
-  transition: opacity 180ms ease, transform 180ms ease;
-}
-
-.stackNavItem.isActive .stackBadgeIcon {
-  width: var(--hover-width);
-  height: 31px;
-  color: transparent;
-  background: #f97316;
-  transform: scale(1);
-  box-shadow:
-    0 14px 28px rgba(15, 23, 42, 0.24),
-    0 0 20px rgba(249, 115, 22, 0.4);
-  transition: width 650ms cubic-bezier(0.34, 1.56, 0.64, 1), height 650ms cubic-bezier(0.34, 1.56, 0.64, 1), transform 320ms ease, color 420ms ease, background 450ms ease, box-shadow 450ms ease, opacity 260ms ease;
-}
-
-.stackNavItem.isActive.isPinned .stackBadgeIcon {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.96));
-  transition: width 650ms cubic-bezier(0.34, 1.56, 0.64, 1), height 650ms cubic-bezier(0.34, 1.56, 0.64, 1), transform 320ms ease, color 420ms ease, background 120ms ease, box-shadow 120ms ease, opacity 260ms ease;
-}
-
-.stackNavItem.isActive .stackBadge {
-  width: var(--hover-width);
-}
-
-.stackNavItem.isActive .stackBadgeIcon svg {
-  opacity: 0;
-  transform: scale(0.7);
-}
-
-.stackNavItem.isActive .stackBadgeTitle {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.stackNavItem:not(.isActive):active .stackBadge {
-  transition: color 420ms ease, transform 220ms ease, opacity 220ms ease, width 1200ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.stackNavItem.isPinned:not(.isActive) .stackBadge,
-.stackNavItem:not(.isActive):active .stackBadge,
-.stackNavItem:not(.isActive):focus-within:not(:hover) .stackBadge {
-  width: var(--hover-width);
-}
-
-.stackNavItem.isPinned:not(.isActive) .stackBadgeIcon,
-.stackNavItem:not(.isActive):active .stackBadgeIcon,
-.stackNavItem:not(.isActive):focus-within:not(:hover) .stackBadgeIcon {
-  box-shadow:
-    0 20px 36px rgba(15, 23, 42, 0.28),
-    0 0 0 1px rgba(255, 255, 255, 0.96),
-    0 0 30px rgba(255, 255, 255, 0.35);
-}
-
-.stackNavItem.isActive.isPinned .stackBadgeIcon {
-  box-shadow:
-    0 20px 36px rgba(15, 23, 42, 0.28),
-    0 0 0 1px rgba(255, 255, 255, 0.96),
-    0 0 30px rgba(255, 255, 255, 0.35);
-}
-
-.stackNavItem:not(.isActive):active .stackBadgeIcon {
-  transition: width 1200ms cubic-bezier(0.22, 1, 0.36, 1), height 1200ms cubic-bezier(0.22, 1, 0.36, 1), transform 320ms ease, color 420ms ease, box-shadow 420ms ease, opacity 260ms ease;
-}
-
-.stackNavItem.isPinned:not(.isActive) .stackBadgeIcon,
-.stackNavItem:not(.isActive):active .stackBadgeIcon,
-.stackNavItem:not(.isActive):focus-within:not(:hover) .stackBadgeIcon {
-  width: var(--hover-width);
-  height: 31px;
-  color: transparent;
-  transform: scale(1);
-  box-shadow:
-    0 14px 28px rgba(15, 23, 42, 0.24),
-    0 0 0 1px rgba(255, 255, 255, 0.9),
-    0 0 20px rgba(255, 255, 255, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
-}
-
-.stackBadgeIcon {
+/* Label box hugs the text, so the fill rises over the letters rather than the whole button.
+   line-height 1.5 makes the box tall enough for ascenders and descenders (the tails of j, p, y),
+   so the orange fill reaches every part of the letters. The button height is unchanged. */
+.pillLabel {
   position: relative;
-  overflow: hidden;
+  display: inline-block;
+  line-height: 1.5;
 }
 
-.stackBadgeIcon::before {
-  content: "";
+/* Orange copy of the label (aria-hidden), painted through the letter shapes with a wavy surface.
+   The image is twice the label height: top half transparent, bottom half orange; moving it up
+   raises the "water" from the bottom while it drifts sideways. */
+.pillLabelFill {
   position: absolute;
   inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(
-    115deg,
-    transparent 20%,
-    rgba(255, 255, 255, 0.65) 38%,
-    rgba(255, 255, 255, 0.4) 47%,
-    transparent 62%
-  );
-  background-size: 250% 100%;
-  background-position: 130% 0;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 1;
-  transition: background-position 650ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 280ms ease;
-}
-
-.stackNavItem:not(.isActive):active .stackBadgeIcon::before {
-  opacity: 1;
-  background-position: -30% 0;
-}
-
-.stackNavItem.isPinned:not(.isActive) .stackBadgeIcon svg,
-.stackNavItem:not(.isActive):active .stackBadgeIcon svg,
-.stackNavItem:not(.isActive):focus-within:not(:hover) .stackBadgeIcon svg {
-  opacity: 0;
-  transform: scale(0.7);
-}
-
-.stackBadgeTitle {
-  color: #1a1a1a;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0;
-  line-height: 1;
-  text-transform: uppercase;
-  text-align: center;
-  width: calc(var(--hover-width) - 10px);
-  max-width: calc(var(--hover-width) - 10px);
-  opacity: 0;
-  transform: scale(0.92);
-  transition: opacity 360ms ease, transform 360ms ease, color 450ms ease;
   white-space: nowrap;
   pointer-events: none;
-  text-shadow: none;
+  color: transparent;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' preserveAspectRatio='none'%3E%3Cpath d='M0 12 C6 9 6 9 12 12 C18 15 18 15 24 12 V24 H0 Z' fill='%23f97316'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 22px 200%;
+  background-position: 0 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  opacity: 0;
 }
 
-.stackNavItem.isPinned:not(.isActive) .stackBadgeTitle,
-.stackNavItem:not(.isActive):active .stackBadgeTitle,
-.stackNavItem:not(.isActive):focus-within:not(:hover) .stackBadgeTitle,
-.stackNavItem.isActive .stackBadgeTitle {
+.pillLink.isActive .pillLabelFill {
   opacity: 1;
-  transform: scale(1);
+  animation: pillWaterFill 1920ms cubic-bezier(0.45, 0, 0.3, 1) both;
 }
 
-.stackNavItem.isActive .stackBadgeTitle {
-  color: #0b1020; /* dark navy on #f97316: ~6.7:1 (WCAG AA) */
+@keyframes pillWaterFill {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -44px 100%;
+  }
 }
 
-.stackNavItem.isActive.isPinned .stackBadgeTitle {
-  color: #1a1a1a;
+/* Sliding highlight behind the current item, positioned from TopNavbar.tsx (transform + width). */
+.pillIndicator {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  width: 0;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  opacity: 0;
+  pointer-events: none;
 }
 
-.stackNavItem:not(.isActive):focus-within:not(:hover) .stackBadgeTitle {
-  color: #c2410c; /* ~5.2:1 on the white badge */
+.pillIndicator.isReady {
+  transition:
+    transform 960ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 960ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 200ms ease;
 }
 
-.stackNavItem.isPinned:not(.isActive) .stackBadge,
-.stackNavItem:not(.isActive):active .stackBadge,
-.stackNavItem:not(.isActive):focus-within:not(:hover) .stackBadge,
-.stackNavItem.isActive .stackBadge {
-  transform: translateY(-2px);
+/* "More" */
+.pillMore {
+  position: relative;
 }
 
-@media (max-width: 900px) {
-  .topNav {
-    top: calc(10px + env(safe-area-inset-top));
-    width: min(720px, calc(100vw - 18px));
+.pillMoreButton.isOpen {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.pillMoreChevron {
+  transition: transform 200ms ease;
+}
+
+.pillMoreButton.isOpen .pillMoreChevron {
+  transform: rotate(180deg);
+}
+
+/* Orange dot when the current section is inside "More". */
+.pillMoreButton.hasActive::before {
+  content: "";
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #f97316;
+}
+
+.pillMenu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: -5px; /* line up with the pill's right edge */
+  min-width: 196px;
+  padding: 6px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(11, 16, 32, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 200ms ease, transform 200ms ease, visibility 0s linear 200ms;
+}
+
+.pillMenu.isOpen {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity 200ms ease, transform 200ms ease, visibility 0s;
+}
+
+.pillMenuList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pillMenuLink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.pillMenuIcon {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.pillMenuIcon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pillMenuLink:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.pillMenuLink:focus-visible {
+  outline-offset: -2px; /* keep the focus ring inside the dropdown */
+}
+
+.pillMenuLink.isActive {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.pillMenuLink.isActive .pillMenuIcon {
+  color: #f97316;
+}
+
+.pillMenuLink.isActive::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 999px;
+  background: #f97316;
+}
+
+/* Tablets: slightly tighter labels so the pill keeps clear space beside ROMI and ASK AI. */
+@media (max-width: 1023px) {
+  .pillLink {
+    padding: 0 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 767px) {
+  .pillLink {
+    padding: 0 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pillLink,
+  .pillIndicator.isReady,
+  .pillMoreChevron,
+  .pillMenu,
+  .pillMenu.isOpen,
+  .pillMenuLink {
+    transition: none;
   }
 
-  .stackNav {
-    width: 100%;
+  /* The current label is simply orange, without the rising fill. */
+  .pillLink.isActive .pillLabelFill {
+    animation: none;
+    background-position: 0 100%;
   }
 
-  .stackNavRow {
-    gap: 4px;
-    padding: 8px 8px;
-  }
-
-  .stackBadge {
-    width: 42px;
-    height: 34px;
-  }
-
-  .stackBadgeIcon {
-    width: 28px;
-    height: 28px;
-  }
-
-  .stackBadgeIcon svg {
-    width: 12px;
-    height: 12px;
+  .pillMenu {
+    transform: none;
   }
 }
 
@@ -489,10 +480,4 @@
   .mobileNav.isOpen .mobileNavPanel {
     transform: translate(-50%, 0);
   }
-}
-
-/* Keyboard focus ring follows the round badge instead of its square hit area. */
-.stackBadge:focus-visible {
-  border-radius: 999px;
-  outline-offset: 1px;
 }
