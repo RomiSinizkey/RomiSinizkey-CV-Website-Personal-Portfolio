@@ -3,32 +3,34 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 22px;
-  margin-top: 38px;
+  gap: 12px;
+  margin-top: clamp(28px, 3.2vw, 40px);
   pointer-events: auto;
 }
 
+/* Secondary (glass) buttons. Orange fill sweeps in from the left on hover. */
 .homeQuickLinkBtn {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 26px;
-  padding: 0 12px;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 11px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-decoration: none;
   text-transform: uppercase;
-  transition: color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+  transition: color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
 }
 
 .homeQuickLinkBtn::before {
@@ -36,17 +38,55 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(180deg, #ff9a3c 0%, #ff6a00 100%);
+  background: #f97316;
   clip-path: inset(0 100% 0 0);
-  transition: clip-path 1400ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: clip-path 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .homeQuickLinkBtn:hover::before {
   clip-path: inset(0 0 0 0);
 }
 
+/* Dark navy text on bright orange keeps the orange identity and passes WCAG AA (about 6.7:1). */
 .homeQuickLinkBtn:hover {
-  color: #ffffff;
-  border-color: rgba(255, 154, 60, 0.5);
-  box-shadow: 0 10px 20px rgba(255, 106, 0, 0.3), 0 0 0 1px rgba(255, 154, 60, 0.25);
+  color: #0b1020;
+  border-color: #f97316;
+  box-shadow: 0 10px 22px rgba(249, 115, 22, 0.3);
+}
+
+/* Primary (Resume): solid orange, a lighter orange sweeps in on hover. */
+.homeQuickLinkBtn.is-primary {
+  border-color: #f97316;
+  background: #f97316;
+  color: #0b1020;
+  box-shadow: 0 10px 22px rgba(249, 115, 22, 0.24);
+}
+
+.homeQuickLinkBtn.is-primary::before {
+  background: #fb923c;
+}
+
+.homeQuickLinkBtn.is-primary:hover {
+  border-color: #fb923c;
+  box-shadow: 0 12px 26px rgba(249, 115, 22, 0.38);
+}
+
+/* Narrow screens: two balanced rows of equal-width buttons. */
+@media (max-width: 480px) {
+  .homeQuickLinks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: min(100%, 340px);
+    gap: 10px;
+  }
+
+  .homeQuickLinkBtn {
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 640px) and (max-height: 620px) {
+  .homeQuickLinks {
+    margin-top: 20px;
+  }
 }

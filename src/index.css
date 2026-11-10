@@ -131,6 +131,12 @@ body{
   opacity: 0.9;
 }
 
+/* Visible keyboard focus for links and buttons (mouse clicks do not trigger :focus-visible). */
+:where(a, button, summary, [role="button"]):focus-visible{
+  outline: 2px solid #f97316;
+  outline-offset: 3px;
+}
+
 a{
   color: inherit;
   text-decoration: none;

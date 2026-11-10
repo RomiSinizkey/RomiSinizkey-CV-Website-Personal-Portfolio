@@ -71,7 +71,20 @@ function QuickFacts() {
   );
 }
 
-function HeaderSection({ firstName, story, showHomeLink = true }: { firstName: string; story: string; showHomeLink?: boolean }) {
+function HeaderSection({
+  firstName,
+  story,
+  showHomeLink = true,
+  headingLevel = "h1",
+}: {
+  firstName: string;
+  story: string;
+  showHomeLink?: boolean;
+  headingLevel?: "h1" | "h2";
+}) {
+  // h1 on the standalone /about page; h2 when embedded on the home page (the hero name is the h1 there).
+  const Heading = headingLevel;
+
   return (
     <motion.div
       className="mb-10 rounded-3xl bg-black/20 backdrop-blur-[2px] p-6 md:p-8 border border-white/10"
@@ -83,9 +96,9 @@ function HeaderSection({ firstName, story, showHomeLink = true }: { firstName: s
         <div className="min-w-0">
           <p className="text-sm font-bold uppercase tracking-[0.3em] text-orange-400/90">About</p>
 
-          <h1 className="mt-3 text-5xl md:text-6xl font-black leading-[1.1] text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+          <Heading className="mt-3 text-5xl md:text-6xl font-black leading-[1.1] text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
             Get to know <span className="text-orange-500">{firstName}</span>
-          </h1>
+          </Heading>
 
           <p className="mt-4 text-xl md:text-2xl font-bold text-white/90 leading-relaxed max-w-3xl">
             {profile.headline}
@@ -128,7 +141,7 @@ export function AboutSection({ embedded = false }: { embedded?: boolean }) {
       )}
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 py-10 pointer-events-auto">
-        <HeaderSection firstName={firstName} story={story} showHomeLink={!embedded} />
+        <HeaderSection firstName={firstName} story={story} showHomeLink={!embedded} headingLevel={embedded ? "h2" : "h1"} />
       </div>
     </div>
   );

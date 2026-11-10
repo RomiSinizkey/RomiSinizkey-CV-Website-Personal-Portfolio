@@ -42,8 +42,8 @@
 }
 
 .aiw-launcher-letter-base {
-  color: rgba(255, 255, 255, 0.18);
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.55);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.75);
 }
 
 .aiw-launcher-letter-fill {
@@ -255,8 +255,8 @@
   bottom: 10px;
   z-index: 20;
 
-  /* Hidden by default (no React state needed) */
-  opacity: 0.05;
+  /* Dimmed by default so the input is still visible on touch screens; full opacity on hover/focus. */
+  opacity: 0.75;
   transform: translateY(10px);
   pointer-events: none;
 }
@@ -421,4 +421,13 @@
   .aiw-input-bar {
     bottom: 8px;
   }
+}
+
+/* Keyboard focus ring for the launcher (the button has no background, so the radius only shapes the ring). */
+.aiw-launcher-button:focus-visible {
+  border-radius: 10px;
+}
+
+.aiw-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.65); /* ~4.9:1 even while the input bar is dimmed to 0.75 */
 }

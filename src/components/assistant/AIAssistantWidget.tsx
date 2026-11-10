@@ -389,6 +389,7 @@ function AnimatedLauncherButton({
       type="button"
       onClick={() => setOpen(true)}
       className="aiw-launcher-button aiw-launcher-animated"
+      aria-label="Ask AI assistant"
       aria-expanded={open}
       aria-controls="portfolio-ai-chat"
       onMouseEnter={() => setHovered(true)}

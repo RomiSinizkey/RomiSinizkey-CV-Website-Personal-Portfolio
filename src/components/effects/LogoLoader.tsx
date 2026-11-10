@@ -1,44 +1,94 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import "./LogoLoader.css";
 
-const MIN_DISPLAY_MS = 8300; // minimum milliseconds the loader stays visible
+// Full intro animation is ~2.8s (see --speed in LogoLoader.css); the page is revealed at 3.2s.
+const MIN_DISPLAY_MS = 3200;
+// With "reduce motion" the CSS shows a static logo; keep it only briefly.
+const REDUCED_MOTION_DISPLAY_MS = 600;
+// Failsafe: reveal the page even if the window "load" event never fires (e.g. a stalled request).
+const MAX_WAIT_MS = 6000;
+// Matches the CSS opacity transition (0.6s) of .logo-loader-overlay.
+const FADE_OUT_MS = 650;
 const INTRO_WORD = "PORTFOLIO";
+const SEEN_KEY = "romi-portfolio-intro-seen";
+
+// sessionStorage can throw (blocked storage, some private modes); then the intro simply plays again.
+function hasSeenIntro() {
+  try {
+    return window.sessionStorage.getItem(SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markIntroSeen() {
+  try {
+    window.sessionStorage.setItem(SEEN_KEY, "1");
+  } catch {
+    // Storage unavailable: nothing to remember.
+  }
+}
+
+function prefersReducedMotion() {
+  return typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 interface Props {
   onDone?: () => void;
 }
 
 export default function LogoLoader({ onDone }: Props) {
+  // Already played in this browser tab: skip it and show the page right away.
+  const [skip] = useState(hasSeenIntro);
   const [hiding, setHiding] = useState(false);
-  const [unmounted, setUnmounted] = useState(false);
-  const startTime = useRef(0);
+  const [unmounted, setUnmounted] = useState(skip);
+  const onDoneRef = useRef(onDone);
 
   useEffect(() => {
-    startTime.current = Date.now();
+    onDoneRef.current = onDone;
+  }, [onDone]);
+
+  useEffect(() => {
+    if (skip) {
+      onDoneRef.current?.();
+      return;
+    }
+
+    markIntroSeen();
+    const startTime = performance.now();
+    const minDisplayMs = prefersReducedMotion() ? REDUCED_MOTION_DISPLAY_MS : MIN_DISPLAY_MS;
+    const timers: number[] = [];
+    let finished = false;
 
     const finish = () => {
-      const elapsed = Date.now() - startTime.current;
-      const remaining = Math.max(0, MIN_DISPLAY_MS - elapsed);
+      if (finished) return;
+      finished = true;
+      const remaining = Math.max(0, minDisplayMs - (performance.now() - startTime));
 
-      setTimeout(() => {
-        // reveal the page immediately so it crossfades in under the
-        // overlay instead of popping in once the fade-out finishes
-        onDone?.();
-        setHiding(true);
-        // remove from DOM after the CSS fade-out transition (0.6s)
-        setTimeout(() => {
-          setUnmounted(true);
-        }, 650);
-      }, remaining);
+      timers.push(
+        window.setTimeout(() => {
+          // reveal the page immediately so it crossfades in under the
+          // overlay instead of popping in once the fade-out finishes
+          onDoneRef.current?.();
+          setHiding(true);
+          // remove from DOM after the CSS fade-out transition
+          timers.push(window.setTimeout(() => setUnmounted(true), FADE_OUT_MS));
+        }, remaining)
+      );
     };
 
     if (document.readyState === "complete") {
       finish();
     } else {
       window.addEventListener("load", finish, { once: true });
-      return () => window.removeEventListener("load", finish);
     }
-  }, [onDone]);
+    timers.push(window.setTimeout(finish, MAX_WAIT_MS));
+
+    return () => {
+      window.removeEventListener("load", finish);
+      timers.forEach((timer) => window.clearTimeout(timer));
+    };
+  }, [skip]);
 
   if (unmounted) return null;
 

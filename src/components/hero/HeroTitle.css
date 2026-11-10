@@ -4,7 +4,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: max-content;
+  width: 100%;
+  max-width: 980px;
 }
 
 .homeHeroTitle::before {
@@ -17,6 +18,37 @@
   height: 340px;
   border-radius: 32px;
   pointer-events: none;
+}
+
+/* Name: the page's main heading. */
+.homeHeroName {
+  color: #ffffff;
+  font-size: clamp(2.25rem, 10vw, 5.25rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+/* "Computer Science": the orange animated letters, second in the hierarchy. */
+.homeHeroField {
+  margin-top: clamp(6px, 1vw, 12px);
+  font-size: clamp(1.75rem, 7vw, 4rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+/* Role: small, letter-spaced supporting line (same style family as the intro wordmark). */
+.homeHeroRole {
+  margin-top: clamp(14px, 1.8vw, 22px);
+  padding-left: 0.28em; /* balances the trailing letter-spacing so the line stays centered */
+  color: rgba(255, 255, 255, 0.72);
+  font-size: clamp(0.8125rem, 1.15vw, 1rem);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
 }
 
 .heroComputerscienceChar {
@@ -36,6 +68,13 @@
 
 .heroComputerscienceChar.is-space {
   width: 0.25em;
+}
+
+/* Short phones (e.g. 320×568): tighten vertical spacing so the hero fits the first screen. */
+@media (max-width: 640px) and (max-height: 620px) {
+  .homeHeroRole {
+    margin-top: 12px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

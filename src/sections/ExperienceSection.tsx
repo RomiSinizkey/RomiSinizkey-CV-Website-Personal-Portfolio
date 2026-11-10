@@ -17,7 +17,7 @@ export function ExperienceSection({ embedded = false }: ExperienceSectionProps) 
               <div key={`${exp.company}-${idx}`} className="homepage-glass-card">
                 <h3 className="text-xl font-bold text-slate-900">{exp.title}</h3>
                 <p className="mt-1 text-slate-700">{exp.company}</p>
-                <p className="mt-1 text-sm text-slate-500">{exp.years}</p>
+                <p className="mt-1 text-sm text-slate-700">{exp.years}</p>
                 <ul className="mt-4 space-y-2 text-sm text-slate-700">
                   {exp.bullets.map((bullet) => (
                     <li key={bullet}>• {bullet}</li>

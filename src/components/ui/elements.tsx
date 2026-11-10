@@ -12,7 +12,7 @@ type LabelSize = "sm" | "md" | "lg";
 type DividerVariant = "soft" | "bold";
 
 const buttonVariantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-orange-600 text-white hover:bg-orange-700 active:bg-orange-800",
+  primary: "bg-[#F97316] text-[#0B1020] hover:bg-[#FB923C] active:bg-[#EA580C]",
   secondary: "bg-sky-600 text-white hover:bg-sky-700 active:bg-sky-800",
   outline: "border-2 border-orange-600 text-orange-600 hover:bg-orange-50",
   ghost: "text-orange-600 hover:bg-orange-50 active:bg-orange-100",

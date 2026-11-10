@@ -3,8 +3,11 @@
 ========================= */
 
 .logo-loader-overlay {
-  --dur: 3.8s;
-  --word-dur: 1.85s;
+  /* --speed scales every intro timing (1 = original 5.65s animation). 0.5 keeps the full sequence
+     at half the length; LogoLoader.tsx reveals the page at 3.2s. */
+  --speed: 0.5;
+  --dur: calc(3.8s * var(--speed));
+  --word-dur: calc(1.85s * var(--speed));
   --purple: #8a2be2;
   --indigo: #6a5cff;
   --cyan: #00d4ff;
@@ -47,8 +50,8 @@
   align-items: center;
   justify-content: center;
   /* fully visible (default opacity) until the delay below elapses, then fades */
-  animation: ll-word-fade-out 0.35s ease forwards;
-  animation-delay: 1.5s;
+  animation: ll-word-fade-out calc(0.35s * var(--speed)) ease forwards;
+  animation-delay: calc(1.5s * var(--speed));
 }
 
 .ll-word {
@@ -59,8 +62,8 @@
   letter-spacing: 0.22em;
   color: #fff;
   text-transform: uppercase;
-  animation: ll-word-glow-flash 0.35s ease forwards;
-  animation-delay: 1.3s;
+  animation: ll-word-glow-flash calc(0.35s * var(--speed)) ease forwards;
+  animation-delay: calc(1.3s * var(--speed));
   filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
 }
 
@@ -82,8 +85,8 @@
   -webkit-text-stroke: 1.4px rgba(255, 255, 255, 0.9);
   color: transparent;
   opacity: 0;
-  animation: ll-word-outline-in 0.32s ease forwards;
-  animation-delay: calc(var(--i) * 0.08s);
+  animation: ll-word-outline-in calc(0.32s * var(--speed)) ease forwards;
+  animation-delay: calc(var(--i) * 0.08s * var(--speed));
 }
 
 .ll-word-letter::after {
@@ -92,8 +95,8 @@
   background-clip: text;
   color: transparent;
   clip-path: inset(100% 0 0 0);
-  animation: ll-word-fill-rise 0.38s cubic-bezier(0.65, 0, 0.35, 1) forwards;
-  animation-delay: calc(var(--i) * 0.08s + 0.1s);
+  animation: ll-word-fill-rise calc(0.38s * var(--speed)) cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation-delay: calc((var(--i) * 0.08s + 0.1s) * var(--speed));
 }
 
 .ll-mark {

@@ -34,7 +34,10 @@ export default function RootLayout({ ready = false }: Props) {
         <ScrollProgressBar />
         <TopNavbar />
         <AIAssistantWidget ready={ready} />
-        <Outlet context={{ ready }} />
+        {/* inert while the overlay covers this page (same condition), so its hidden content cannot be focused or clicked. */}
+        <main id="main-content" inert={shouldShowOverlay}>
+          <Outlet context={{ ready }} />
+        </main>
       </div>
     </div>
   );

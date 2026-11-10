@@ -68,6 +68,11 @@ export default function HomePage() {
     activeSection !== "home-section" &&
     activeSection !== "about-section" &&
     import.meta.env.PROD;
+  // Sections covered by the Under Construction overlay are `inert` in production (no keyboard focus,
+  // clicks or screen-reader access). Always on, not only while the overlay shows, so Tab can never slip
+  // into them from Home/About before the overlay appears. Off in local development.
+  // To remove Under Construction: delete this constant and its `inert` uses below.
+  const sectionsUnderConstruction = import.meta.env.PROD;
 
   return (
     <div className="relative w-full overflow-x-hidden">
@@ -76,14 +81,15 @@ export default function HomePage() {
       <section
       id="home-section"
       ref={homeSectionRef}
-      className="relative min-h-screen"
+      className="relative flex min-h-screen flex-col items-center justify-center px-4 pt-28 pb-14"
     >
       <div className="pointer-events-auto absolute top-4 left-4 z-30">
         <NameLogo />
       </div>
 
-      {/* TRUE CENTER */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
+      {/* Centered in the space below the fixed navbar (the top padding clears it). The section grows
+          instead of overlapping the navbar when the content is taller than a short phone screen. */}
+      <div className="relative z-20 flex w-full flex-col items-center">
         <HeroTitle />
         <QuickLinks />
       </div>
@@ -100,6 +106,7 @@ export default function HomePage() {
 
       <section
         id="projects-section"
+        inert={sectionsUnderConstruction}
         className="relative z-20 min-h-[120vh] px-6 py-28"
       >
         <ProjectsSection embedded />
@@ -107,6 +114,7 @@ export default function HomePage() {
 
       <section
         id="education-section"
+        inert={sectionsUnderConstruction}
         className="relative z-20 min-h-[120vh] px-6 py-28"
       >
         <EducationSection embedded />
@@ -114,6 +122,7 @@ export default function HomePage() {
 
       <section
         id="experience-section"
+        inert={sectionsUnderConstruction}
         className="relative z-20 min-h-[120vh] px-6 py-28"
       >
         <ExperienceSection embedded />
@@ -121,6 +130,7 @@ export default function HomePage() {
 
       <section
         id="skills-section"
+        inert={sectionsUnderConstruction}
         className="relative z-20 min-h-[120vh] px-6 py-28"
       >
         <SkillsSection />
@@ -128,6 +138,7 @@ export default function HomePage() {
 
       <section
         id="languages-section"
+        inert={sectionsUnderConstruction}
         className="relative z-20 min-h-[120vh] px-6 py-28"
       >
         <LanguagesSection />

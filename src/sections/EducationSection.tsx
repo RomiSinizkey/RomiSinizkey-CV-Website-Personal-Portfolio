@@ -17,7 +17,7 @@ export function EducationSection({ embedded = false }: EducationSectionProps) {
               <div key={`${edu.institution}-${idx}`} className="homepage-glass-card">
                 <h3 className="text-xl font-bold text-slate-900">{edu.degree}</h3>
                 <p className="mt-1 text-slate-700">{edu.institution}</p>
-                <p className="mt-1 text-sm text-slate-500">{edu.years}</p>
+                <p className="mt-1 text-sm text-slate-700">{edu.years}</p>
                 {edu.details?.length ? (
                   <ul className="mt-4 space-y-2 text-sm text-slate-700">
                     {edu.details.map((detail) => (

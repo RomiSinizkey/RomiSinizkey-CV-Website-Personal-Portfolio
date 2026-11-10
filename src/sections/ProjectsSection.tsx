@@ -17,7 +17,6 @@ export function ProjectsSection({ embedded = false }: ProjectsSectionProps) {
           <div id="projects-preview" className="h-px w-px" aria-hidden="true" />
           <div className="mx-auto w-full max-w-5xl">
             <h2 className="homepage-section-title">Projects</h2>
-            <p className="mt-3 text-slate-600">A single-page flow: scroll to move between sections.</p>
 
             <div className="mt-8 grid gap-5 md:grid-cols-2">
               {profile.projects.map((project) => (
@@ -29,7 +28,7 @@ export function ProjectsSection({ embedded = false }: ProjectsSectionProps) {
                   className="homepage-glass-card transition hover:-translate-y-1"
                 >
                   <h3 className="text-xl font-bold text-slate-900">{project.name}</h3>
-                  <p className="mt-2 text-sm text-slate-600">{project.desc}</p>
+                  <p className="mt-2 text-sm text-slate-800">{project.desc}</p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {project.tech.map((tech) => (
                       <span key={`${project.name}-${tech}`} className="homepage-pill-dark">
@@ -73,13 +72,13 @@ export function ProjectsSection({ embedded = false }: ProjectsSectionProps) {
                   >
                     <Card interactive className="h-full">
                       <Stack direction="col" gap={4} align="start">
-                        <h3 className="text-xl font-bold">{project.name}</h3>
+                        <h2 className="text-xl font-bold text-slate-900">{project.name}</h2>
                         <p className="text-sm text-gray-600">{project.desc}</p>
 
                         <Divider />
 
                         <div className="w-full">
-                          <Label className="mb-2 text-orange-600">Tech Stack</Label>
+                          <Label className="mb-2 text-orange-700">Tech Stack</Label>
                           <Stack direction="row" gap={2} wrap align="start">
                             {project.tech.map((tech) => (
                               <Badge key={tech} variant="primary" size="sm">

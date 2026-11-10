@@ -23,6 +23,8 @@ export type ProjectItem = {
 
 export type Profile = {
   fullName: string;
+  /** Hero supporting line under the animated "Computer Science". */
+  role: string;
   headline: string;
   location?: string;
   summary: string;
@@ -39,10 +41,11 @@ export type Profile = {
 
 export const profile: Profile = {
   fullName: "Romi Sinizkey",
+  role: "Software Developer",
   headline: "Computer Science Student | Software Developer",
   location: "Israel, Tzur Hadassah",
   summary:
-    "3rd-year Computer Science student with strong foundations in algorithms, data structures, operating systems, and web development. I work hands-on with Python, JavaScript, C, C++, and SQL, and I'm currently building a live production platform at a startup — full-stack, from customer order search to data management and system integration. Looking for an internship or entry-level role where I can keep growing as a backend, full-stack, or frontend engineer.",
+    "3rd-year Computer Science student with strong foundations in algorithms, data structures, operating systems, and web development. I work hands-on with Python, JavaScript, C, C++, and SQL, and I've built features on a live production platform at a startup — full-stack, from customer order search to data management and system integration. Looking for an internship or entry-level role where I can keep growing as a backend, full-stack, or frontend engineer.",
   socials: [
     { label: "GitHub", href: "https://github.com/RomiSinizkey" },
     { label: "LinkedIn", href: "https://www.linkedin.com/in/romi-sinizkey-30a7b7322/" }
@@ -65,9 +68,9 @@ export const profile: Profile = {
       company: "Bridgify",
       years: "Dec 2025 (Temporary)",
       bullets: [
-        "Building both frontend and backend features on a live production platform, including UIs with React and server-side logic with Python",
-        "Designing, developing, and improving system components, and integrating new features into existing systems",
-        "Collaborating closely with the development team on feature development, debugging, and maintaining production-quality code"
+        "Built both frontend and backend features on a live production platform, including UIs with React and server-side logic with Python",
+        "Designed, developed, and improved system components, and integrated new features into existing systems",
+        "Collaborated closely with the development team on feature development, debugging, and maintaining production-quality code"
       ]
     }
   ],

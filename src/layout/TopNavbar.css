@@ -111,12 +111,12 @@
   width: var(--hover-width);
   height: 31px;
   color: transparent;
-  background: linear-gradient(180deg, #f97316, #ea580c);
+  background: #f97316;
   transform: scale(1);
   box-shadow:
     0 14px 28px rgba(15, 23, 42, 0.24),
-    0 0 20px rgba(234, 88, 12, 0.4);
-  transition: width 650ms cubic-bezier(0.34, 1.56, 0.64, 1), height 650ms cubic-bezier(0.34, 1.56, 0.64, 1), transform 320ms ease, color 420ms ease, background 1800ms ease, box-shadow 1800ms ease, opacity 260ms ease;
+    0 0 20px rgba(249, 115, 22, 0.4);
+  transition: width 650ms cubic-bezier(0.34, 1.56, 0.64, 1), height 650ms cubic-bezier(0.34, 1.56, 0.64, 1), transform 320ms ease, color 420ms ease, background 450ms ease, box-shadow 450ms ease, opacity 260ms ease;
 }
 
 .stackNavItem.isActive.isPinned .stackBadgeIcon {
@@ -231,7 +231,7 @@
   max-width: calc(var(--hover-width) - 10px);
   opacity: 0;
   transform: scale(0.92);
-  transition: opacity 360ms ease, transform 360ms ease, color 1800ms ease;
+  transition: opacity 360ms ease, transform 360ms ease, color 450ms ease;
   white-space: nowrap;
   pointer-events: none;
   text-shadow: none;
@@ -246,7 +246,7 @@
 }
 
 .stackNavItem.isActive .stackBadgeTitle {
-  color: #ffffff;
+  color: #0b1020; /* dark navy on #f97316: ~6.7:1 (WCAG AA) */
 }
 
 .stackNavItem.isActive.isPinned .stackBadgeTitle {
@@ -254,7 +254,7 @@
 }
 
 .stackNavItem:not(.isActive):focus-within:not(:hover) .stackBadgeTitle {
-  color: #ea580c;
+  color: #c2410c; /* ~5.2:1 on the white badge */
 }
 
 .stackNavItem.isPinned:not(.isActive) .stackBadge,
@@ -295,10 +295,204 @@
   }
 }
 
-/* Phones: the badge row is wider than the gap between the ROMI logo (top-left)
-   and the ASK AI launcher (top-right), so give the navbar its own row below them. */
+/* =========================
+   MOBILE NAVIGATION (<= 640px)
+   The badge row is replaced by a compact 44px menu button between the ROMI logo and the
+   ASK AI launcher; it opens a dropdown with every destination. Tablet/desktop are unchanged.
+   Breakpoint is mirrored in TopNavbar.tsx (MOBILE_NAV_QUERY).
+========================= */
+
+.mobileNav {
+  display: none;
+}
+
 @media (max-width: 640px) {
   .topNav {
-    top: calc(68px + env(safe-area-inset-top));
+    display: none;
   }
+
+  .mobileNav {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 99999; /* same layer as the desktop navbar: above Under Construction, below ASK AI */
+  }
+}
+
+/* Closed state: a glass button in the same style as the hero buttons, centered on the logo/ASK AI row. */
+.mobileNavTrigger {
+  position: fixed;
+  top: calc(22px + env(safe-area-inset-top));
+  left: 50%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: -22px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(11, 16, 32, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: border-color 240ms ease, box-shadow 240ms ease;
+}
+
+.mobileNavTrigger:hover,
+.mobileNav.isOpen .mobileNavTrigger {
+  border-color: rgba(249, 115, 22, 0.75);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3), 0 0 18px rgba(249, 115, 22, 0.22);
+}
+
+/* Menu icon turns into a close icon. */
+.mobileNavIcon {
+  grid-area: 1 / 1;
+  transition: opacity 200ms ease, transform 240ms ease;
+}
+
+.mobileNavIconClose,
+.mobileNav.isOpen .mobileNavIconOpen {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.6);
+}
+
+.mobileNav.isOpen .mobileNavIconClose {
+  opacity: 1;
+  transform: none;
+}
+
+/* Page dimming while open; tapping it closes the menu. */
+.mobileNavBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+}
+
+.mobileNav.isOpen .mobileNavBackdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Open state: dark navy glass dropdown. Hidden with visibility, so closed items are not focusable. */
+.mobileNavPanel {
+  position: fixed;
+  top: calc(74px + env(safe-area-inset-top));
+  left: 50%;
+  z-index: 2;
+  width: min(320px, calc(100vw - 32px));
+  max-height: calc(100dvh - 90px - env(safe-area-inset-top));
+  overflow-y: auto;
+  padding: 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(11, 16, 32, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -6px) scale(0.98);
+  transform-origin: top center;
+  transition: opacity 240ms ease, transform 240ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 240ms;
+}
+
+.mobileNav.isOpen .mobileNavPanel {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0) scale(1);
+  transition: opacity 240ms ease, transform 240ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s;
+}
+
+.mobileNavList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mobileNavLink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.mobileNavLinkIcon {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.mobileNavLinkIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mobileNavLink:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.mobileNavLink:focus-visible {
+  outline-offset: -2px; /* keep the focus ring inside the panel */
+}
+
+/* Current section/page: orange text, icon and a slim accent bar. */
+.mobileNavLink.isActive {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.mobileNavLink.isActive .mobileNavLinkIcon {
+  color: #f97316;
+}
+
+.mobileNavLink.isActive::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 999px;
+  background: #f97316;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileNavTrigger,
+  .mobileNavIcon,
+  .mobileNavBackdrop,
+  .mobileNavPanel,
+  .mobileNav.isOpen .mobileNavPanel,
+  .mobileNavLink {
+    transition: none;
+  }
+
+  .mobileNavPanel,
+  .mobileNav.isOpen .mobileNavPanel {
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Keyboard focus ring follows the round badge instead of its square hit area. */
+.stackBadge:focus-visible {
+  border-radius: 999px;
+  outline-offset: 1px;
 }

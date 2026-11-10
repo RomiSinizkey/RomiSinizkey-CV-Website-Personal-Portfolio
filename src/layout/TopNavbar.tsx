@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 import type { CSSProperties, MouseEvent } from "react";
 import { scrollToSection } from "@/lib/scrollToSection";
 import "./TopNavbar.css";
@@ -74,6 +75,9 @@ function renderBadgeIcon(icon: BadgeNav["icon"]) {
   }
 }
 
+// Phones get the compact menu button instead of the badge row (keep in sync with TopNavbar.css).
+const MOBILE_NAV_QUERY = "(max-width: 640px)";
+
 function getBadgeHoverWidth(label: string) {
   return Math.max(84, Math.min(116, label.length * 8 + 22));
 }
@@ -86,6 +90,20 @@ export default function TopNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home-section");
   const [pinnedId, setPinnedId] = useState<string | null>(null);
+
+  // Mobile menu (<= 640px). "Open" is tied to the current page (history key + path; the key alone is
+  // "default" for hash-only changes), so any route change, including browser back/forward, closes it.
+  const pageKey = `${location.key}:${location.pathname}`;
+  const [menuOpenKey, setMenuOpenKey] = useState<string | null>(null);
+  const isMenuOpen = menuOpenKey === pageKey;
+  const menuTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const menuPanelRef = useRef<HTMLElement | null>(null);
+  const menuPanelId = useId();
+
+  const closeMenu = useCallback((restoreFocus = false) => {
+    setMenuOpenKey(null);
+    if (restoreFocus) menuTriggerRef.current?.focus({ preventScroll: true });
+  }, []);
 
   useEffect(() => {
     const syncScrolled = () => {
@@ -153,9 +171,52 @@ export default function TopNavbar() {
     };
   }, [location.pathname]);
 
-  const onBadgeClick = (badge: BadgeNav) => (e: MouseEvent) => {
-    e.preventDefault();
-    setPinnedId(badge.id);
+  // While the menu is open: Escape closes it (focus returns to the button), and pressing anywhere
+  // outside it closes it. That includes the ASK AI launcher, so the two are never open together.
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeMenu(true);
+      }
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (menuPanelRef.current?.contains(target) || menuTriggerRef.current?.contains(target)) return;
+      closeMenu();
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown);
+    // Put focus on the current item so keyboard users can continue with Tab right away.
+    const frame = requestAnimationFrame(() => {
+      const panel = menuPanelRef.current;
+      (panel?.querySelector<HTMLElement>("[aria-current]") ?? panel?.querySelector<HTMLElement>("a"))?.focus({ preventScroll: true });
+    });
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
+      cancelAnimationFrame(frame);
+    };
+  }, [isMenuOpen, closeMenu]);
+
+  // Widening past the phone breakpoint closes the menu (the desktop navbar takes over).
+  useEffect(() => {
+    const media = window.matchMedia(MOBILE_NAV_QUERY);
+    const onChange = () => {
+      if (!media.matches) setMenuOpenKey(null);
+    };
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
+
+  const isBadgeActive = (badge: BadgeNav) =>
+    location.pathname === "/" ? activeSection === badge.sectionId : routeActiveBadgeId === badge.id;
+
+  const goToBadge = (badge: BadgeNav) => {
     setActiveSection(badge.sectionId);
 
     if (location.pathname !== "/") {
@@ -170,41 +231,103 @@ export default function TopNavbar() {
     scrollToSection(badge.sectionId);
   };
 
-  return (
-    <header className={cn("topNav", scrolled && "isScrolled")}>
-      <nav className="stackNav" aria-label="Primary">
-        <ul className="stackNavRow" onMouseLeave={() => setPinnedId(null)}>
-          {badges.map((badge, index) => {
-            const isActive = location.pathname === "/"
-              ? activeSection === badge.sectionId
-              : routeActiveBadgeId === badge.id;
-            const hoverWidth = getBadgeHoverWidth(badge.label);
+  const onBadgeClick = (badge: BadgeNav) => (e: MouseEvent) => {
+    e.preventDefault();
+    setPinnedId(badge.id);
+    goToBadge(badge);
+  };
 
-            return (
-              <li
-                key={badge.id}
-                className={cn("stackNavItem", isActive && "isActive", pinnedId === badge.id && "isPinned")}
-                onMouseEnter={() => setPinnedId(badge.id)}
-                style={{
-                  "--i": badge.colorStart,
-                  "--j": badge.colorEnd,
-                  "--hover-width": `${hoverWidth}px`,
-                  "--delay": `${50 + index * 45}ms`,
-                } as CSSProperties}
-              >
-                <a
-                  href={`#${badge.sectionId}`}
-                  onClick={onBadgeClick(badge)}
-                  className="stackBadge"
+  const onMenuItemClick = (badge: BadgeNav) => (e: MouseEvent) => {
+    e.preventDefault();
+    closeMenu(true);
+    goToBadge(badge);
+  };
+
+  return (
+    <>
+      <header className={cn("topNav", scrolled && "isScrolled")}>
+        <nav className="stackNav" aria-label="Primary">
+          <ul className="stackNavRow" onMouseLeave={() => setPinnedId(null)}>
+            {badges.map((badge, index) => {
+              const isActive = isBadgeActive(badge);
+              const hoverWidth = getBadgeHoverWidth(badge.label);
+
+              return (
+                <li
+                  key={badge.id}
+                  className={cn("stackNavItem", isActive && "isActive", pinnedId === badge.id && "isPinned")}
+                  onMouseEnter={() => setPinnedId(badge.id)}
+                  style={{
+                    "--i": badge.colorStart,
+                    "--j": badge.colorEnd,
+                    "--hover-width": `${hoverWidth}px`,
+                    "--delay": `${50 + index * 45}ms`,
+                  } as CSSProperties}
                 >
-                  <span className="stackBadgeIcon" aria-hidden="true">{renderBadgeIcon(badge.icon)}</span>
-                  <span className="stackBadgeTitle">{badge.label}</span>
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-    </header>
+                  <a
+                    href={`#${badge.sectionId}`}
+                    onClick={onBadgeClick(badge)}
+                    className="stackBadge"
+                  >
+                    <span className="stackBadgeIcon" aria-hidden="true">{renderBadgeIcon(badge.icon)}</span>
+                    <span className="stackBadgeTitle">{badge.label}</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </header>
+
+      {/* Phones (<= 640px, see TopNavbar.css): a 44px menu button that opens a dropdown with every destination. */}
+      <div className={cn("mobileNav", isMenuOpen && "isOpen")}>
+        <button
+          ref={menuTriggerRef}
+          type="button"
+          className="mobileNavTrigger"
+          aria-label="Navigation menu"
+          aria-expanded={isMenuOpen}
+          aria-controls={menuPanelId}
+          onClick={() => (isMenuOpen ? closeMenu() : setMenuOpenKey(pageKey))}
+        >
+          <Menu className="mobileNavIcon mobileNavIconOpen" size={20} strokeWidth={2} aria-hidden="true" />
+          <X className="mobileNavIcon mobileNavIconClose" size={20} strokeWidth={2} aria-hidden="true" />
+        </button>
+
+        <div className="mobileNavBackdrop" aria-hidden="true" />
+
+        <nav
+          ref={menuPanelRef}
+          id={menuPanelId}
+          className="mobileNavPanel"
+          aria-label="Primary"
+          onBlur={(event) => {
+            // Tabbing out of the menu closes it (a null target means the window lost focus: keep it open).
+            const next = event.relatedTarget as Node | null;
+            if (next && !menuPanelRef.current?.contains(next) && !menuTriggerRef.current?.contains(next)) closeMenu();
+          }}
+        >
+          <ul className="mobileNavList">
+            {badges.map((badge) => {
+              const isActive = isBadgeActive(badge);
+
+              return (
+                <li key={badge.id}>
+                  <a
+                    href={`#${badge.sectionId}`}
+                    onClick={onMenuItemClick(badge)}
+                    className={cn("mobileNavLink", isActive && "isActive")}
+                    aria-current={isActive ? (location.pathname === "/" ? "location" : "page") : undefined}
+                  >
+                    <span className="mobileNavLinkIcon" aria-hidden="true">{renderBadgeIcon(badge.icon)}</span>
+                    <span>{badge.label}</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </div>
+    </>
   );
 }

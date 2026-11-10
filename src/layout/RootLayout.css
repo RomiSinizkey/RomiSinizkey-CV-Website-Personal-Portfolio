@@ -22,16 +22,10 @@
 }
 
 /* Standalone pages (/about, /projects, ...): start content below the fixed navbar and ASK AI
-   launcher. Desktop (>= 1024px) is unchanged; phones need more room because the navbar
-   moves to its own row below the logo/launcher (see TopNavbar.css). */
+   launcher. Desktop (>= 1024px) is unchanged; phones (<= 640px) use the compact menu button,
+   which fits in the same top row, so the same spacing works there too. */
 @media (max-width: 1023px) {
   .content-wrapper.is-subpage {
     padding-top: 56px;
-  }
-}
-
-@media (max-width: 640px) {
-  .content-wrapper.is-subpage {
-    padding-top: 112px;
   }
 }
